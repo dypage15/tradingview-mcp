@@ -1,0 +1,119 @@
+{
+  "success": true,
+  "generatedAt": "2026-04-19T20:40:03.484Z",
+  "entityId": "faV5i7",
+  "advisorSubstring": "CBC LIQUIDITY PRO V5",
+  "gridSlice": "0:3",
+  "grid": {
+    "in_2_atrRatioMin": [
+      1,
+      1.2,
+      1.4,
+      1.6,
+      1.8
+    ],
+    "in_3_moveCountMin": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "in_4_moveThresholdPts": [
+      35,
+      45,
+      55,
+      65
+    ],
+    "in_12_sweepThPts": [
+      0.3,
+      0.5,
+      0.7
+    ]
+  },
+  "countOk": 3,
+  "countFail": 0,
+  "top25": [
+    {
+      "scenarioId": 0,
+      "in_2": 1,
+      "in_3": 2,
+      "in_4": 35,
+      "in_12": 0.3,
+      "netProfit": 0,
+      "totalTrades": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "strategy_name": "CBC LIQUIDITY PRO V5",
+      "score": 0
+    },
+    {
+      "scenarioId": 1,
+      "in_2": 1,
+      "in_3": 2,
+      "in_4": 35,
+      "in_12": 0.5,
+      "netProfit": 0,
+      "totalTrades": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "strategy_name": "CBC LIQUIDITY PRO V5",
+      "score": 0
+    },
+    {
+      "scenarioId": 2,
+      "in_2": 1,
+      "in_3": 2,
+      "in_4": 35,
+      "in_12": 0.7,
+      "netProfit": 0,
+      "totalTrades": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "strategy_name": "CBC LIQUIDITY PRO V5",
+      "score": 0
+    }
+  ],
+  "failedSample": [],
+  "all": [
+    {
+      "scenarioId": 0,
+      "in_2": 1,
+      "in_3": 2,
+      "in_4": 35,
+      "in_12": 0.3,
+      "netProfit": 0,
+      "totalTrades": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "strategy_name": "CBC LIQUIDITY PRO V5",
+      "score": 0
+    },
+    {
+      "scenarioId": 1,
+      "in_2": 1,
+      "in_3": 2,
+      "in_4": 35,
+      "in_12": 0.5,
+      "netProfit": 0,
+      "totalTrades": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "strategy_name": "CBC LIQUIDITY PRO V5",
+      "score": 0
+    },
+    {
+      "scenarioId": 2,
+      "in_2": 1,
+      "in_3": 2,
+      "in_4": 35,
+      "in_12": 0.7,
+      "netProfit": 0,
+      "totalTrades": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "strategy_name": "CBC LIQUIDITY PRO V5",
+      "score": 0
+    }
+  ]
+}

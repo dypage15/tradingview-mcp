@@ -1,0 +1,101 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\clreg23_session_2026-05-22T05-30-36",
+  "scenario_count": 7,
+  "profitable_count": 2,
+  "best": {
+    "scenarioId": 0,
+    "spec": {
+      "rsiMode": "Combined",
+      "rsiLen": 6,
+      "confLookback": 3,
+      "cloudSmooth": 3,
+      "minBarsBetween": 0,
+      "minCloudSep": 0,
+      "riskMode": "Points",
+      "tpPoints": 30,
+      "slPoints": 15,
+      "useSession": false,
+      "sessStart": "0930-1600",
+      "sessionLabel": "off"
+    },
+    "error": null,
+    "totalTrades": 551,
+    "percentProfitable": 37.74954627949184,
+    "profitFactor": 1.1294622616148167,
+    "netProfit": 2581.2599999999366,
+    "expectancy": 4.684682395644168,
+    "execution_table": {
+      "parsed": true,
+      "dataSource": "engine",
+      "signalsLong": 302,
+      "signalsShort": 307,
+      "fillsLong": 0,
+      "fillsShort": 0,
+      "closedTrades": 551,
+      "engineClosed": 551,
+      "recordedWins": 208,
+      "recordedLosses": 343,
+      "winPct": 37.7,
+      "netPts": 2581.26,
+      "profitFactor": 1.13,
+      "bullFlips": 303,
+      "bearFlips": 309,
+      "missedLong": 1,
+      "missedShort": 2
+    },
+    "metrics_source": "tester_or_engine",
+    "metConstraint": true,
+    "score": 211.01864904645421
+  },
+  "top_all": [
+    {
+      "session": "off",
+      "net": 2581.2599999999366,
+      "pf": 1.1294622616148167,
+      "wr": 37.74954627949184,
+      "trades": 551
+    },
+    {
+      "session": "rth_0930_1600",
+      "net": 2581.2599999999366,
+      "pf": 1.1294622616148167,
+      "wr": 37.74954627949184,
+      "trades": 551
+    },
+    {
+      "session": "globex_evening_1800_2359",
+      "net": -108.57999999999038,
+      "pf": 0.9651857741981024,
+      "wr": 35.91549295774648,
+      "trades": 142
+    },
+    {
+      "session": "ny_open_0830_1130",
+      "net": -389.81999999999425,
+      "pf": 0.8838334773668699,
+      "wr": 40.86021505376344,
+      "trades": 93
+    },
+    {
+      "session": "morning_0930_1200",
+      "net": -444.6800000000005,
+      "pf": 0.775373300195995,
+      "wr": 36.84210526315789,
+      "trades": 57
+    },
+    {
+      "session": "extended_0800_1600",
+      "net": -1018.579999999969,
+      "pf": 0.8546733438913422,
+      "wr": 37.78801843317972,
+      "trades": 217
+    },
+    {
+      "session": "london_0700_1100",
+      "net": -1193.2199999999875,
+      "pf": 0.7387963644005486,
+      "wr": 34.375,
+      "trades": 128
+    }
+  ]
+}

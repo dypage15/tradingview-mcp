@@ -1,0 +1,844 @@
+================================================================================
+DOYLE S&D (v61.1 - Signal Fix) + SWEEP V2 — 250 QUESTION REVIEW NOTEPAD
+================================================================================
+Created: 2026-04-05
+Purpose: Structured Q&A for trade review, confluence gaps, and drawdown thinking.
+
+IMPORTANT — FACTUAL BASIS (read first)
+--------------------------------------------------------------------------------
+• Sweep Engine v2.0: Answers about logic, sessions, sweeps, filters, and risk are
+  grounded in the local Pine source `sweep-engine-v2-export.pine` (repo:
+  tradingview-mcp). No Pine files were modified to produce this document.
+
+• Doyle S&D (v61.1 - Signal Fix): Source code is NOT present in this workspace.
+  This document does NOT claim how Doyle draws zones, validates signals, or what
+  “Signal Fix” changed. Where Doyle is mentioned, answers are either (a) how to
+  compare overlays honestly on your chart, or (b) general supply/demand concepts
+  — not verified facts about v61.1.
+
+• Your actual winners/losers: No Strategy Tester export or trade list was
+  attached. Answers cannot truthfully say “your losing trades were mostly X”
+  without that data. Where relevant, the answer says what TO measure.
+
+================================================================================
+SECTION A — SCOPE, EVIDENCE, AND WHAT “FACTUAL” MEANS HERE (Q1–Q25)
+================================================================================
+
+Q001: Can this notepad list which of my trades were “right” or “wrong” with numbers?
+A001: No. Without an exported trade list or screenshots tied to bar times, only
+      general mechanics and hypotheses are possible.
+
+Q002: Is Sweep v2’s sweep definition the same as ICT “liquidity sweep”?
+A002: Sweep v2 implements a precise pattern: wick through a session level and
+      close back through it (see sweepIBlo/sweepIBhi etc. in code). Similar idea;
+      exact bar rules may differ from informal ICT labels.
+
+Q003: Does Sweep v2 know about order blocks or breaker blocks?
+A003: Not as entry logic. Tier 3 Fibs/OB are optional display (i_showT3); they
+      are not part of the default sweep entry conditions.
+
+Q004: Where does session time come from?
+A004: hour/minute in America/Chicago (CT). IB, London, Asia windows are coded
+      explicitly in the script.
+
+Q005: Is VWAP session-based?
+A005: VWAP resets on the script’s new day (ta.change(time("D"))), i.e. calendar
+      day boundary for the chart’s session — verify against your futures RTH
+      expectations.
+
+Q006: Can I trust “predConf” as win probability?
+A006: No. Comments in code state confidence is a heuristic composite, not true
+      probability.
+
+Q007: What is the honest limitation regarding Doyle + Sweep together?
+A007: Confluence between two studies must be verified visually or by exporting
+      bar-aligned data. This file cannot assert correlation without your data.
+
+Q008: Would adding “more indicators” always reduce drawdown?
+A008: Not necessarily. More filters reduce sample size and can overfit past data.
+
+Q009: Is max DD in the tester the same as the script’s $ drawdown guard?
+A009: Related but not identical. The guard uses peak strategy.equity vs current;
+      tester metrics use TradingView’s definitions and path dependency.
+
+Q010: Does reactive mode enter on the same bar as the sweep?
+A010: Orders use process_orders_on_close=true; logic is evaluated for the bar’s
+      close context as coded — entries fire when signal conditions align on that
+      evaluation model.
+
+Q011: Can London sweeps fire outside killzone hours?
+A011: London sweep long/short use isKillzone in the sweep conditions (code).
+
+Q012: Can IB sweeps fire outside post-IB?
+A012: IB sweeps require isPostIB for IB-defined sweeps (code).
+
+Q013: Is Asia sweep gated by killzone?
+A013: Yes for sweepAsLo/sweepAsHi — they include isKillzone (code).
+
+Q014: What does “Bear pool” mean in Sweep v2?
+A014: predDominant == -1 from the heuristic model comparing high vs low pool
+      scores (bestHighScore vs bestLowScore).
+
+Q015: What does i_blockReactiveLongVsBearModel do?
+A015: When enabled, reactive longs are skipped if the model is Bear pool
+      (predDominant == -1), while predictive longs still require Bull pool by
+      construction.
+
+Q016: Is min confluence 0 recommended in tooltips?
+A016: Tooltip text in source recommends 0 so sweeps with confScore 0 still trade;
+      raising min confluence filters out many valid sweep-only bars.
+
+Q017: Does Sweep use round numbers as mandatory?
+A017: No. Rounds add to confScore when price is within atr*i_confProx of a round;
+      they are one of three confluence components with VWAP and Lon50 alignment.
+
+Q018: What is the default SL/TP structure?
+A018: SL = i_slMult * ATR, TP = i_tpMult * ATR from entry reference price; reactive
+      uses close; predictive uses model level ± ATR multiples (code).
+
+Q019: Is there pyramiding?
+A019: strategy() sets pyramiding=0 in the export — one position direction at a
+      time as defined by TradingView semantics.
+
+Q020: Commission/slippage matter for drawdown?
+A020: Yes. Fixed commission per contract and slippage=ticks are in strategy();
+      tight edges flip when costs rise.
+
+Q021: Can I infer causation from overlaying Doyle zones on Sweep signals?
+A021: You can describe association on the chart; causation needs controlled
+      tests (same params, hold-out periods).
+
+Q022: What is a “common sense error” independent of indicators?
+A022: Trading a backtested edge on different contract/symbol, session, or size
+      without re-validation is a frequent error.
+
+Q023: What should I log manually for each trade to make this Q&A real next time?
+A023: Date, time (CT), symbol, TF, sweep source (IB/LON/ASIA), confScore, regime
+      toggles on/off, whether price was inside a Doyle zone (subjective unless
+      Doyle exports coordinates), and outcome.
+
+Q024: Is this notepad financial advice?
+A024: No. It is a structured review template and factual notes about local code.
+
+Q025: Can v61.1 “Signal Fix” be summarized here?
+A025: No — the Pine source for Doyle S&D v61.1 is not in this workspace.
+
+================================================================================
+SECTION B — SWEEP DEFINITIONS: WHAT COUNTS AS A SWEEP (Q26–Q70)
+================================================================================
+
+Q026: Define bull sweep for IB in plain English.
+A026: After IB is valid, on post-IB hours, price dips below IB low and closes
+      back above it, with lon50 bull filter and optional depth filter.
+
+Q027: Define bear sweep for IB.
+A027: Symmetric: spike above IB high, close back below, with lon50 bear filter
+      and optional depth.
+
+Q028: What is “depth” in Sweep v2?
+A028: Optional i_sweepDepthAtr requires penetration beyond the level by ATR×mult.
+
+Q029: If depth is 0, can shallow taps trigger?
+A029: Yes — depth filter is off when i_sweepDepthAtr is 0.
+
+Q030: Does a sweep require volume confirmation by default?
+A030: No — volGate is off unless i_useVolGate is enabled.
+
+Q031: Does a sweep require RSI confirmation by default?
+A031: No — RSI gate is off unless i_useRsiGate is enabled.
+
+Q032: Does a sweep require HTF trend by default?
+A032: No — i_useHtfTrend defaults false.
+
+Q033: Can both bullSweep and bearSweep be true same bar?
+A033: They derive from different session patterns; in practice one bar might
+      theoretically align with multiple session sources — the strategy combines
+      OR logic for sources; review code paths for your TF.
+
+Q034: What does swIBL track?
+A034: A persistent flag that IB low was swept (used for model decay weighting).
+
+Q035: What does model decay do?
+A035: After a level’s sweep flag is true, scores for that side use
+      i_modelSweptDecay multiplier (default 0.42) — weakens repeated emphasis.
+
+Q036: Is “sweep dot” the same as an entry?
+A036: No. Raw sweep markers can show without strategy entry if filters fail.
+
+Q037: What gating sits between sweep and reactive long entry?
+A037: volOK, cdOK, canEnter (includes flat time, day trade cap, DD guard), conf
+      vs i_minConf, trendLongOK, atrRegimeOK, adxOK, qualityOK, reactiveLongModelOK.
+
+Q038: What is canEnter blocked by besides signals?
+A038: pastFlat (flatten window), position flat, max trades/day, ddOK.
+
+Q039: What happens at flatten time?
+A039: strategy.close_all for session flat; new entries blocked when pastFlat.
+
+Q040: Does Sweep distinguish news events?
+A040: No explicit news filter in the export.
+
+Q041: Does Sweep use CME holidays?
+A041: No special holiday calendar — session flags are clock-based CT.
+
+Q042: Could London sweep fire when London levels are stale?
+A042: lonOK becomes true after London session completes its build window; levels
+      persist until reset — interpret carefully around multi-day context.
+
+Q043: Is Asia sweep valid if Asia levels are from prior calendar segment?
+A043: Levels update during isAsia; asiaOK flips when Asia segment completes per code.
+
+Q044: Are sweeps symmetric long vs short in filters?
+A044: qualityOK vs qualityOKShort and trendLongOK vs trendShortOK mirror, but
+      Lon50 alignment differs for bull vs bear.
+
+Q045: Does Sweep require close above VWAP for longs?
+A045: Not required. nearVWAP only adds confluence if price is proximate to VWAP.
+
+Q046: Can i_minConf=3 eliminate almost all trades?
+A046: Often yes — many sweeps score 0–2 on confluence components.
+
+Q047: Is killzone the same as RTH open?
+A047: Killzone is a union of NY AM, SB AM, LonClose windows per code — not identical
+      to full RTH.
+
+Q048: Does Sweep mark liquidity “equal highs”?
+A048: No — it uses IB/London/Asia session highs/lows, not swing EQH/EQL patterns.
+
+Q049: Could a good-looking sweep fail because of spread spikes?
+A049: Slippage is modeled as fixed ticks; real microstructure can differ.
+
+Q050: Is entry at close always favorable for sweeps?
+A050: Backtest uses bar-close processing; live fills can differ with limits/stops.
+
+Q051: Predictive long uses limit at bestLowPx — can it not fill?
+A051: Yes — unfilled limits are a real divergence from reactive backtests.
+
+Q052: Does predictive require pool edge?
+A052: If i_predMinEdge > 0, poolEdge must exceed it; default is 0 (off).
+
+Q053: What invalidates a predictive short setup fastest?
+A053: predDominant not -1, predConf below min, missing bestHighPx, or gates fail.
+
+Q054: Is predDominant neutral common?
+A054: When bestLowScore == bestHighScore, predDominant is 0 — predictive entries
+      require ±1 dominance.
+
+Q055: Does Sweep hedge?
+A055: No — single net position, pyramiding 0.
+
+Q056: Can cooldown cause missing a second valid sweep?
+A056: Yes — lastSig and i_cooldown block rapid re-entries.
+
+Q057: Is cooldown a drawdown mitigator?
+A057: It can reduce trade clustering and overtrading; it also misses sequences.
+
+Q058: Does Sweep scale size with volatility?
+A058: default_qty is fixed; no volatility sizing in export.
+
+Q059: Are stops tracked from entry or from structure?
+A059: From ATR multiples relative to entry reference (close or model price).
+
+Q060: Could ATR expansion after entry hurt stops?
+A060: Stops are set at entry reference × ATR; intrabar path can hit stops as TV models.
+
+Q061: Does Sweep trail stops?
+A061: No trailing logic shown — exit via strategy.exit stop/limit parameters.
+
+Q062: Does partial profit exist?
+A062: No partial exits in the excerpt — standard bracket.
+
+Q063: Can session flat close before TP?
+A063: Yes — close_all at flatten can exit winners early.
+
+Q064: Is that good or bad for metrics?
+A064: It reduces overnight/globex risk but can cut winners — empirical.
+
+Q065: Does Sweep filter gap opens?
+A065: No dedicated gap filter.
+
+Q066: Does Sweep use opening range beyond IB?
+A066: IB is the defined opening range window for IB levels — not OR15 separately.
+
+Q067: Can two sweeps same day from different sessions both signal?
+A067: Cooldown and day trade cap may prevent; otherwise possible across sessions.
+
+Q068: Is there a “max hold time”?
+A068: Not as a timer — flatten time and exit bracket define horizon.
+
+Q069: Does Sweep know about correlated indices?
+A069: No multi-asset filter in export.
+
+Q070: Macro event risk?
+A070: Not modeled — common sense to stand down manually around major releases.
+
+================================================================================
+SECTION C — CONFLUENCE, REGIME, QUALITY (Q71–Q130)
+================================================================================
+
+Q071: What confluence does Sweep natively score?
+A071: Proximity to round number, VWAP, and Lon50 alignment (0–3 score).
+
+Q072: What is NOT in native confluence?
+A072: Doyle zones, FVG, BOS/CHOCH, CVD, footprint — unless you add manual process.
+
+Q073: Would raising min confluence likely reduce drawdown?
+A073: Possibly fewer trades and fewer bad trades — also fewer good trades; test.
+
+Q074: Does HTF trend filter reduce counter-trend sweeps?
+A074: That is the stated intent when i_useHtfTrend is enabled.
+
+Q075: Does ATR regime filter reduce chop?
+A075: Intended to skip low-ATR bars vs baseline when enabled.
+
+Q076: Does ADX filter help trending vs ranging?
+A076: It gates on ADX floor/ceiling when enabled — can exclude ranges or extremes.
+
+Q077: EMA gate purpose?
+A077: When enabled, aligns entries with fast/slow EMA structure on chart TF.
+
+Q078: RSI gate purpose?
+A078: When enabled, blocks longs in very high RSI and shorts in very low RSI per
+      input bands — reduces extreme fades.
+
+Q079: Volume gate purpose?
+A079: Requires volume vs SMA when enabled — aims to avoid dead bars.
+
+Q080: Max trades/day purpose?
+A080: Caps overtrading in chop; may miss late-day winners.
+
+Q081: Are defaults “permissive”?
+A081: Many quality/regime gates default off — edge case: more signals, more DD risk.
+
+Q082: Is i_minAtr useful for micro contracts?
+A082: It can block ultra-low volatility periods if set thoughtfully.
+
+Q083: Does Sweep measure spread?
+A083: Not directly — slippage input approximates execution cost.
+
+Q084: Correlation with higher timeframe bias?
+A084: Optional HTF EMA via request.security for trend and model boosts.
+
+Q085: Can model HTF boost conflict with reactive sweep direction?
+A085: Reactive longs can be blocked in Bear pool when i_blockReactiveLongVsBearModel
+      is true — reduces fighting the model.
+
+Q086: Is that always optimal?
+A086: No — strong mean-reversion at session levels can disagree with HTF bias.
+
+Q087: Common sense: fighting the daily trend?
+A087: Sweeps are often mean-reversion at levels — daily trend matters; test HTF on/off.
+
+Q088: Does Sweep include seasonal day-of-week filter?
+A088: No.
+
+Q089: Monthly rollover risk on futures?
+A089: Not modeled — continuous contract choice matters for backtests.
+
+Q090: Data vendor differences?
+A090: Can change sweep detection — validate on your feed.
+
+Q091: What confluence might Doyle add conceptually?
+A091: If Doyle marks supply/demand, alignment of sweep with a zone is extra context
+      — must be verified on chart, not asserted here.
+
+Q092: What would “missing confluence” look like?
+A092: Sweep fires at a level but price is mid-range between Doyle zones, or into
+      opposing zone — user judgment.
+
+Q093: Should shorts and longs be symmetric in performance?
+A093: Not necessarily — instrument and regime often skew one side; check longShort
+      stats if exported.
+
+Q094: Does Sweep know about relative volume?
+A094: Uses bar volume vs SMA if vol gate on — not relative to prior sessions explicitly.
+
+Q095: Does Sweep use tick volume vs real volume?
+A095: Depends on symbol data in TradingView — user must verify asset settings.
+
+Q096: Is VWAP anchored correctly for futures overnight?
+A096: Script VWAP resets on coded newDay — confirm if that matches how you trade.
+
+Q097: Could VWAP mis-anchor inflate sweeps?
+A097: If your mental model uses session VWAP differently, perceived edge diverges.
+
+Q098: Round number interval default 100 — always appropriate?
+A098: For high-priced indices maybe; for FX adjust — user setting.
+
+Q099: Confluence proximity 1.5 ATR — wide or tight?
+A099: Relatively wide — increases tag frequency; tune for noise.
+
+Q100: Does Sweep penalize far-from-level entries?
+A100: Predictive model uses distance scoring via modelDistW; reactive uses close at signal.
+
+Q101: Is poolEdge low in chop?
+A101: Often — similar pool scores produce low edge; predConf may still vary.
+
+Q102: Should predictive be avoided in low edge regimes?
+A102: Raising i_predMinEdge targets that — validate in tester.
+
+Q103: Does Sweep include candlestick patterns?
+A103: No hammer/engulfing pattern library in described logic.
+
+Q104: Wick vs body emphasis?
+A104: Sweeps use wick beyond level and close back — implicit wick importance.
+
+Q105: Does Sweep detect failed auctions?
+A105: No explicit auction theory metrics.
+
+Q106: Order flow?
+A106: Not included.
+
+Q107: Delta?
+A107: Not included.
+
+Q108: Heatmap?
+A108: Not included.
+
+Q109: Could these be “missing” vs prop traders?
+A109: Often yes — but adding complexity increases overfit risk without validation.
+
+Q110: Is simpler better?
+A110: For robustness, sometimes — must be tested, not assumed.
+
+Q111: Does Sweep tag session open range breakouts?
+A111: Not as a separate ORB strategy — IB levels are IB window specific.
+
+Q112: Does Sweep require mitigation of a swing?
+A112: No mitigation concept — session liquidity sweep only.
+
+Q113: Fair value gaps?
+A113: Not in core entries; Tier3 fib is optional display.
+
+Q114: Could FVG confluence help manually?
+A114: Possibly — but this doc cannot verify on your trades.
+
+Q115: Breaker blocks?
+A115: Not in Sweep v2 core.
+
+Q116: Liquidity voids?
+A116: Not modeled.
+
+Q117: Opening drive vs balance?
+A117: Not explicitly classified.
+
+Q118: Could ADX help avoid balance days?
+A118: Low ADX might correlate with chop — if i_adxFloor high, fewer trades.
+
+Q119: Could ADX ceiling avoid news spikes?
+A119: Possibly sometimes — empirical.
+
+Q120: RSI gate too tight?
+A120: Defaults are moderate bands — tightening can kill valid reversal trades.
+
+Q121: EMA gate wrong on fast markets?
+A121: Lagging EMAs can disagree with liquidity fades — test.
+
+Q122: Volume gate on thin markets?
+A122: Can block many signals — watch false negatives.
+
+Q123: Lon50 bias optional default off?
+A123: i_useLon50 defaults false — user enabled state unknown.
+
+Q124: If Lon50 on, could it block good trades?
+A124: Yes — requires price on correct side of Lon50 for sweep direction.
+
+Q125: Does Sweep combine Lon50 into confluence and bias?
+A125: Two roles: lon50Bull/Bear for sweep validity when enabled; alignment adds score.
+
+Q126: Is double-counting a risk conceptually?
+A126: Related ideas appear in validity vs score — not identical fields.
+
+Q127: Does Sweep output why a trade skipped?
+A127: Dashboard shows modes and model; full boolean trace is not a single string.
+
+Q128: For debugging, what to plot?
+A128: Raw sweep dots vs entries — already supported via display toggles.
+
+Q129: Should Doyle zones be primary and Sweep secondary?
+A129: User workflow choice — test both hierarchies with rules.
+
+Q130: Is there one “correct” hierarchy?
+A130: No universal answer without data on your symbol and timeframe.
+
+================================================================================
+SECTION D — RISK, DRAWDOWN, AND EXECUTION REALISM (Q131–Q180)
+================================================================================
+
+Q131: Largest structural DD sources for this strategy class?
+A131: Clustered losses in chop, false sweeps, costs, and regime shifts.
+
+Q132: Does the $ equity DD guard fix backtest max DD?
+A132: It caps future entries after depth — reported tester DD can still differ.
+
+Q133: Does flatten reduce gap risk?
+A133: Exits intraday at flatten — reduces holding into overnight gaps if honored live.
+
+Q134: Live trading: will fills match tester?
+A134: Often no — limits, partial fills, latency, and stop priority differ.
+
+Q135: Is stop hunting modeled?
+A135: Slippage models average adverse ticks — not full order book.
+
+Q136: Can bracket asymmetry cause more DD than expected?
+A136: If volatility clusters, fixed ATR multiples may be too tight or too wide.
+
+Q137: Should SL/TP be asymmetric?
+A137: Maybe for skewed instruments — current defaults are symmetric multiples.
+
+Q138: Does Sweep adapt SL to news?
+A138: No.
+
+Q139: Does Sweep reduce size after losses?
+A139: No automated position sizing in export.
+
+Q140: Kelly criterion?
+A140: Not implemented.
+
+Q141: Risk per trade fixed?
+A141: Fixed qty=1 contract in strategy defaults — not %-of-equity.
+
+Q142: Could fixed contract size hide DD % issues?
+A142: Yes — always scale metrics to account size goals.
+
+Q143: Max consecutive losses — psychological?
+A143: Real — quant-advisor style stats flag streaks if trades export.
+
+Q144: Does cooldown interact with streaks?
+A144: It spaces entries; doesn’t change individual trade outcome distribution.
+
+Q145: Does max trades/day help DD?
+A145: Can cap exposure; may miss recovery trades.
+
+Q146: Does HTF filter help DD?
+A146: Often reduces wrong-way trades in trends — test OOS.
+
+Q147: Does volume filter help DD?
+A147: Can reduce low-participation fades — test.
+
+Q148: Does RSI filter help DD?
+A148: Can reduce chasing extremes — also blocks some winners.
+
+Q149: Does ADX filter help DD?
+A149: Can reduce chop entries — may miss trend pullbacks.
+
+Q150: Does EMA filter help DD?
+A150: Similar tradeoff — fewer counter-trend liquidity grabs.
+
+Q151: Is there a free lunch?
+A151: No — each filter has opportunity cost.
+
+Q152: Does predictive mode change DD profile?
+A152: Different fill behavior vs reactive — must be compared on same sample.
+
+Q153: Are unfilled limits “free risk reduction”?
+A153: They reduce exposure but change sample and can bias stats.
+
+Q154: Does model decay reduce repeated stopouts?
+A154: It down-weights levels after sweeps — may help in repeated stop hunts.
+
+Q155: Is decay magnitude default 0.42 always good?
+A155: Tune — too aggressive may ignore valid re-tests.
+
+Q156: Does Sweep include spread widening hours?
+A156: Not explicitly — user may avoid manually.
+
+Q157: Rollover week behavior?
+A157: Not modeled — common sense caution.
+
+Q158: Economic calendar?
+A158: Not modeled.
+
+Q159: Correlation to VIX spikes?
+A159: Not modeled.
+
+Q160: Crypto weekend gaps?
+A160: Session definitions are CT clock — crypto may mismatch — user verify.
+
+Q161: Forex Sunday open?
+A161: Session flags may not align with FX sessions — verify symbol.
+
+Q162: Does DD guard block pyramiding?
+A162: Pyramiding is already 0 — DD guard blocks new entries when drawdown exceeded.
+
+Q163: After DD guard triggers, when can we trade again?
+A163: When equity recovers such that peak - equity < limit; peak updates on new highs.
+
+Q164: Can you be blocked “forever” in a grind-down?
+A164: If equity never makes new highs, drawdown vs peak can remain large — logic issue
+      to understand: peak only rises when equity exceeds prior peak.
+
+Q165: Is that intended?
+A165: Standard peak equity DD semantics — if undesired, different risk architecture
+      needed (not discussed as code change here).
+
+Q166: Flatten vs DD close ordering?
+A166: Code closes DD flatten before session flat when conditions coincide — review
+      live behavior if both true.
+
+Q167: Does commission dominate small edges?
+A167: Possibly — especially high frequency with small average win.
+
+Q168: Slippage=2 — enough for MNQ?
+A168: Stress-test higher slippage in tester for realism.
+
+Q169: Does Sweep include partial fills?
+A169: Not modeled beyond TV strategy engine behavior.
+
+Q170: Does using market vs limit change DD?
+A170: Yes — different entry distribution.
+
+Q171: Should I walk-forward optimize SL/TP?
+A171: Prone to overfit — use hold-out validation.
+
+Q172: Should I optimize cooldown?
+A172: Same caution — validate OOS.
+
+Q173: Is grid search safe?
+A173: Only with constraints, OOS checks, and humility about multiple testing.
+
+Q174: Does Sweep show equity curve on chart?
+A174: Strategy tester does; script includes equity-based calculations for DD guard.
+
+Q175: Does Doyle show invalidations?
+A175: Unknown without Doyle source — user should read Doyle docs/labels.
+
+Q176: If Doyle signal contradicts Sweep, what’s common sense?
+A176: No trade or reduced size until rules are defined — don’t stack conflicting stories.
+
+Q177: If both agree, is trade guaranteed?
+A177: No — agreement reduces some conflicts, not outcome certainty.
+
+Q178: Is “more confluence” always lower DD?
+A178: Not proven — can overfit and reduce diversification of trades.
+
+Q179: Best drawdown metric?
+A179: Use multiple: max DD, avg DD duration, ulcer, recovery factor — not one number.
+
+Q180: Should I compare max DD to account risk tolerance?
+A180: Yes — always.
+
+================================================================================
+SECTION E — DOYLE S&D: HONEST LIMITS + HOW TO USE IT ALONGSIDE SWEEP (Q181–Q220)
+================================================================================
+
+Q181: What is supply and demand generically?
+A181: Zones where selling (supply) or buying (demand) is expected to have left
+      unfilled interest — price often reacts on retests.
+
+Q182: Does Sweep implement S&D zones?
+A182: Not as labeled supply/demand boxes — it uses session sweeps and optional rounds/VWAP.
+
+Q183: Can Doyle zones align with session levels?
+A183: Often visually — must be verified per chart.
+
+Q184: Can Doyle contradict session sweep direction?
+A184: Yes — e.g., sweep long into larger supply overhead.
+
+Q185: Is v61.1 “Signal Fix” explained here?
+A185: No source — unknown what was fixed.
+
+Q186: Should I trust Doyle more than Sweep?
+A186: That is a personal methodology choice requiring evidence.
+
+Q187: Can I automate Doyle agreement?
+A187: Not in this workspace without Doyle’s rule export or API.
+
+Q188: Does TradingView allow reading Doyle outputs programmatically?
+A188: Only indirectly via visuals or if Doyle plots values you can parse — not covered here.
+
+Q189: Could Doyle reduce drawdown by filtering Sweep entries?
+A189: Hypothesis — test by tagging trades where price is also at Doyle zone.
+
+Q190: Could Doyle increase drawdown by false zones?
+A190: Possible — bad zones cause bad discretionary overrides.
+
+Q191: Is “touching a zone” enough?
+A191: Depends on Doyle’s rules — unknown here.
+
+Q192: Does reaction strength matter?
+A192: Often in S&D — Sweep does not measure rejection wick size beyond sweep definition.
+
+Q193: Does timeframe alignment matter?
+A193: Common sense: HTF zone + LTF entry is a standard idea — not enforced by Sweep defaults.
+
+Q194: Should Sweep’s HTF EMA substitute for HTF Doyle?
+A194: Different concepts — complementary at best.
+
+Q195: Can I require sweep at IB low AND Doyle demand?
+A195: Manually yes; not coded in Sweep export.
+
+Q196: Could missing HTF Doyle context cause Sweep losses?
+A196: Plausible — counter-trend sweeps against major supply/demand can fail.
+
+Q197: Could missing liquidity context outside session levels matter?
+A197: Yes — external swing highs/lows not in Sweep’s native sweep set.
+
+Q198: Does Sweep include prior day high/low?
+A198: Not as primary sweep sources in the shown definitions.
+
+Q199: Could adding PDH/PDL confluence help?
+A199: Possibly — would be a methodology extension, not in current code.
+
+Q200: Is “institutional order flow” in Sweep?
+A200: No.
+
+Q201: Is “smart money concepts” fully represented?
+A201: Only partial overlap via sweeps/VWAP/rounds — not full SMC taxonomy.
+
+Q202: Could Doyle’s v61 reduce false signals vs older Doyle?
+A202: Unknown without changelog.
+
+Q203: Should I re-backtest after Doyle updates?
+A203: Common sense yes — any indicator change can alter your discretionary process.
+
+Q204: Can Sweep and Doyle use same session timezone?
+A204: Sweep uses CT — Doyle may differ — verify Doyle settings.
+
+Q205: Does mismatch cause phantom confluence?
+A205: Yes — time/session misalignment is a common error.
+
+Q206: Is chart timeframe alignment crucial?
+A206: Yes — Sweep on 5m vs Doyle on 15m can tell different stories.
+
+Q207: Should entries be decided on execution TF only?
+A207: Common practice: context on HTF, execution on LTF — process dependent.
+
+Q208: Can Sweep’s predictive limit be placed at Doyle level?
+A208: Not automatically — predictive uses model-chosen session prices.
+
+Q209: Is that a refinement opportunity?
+A209: Conceptually — would need code or manual trading rules.
+
+Q210: Does Sweep know Doyle “freshness” of zones?
+A210: No.
+
+Q211: Does Sweep know zone strength score from Doyle?
+A211: No.
+
+Q212: Could combining scores be better than either alone?
+A212: Maybe — must be tested with defined rules.
+
+Q213: Is discretion the bridge?
+A213: Often yes when automation doesn’t encode both systems.
+
+Q214: Can rules reduce discretion errors?
+A214: Yes — written checklist before entry.
+
+Q215: Common sense: revenge trading?
+A215: Not indicator-fixable — process and psychology.
+
+Q216: Common sense: over-leverage?
+A216: Not addressed by Sweep sizing defaults — user must size.
+
+Q217: Common sense: ignoring news?
+A217: Risk — no indicator shields from event risk.
+
+Q218: Common sense: curve-fitting a month?
+A218: Likely fails next month — use longer samples and OOS.
+
+Q219: Common sense: ignoring commissions?
+A219: Inflates perceived edge — always include.
+
+Q220: Common sense: changing settings mid-sample?
+A220: Breaks statistical comparability — keep journals.
+
+================================================================================
+SECTION F — PRACTICAL CHECKLISTS AND “WHAT TO MEASURE NEXT” (Q221–Q250)
+================================================================================
+
+Q221: What is the first measurement to validate Sweep alone?
+A221: Strategy Tester on your symbol/TF with realistic costs and sufficient trades.
+
+Q222: What is the first measurement to validate Sweep + Doyle process?
+A222: Tag each trade: Doyle interaction yes/no; compare win rate and avg PnL groups.
+
+Q223: Minimum trades for subgroup comparison?
+A223: Rule of thumb: dozens+ per group — small samples lie.
+
+Q224: Should I separate longs and shorts?
+A224: Yes — asymmetry is common.
+
+Q225: Should I separate IB vs LON vs ASIA sweeps?
+A225: Yes — behavior differs by liquidity time.
+
+Q226: Should I separate killzone vs non-killzone for LON/ASIA?
+A226: Yes — gating differs; verify actual session overlap on chart.
+
+Q227: Should I log predConf buckets for predictive?
+A227: Yes — see if low conf correlates with losses.
+
+Q228: Should I log confScore buckets for reactive?
+A228: Yes — test whether higher confluence actually helps your sample.
+
+Q229: Should I log when Bear pool blocked a reactive long?
+A229: Yes — quantifies model filter impact.
+
+Q230: Should I log DD guard activations?
+A230: Yes — know when risk control engaged.
+
+Q231: What chart error is common with CT?
+A231: User local timezone misread — confirm clock on chart vs your plan.
+
+Q232: What error is common with continuous futures?
+A232: Roll jumps creating false sweeps — validate contract.
+
+Q233: What error is common with predictive limits?
+A233: Assuming fills like reactive — verify fill rate in reports.
+
+Q234: What error is common with min confluence?
+A234: Setting too high and concluding “strategy doesn’t work” when it’s filtered away.
+
+Q235: What error is common with quality gates?
+A235: Turning everything on and getting 5 trades — no statistical power.
+
+Q236: What error is common comparing Doyle to Sweep?
+A236: Eyeballing alignment without defined tolerance (ticks/points).
+
+Q237: Define a simple alignment rule example?
+A237: “Sweep entry bar low within X points of Doyle demand top/bottom box” — pick X.
+
+Q238: Should X be ATR-scaled?
+A238: Often more stable than fixed points across volatility regimes.
+
+Q239: Is drawdown mitigation mostly position sizing?
+A239: Frequently yes — smaller size reduces equity DD even if strategy is unchanged.
+
+Q240: Is drawdown mitigation mostly fewer trades?
+A240: Can be — filters and cooldowns — tradeoff with opportunity.
+
+Q241: Is drawdown mitigation mostly better entries?
+A241: Ideal but hardest — requires edge refinement and validation.
+
+Q242: Is drawdown mitigation mostly exits?
+A242: Stops/TP/time exits materially change DD — Sweep has time flatten + brackets.
+
+Q243: Should I test higher SL mult for trending regimes?
+A243: Hypothesis worth testing — may reduce noise stops; may increase loss size.
+
+Q244: Should I test lower TP mult for chop?
+A244: Hypothesis — take profits quicker; may reduce avg win.
+
+Q245: Should I use walk-forward?
+A245: Strongly recommended for any optimization beyond casual curiosity.
+
+Q246: Should I keep a model card documenting inputs?
+A246: Yes — reproducibility matters.
+
+Q247: Should I compare MNQ to ES?
+A247: Only if your plan trades both — behavior differs.
+
+Q248: Final honest statement about this 250-Q exercise?
+A248: It organizes questions; it cannot replace your own labeled trade data and tests.
+
+Q249: What single habit most reduces “common sense errors”?
+A249: Pre-trade checklist + post-trade review with screenshots and notes.
+
+Q250: What is the most factual takeaway about “missing confluence”?
+A250: Sweep encodes session sweeps + optional rounds/VWAP/Lon50 + optional regime/quality
+      gates; anything else (including Doyle S&D specifics) is outside this file’s
+      verified scope unless you import Doyle rules and your trade results.
+
+================================================================================
+END OF FILE
+================================================================================

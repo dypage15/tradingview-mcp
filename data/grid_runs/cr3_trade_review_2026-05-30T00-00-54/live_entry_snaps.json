@@ -1,0 +1,1002 @@
+[
+  {
+    "num": 1,
+    "entry_sig": "CR3_WL|c2|r32.2|a20|m-9.35|d-2.42|Ba"
+  },
+  {
+    "num": 2,
+    "entry_sig": "CR3_WL|c3|r46.2|a20|m-3|d-0.58|BA"
+  },
+  {
+    "num": 3,
+    "entry_sig": "CR3_WU|c3|r65.3|a20.3|m3.25|d-0.09|Bb"
+  },
+  {
+    "num": 4,
+    "entry_sig": "CR3_WL|c5|r47.3|a21.2|m9.28|d-1.38|BA"
+  },
+  {
+    "num": 5,
+    "entry_sig": "CR3_WU|c2|r52.2|a21.1|m9.55|d0.81|Bb"
+  },
+  {
+    "num": 6,
+    "entry_sig": "CR3_WL|c5|r38.2|a21.1|m9.55|d-0.61|BA"
+  },
+  {
+    "num": 7,
+    "entry_sig": "CR3_WL|c5|r49.8|a20.2|m9.11|d-0.82|BA"
+  },
+  {
+    "num": 8,
+    "entry_sig": "CR3_WL|c5|r39.6|a19.7|m9.17|d-0.09|BA"
+  },
+  {
+    "num": 9,
+    "entry_sig": "CR3_WL|c5|r36.9|a18.4|m3.48|d-0.63|BA"
+  },
+  {
+    "num": 10,
+    "entry_sig": "CR3_WL|c3|r45.9|a17.3|m-0.99|d0.36|BA"
+  },
+  {
+    "num": 11,
+    "entry_sig": "CR3_WU|c1|r53.9|a17.3|m-0.99|d0.87|Bb"
+  },
+  {
+    "num": 12,
+    "entry_sig": "CR3_WL|c2|r46.7|a16.3|m-1.03|d-0.85|BA"
+  },
+  {
+    "num": 13,
+    "entry_sig": "CR3_WL|c2|r46.5|a16.3|m-3.25|d-0.37|BA"
+  },
+  {
+    "num": 14,
+    "entry_sig": "CR3_WL|c2|r21.9|a48.3|m-6|d-2.24|RaO"
+  },
+  {
+    "num": 15,
+    "entry_sig": "CR3_WL|c1|r31.9|a49.3|m-12.55|d-0.89|Ra"
+  },
+  {
+    "num": 16,
+    "entry_sig": "CR3_WL|c1|r34.2|a49.3|m-12.55|d-0.93|Ra"
+  },
+  {
+    "num": 17,
+    "entry_sig": "CR3_WU|c4|r52.7|a50.9|m-24.38|d1.48|RB"
+  },
+  {
+    "num": 18,
+    "entry_sig": "CR3_WL|c1|r43.8|a50.9|m-24.38|d-0.38|Ra"
+  },
+  {
+    "num": 19,
+    "entry_sig": "CR3_WU|c4|r60.3|a52.5|m-32.31|d0.54|RB"
+  },
+  {
+    "num": 20,
+    "entry_sig": "CR3_WL|c1|r39.8|a52.5|m-32.31|d-0.17|Ra"
+  },
+  {
+    "num": 21,
+    "entry_sig": "CR3_WL|c1|r32|a54|m-35.08|d-0.47|Ra"
+  },
+  {
+    "num": 22,
+    "entry_sig": "CR3_WL|c1|r34.3|a54|m-35.08|d-0.06|Ra"
+  },
+  {
+    "num": 23,
+    "entry_sig": "CR3_WU|c4|r58.8|a55.7|m-40.16|d1.91|RB"
+  },
+  {
+    "num": 24,
+    "entry_sig": "CR3_WU|c5|r75.6|a55.7|m-40.16|d0.97|RBO"
+  },
+  {
+    "num": 25,
+    "entry_sig": "CR3_WU|c5|r68.8|a55.4|m-31.63|d-0.65|RB"
+  },
+  {
+    "num": 26,
+    "entry_sig": "CR3_WL|c1|r52.9|a55.4|m-31.63|d-0.28|Ra"
+  },
+  {
+    "num": 27,
+    "entry_sig": "CR3_WU|c5|r53.6|a55.4|m-31.63|d-0.06|RB"
+  },
+  {
+    "num": 28,
+    "entry_sig": "CR3_WU|c5|r63.5|a55.2|m-21.8|d-0.4|RB"
+  },
+  {
+    "num": 29,
+    "entry_sig": "CR3_WL|c1|r44.3|a53.6|m-9.15|d-1.26|Ra"
+  },
+  {
+    "num": 30,
+    "entry_sig": "CR3_WL|c1|r41.2|a52.1|m-2.07|d0.26|Ra"
+  },
+  {
+    "num": 31,
+    "entry_sig": "CR3_WU|c4|r59.4|a52.1|m-2.07|d-0.17|RB"
+  },
+  {
+    "num": 32,
+    "entry_sig": "CR3_WU|c2|r71.1|a49.7|m9.14|d1.19|RbO"
+  },
+  {
+    "num": 33,
+    "entry_sig": "CR3_WU|c1|r66.2|a49.7|m9.14|d0.22|Rb"
+  },
+  {
+    "num": 34,
+    "entry_sig": "CR3_WL|c2|r44.4|a43.4|m30.65|d-0.18|RA"
+  },
+  {
+    "num": 35,
+    "entry_sig": "CR3_WU|c2|r65.4|a34|m-27.41|d0.35|Nb"
+  },
+  {
+    "num": 36,
+    "entry_sig": "CR3_WL|c2|r52.8|a33.4|m-21.24|d-1.05|NA"
+  },
+  {
+    "num": 37,
+    "entry_sig": "CR3_WU|c2|r61.9|a32.5|m-16.94|d0.65|Nb"
+  },
+  {
+    "num": 38,
+    "entry_sig": "CR3_WL|c2|r42.1|a32.5|m-16.94|d-1.27|NA"
+  },
+  {
+    "num": 39,
+    "entry_sig": "CR3_WU|c2|r66.7|a30.9|m-13.72|d0.03|Nb"
+  },
+  {
+    "num": 40,
+    "entry_sig": "CR3_WL|c2|r54.6|a28.9|m-3.11|d-0.7|NA"
+  },
+  {
+    "num": 41,
+    "entry_sig": "CR3_WL|c5|r49.7|a27.2|m4.15|d-0.54|BA"
+  },
+  {
+    "num": 42,
+    "entry_sig": "CR3_WL|c5|r38.7|a25|m11.34|d-1.24|BA"
+  },
+  {
+    "num": 43,
+    "entry_sig": "CR3_WU|c3|r77.9|a25|m11.34|d1.49|BbO"
+  },
+  {
+    "num": 44,
+    "entry_sig": "CR3_WL|c5|r46.6|a24.8|m17.61|d-1.61|BA"
+  },
+  {
+    "num": 45,
+    "entry_sig": "CR3_WL|c5|r37|a24.8|m17.61|d-0.7|BA"
+  },
+  {
+    "num": 46,
+    "entry_sig": "CR3_WL|c5|r38.6|a24.7|m15.3|d-0.1|BA"
+  },
+  {
+    "num": 47,
+    "entry_sig": "CR3_WU|c2|r60|a24.6|m16.13|d0.1|Bb"
+  },
+  {
+    "num": 48,
+    "entry_sig": "CR3_WL|c6|r27.9|a24.6|m16.13|d-1.98|BAO"
+  },
+  {
+    "num": 49,
+    "entry_sig": "CR3_WU|c2|r59.9|a24.1|m12.18|d1.48|Bb"
+  },
+  {
+    "num": 50,
+    "entry_sig": "CR3_WU|c2|r68.6|a23.5|m11.38|d0.85|Bb"
+  },
+  {
+    "num": 51,
+    "entry_sig": "CR3_WU|c1|r65.9|a15.7|m-3.03|d0.74|Nb"
+  },
+  {
+    "num": 52,
+    "entry_sig": "CR3_WL|c2|r47|a16.8|m5.4|d-1.09|NA"
+  },
+  {
+    "num": 53,
+    "entry_sig": "CR3_WL|c3|r45.2|a18.2|m15.56|d-1.32|NA"
+  },
+  {
+    "num": 54,
+    "entry_sig": "CR3_WU|c2|r55.5|a19.5|m20.99|d0.23|Bb"
+  },
+  {
+    "num": 55,
+    "entry_sig": "CR3_WL|c6|r40.8|a20.9|m21.34|d0.74|BA"
+  },
+  {
+    "num": 56,
+    "entry_sig": "CR3_WL|c6|r43.9|a20.9|m21.34|d0.06|BA"
+  },
+  {
+    "num": 57,
+    "entry_sig": "CR3_WL|c6|r24.8|a21.6|m20.3|d-1.71|BAO"
+  },
+  {
+    "num": 58,
+    "entry_sig": "CR3_WU|c2|r47.1|a20.5|m13.26|d1.09|Bb"
+  },
+  {
+    "num": 59,
+    "entry_sig": "CR3_WU|c2|r67.2|a20.5|m13.26|d1.03|Bb"
+  },
+  {
+    "num": 60,
+    "entry_sig": "CR3_WL|c5|r37.2|a19.5|m13.2|d-2.43|BA"
+  },
+  {
+    "num": 61,
+    "entry_sig": "CR3_WL|c4|r46.6|a18.5|m8.49|d-0.11|BA"
+  },
+  {
+    "num": 62,
+    "entry_sig": "CR3_WL|c3|r48.4|a17.6|m7.01|d-0.65|BA"
+  },
+  {
+    "num": 63,
+    "entry_sig": "CR3_WL|c3|r40.6|a17|m4.78|d-0.51|BA"
+  },
+  {
+    "num": 64,
+    "entry_sig": "CR3_WL|c3|r41.8|a17|m4.78|d-0.9|BA"
+  },
+  {
+    "num": 65,
+    "entry_sig": "CR3_WL|c3|r38.6|a16.2|m1.98|d-0.75|BA"
+  },
+  {
+    "num": 66,
+    "entry_sig": "CR3_WL|c2|r39.5|a15.3|m-0.54|d-0.67|BA"
+  },
+  {
+    "num": 67,
+    "entry_sig": "CR3_WU|c1|r56.6|a15.3|m-0.54|d0.67|Bb"
+  },
+  {
+    "num": 68,
+    "entry_sig": "CR3_WL|c1|r44.3|a35|m4.27|d-0.66|Ra"
+  },
+  {
+    "num": 69,
+    "entry_sig": "CR3_WL|c2|r38.3|a33.6|m9.16|d-0.52|Ra"
+  },
+  {
+    "num": 70,
+    "entry_sig": "CR3_WU|c2|r63.2|a33.6|m9.16|d0.51|Rb"
+  },
+  {
+    "num": 71,
+    "entry_sig": "CR3_WU|c2|r63.2|a32.4|m15.87|d0.07|Rb"
+  },
+  {
+    "num": 72,
+    "entry_sig": "CR3_WL|c2|r42.6|a32.4|m15.87|d-0.72|Ra"
+  },
+  {
+    "num": 73,
+    "entry_sig": "CR3_WL|c2|r35.5|a32.4|m15.87|d-0.73|Ra"
+  },
+  {
+    "num": 74,
+    "entry_sig": "CR3_WU|c3|r47.8|a31.5|m16.63|d1.1|RB"
+  },
+  {
+    "num": 75,
+    "entry_sig": "CR3_WL|c2|r46.8|a31.5|m16.63|d-0.09|Ra"
+  },
+  {
+    "num": 76,
+    "entry_sig": "CR3_WU|c3|r62.1|a30.7|m20.2|d-0.37|Rb"
+  },
+  {
+    "num": 77,
+    "entry_sig": "CR3_WL|c2|r45.9|a30.7|m20.2|d-0.98|Ra"
+  },
+  {
+    "num": 78,
+    "entry_sig": "CR3_WU|c2|r59.5|a29.7|m21.36|d0.75|Rb"
+  },
+  {
+    "num": 79,
+    "entry_sig": "CR3_WU|c2|r63.4|a29.7|m21.36|d0.08|Rb"
+  },
+  {
+    "num": 80,
+    "entry_sig": "CR3_WU|c2|r53.8|a27.7|m27.66|d0.17|Rb"
+  },
+  {
+    "num": 81,
+    "entry_sig": "CR3_WU|c2|r73.7|a25.9|m32.61|d0.7|NbO"
+  },
+  {
+    "num": 82,
+    "entry_sig": "CR3_WL|c3|r36.2|a25.9|m32.61|d-2.43|NA"
+  },
+  {
+    "num": 83,
+    "entry_sig": "CR3_WL|c4|r29|a24.8|m30.4|d-0.86|NAO"
+  },
+  {
+    "num": 84,
+    "entry_sig": "CR3_WU|c1|r52.7|a24.8|m30.4|d0.79|Nb"
+  },
+  {
+    "num": 85,
+    "entry_sig": "CR3_WL|c2|r33|a23.1|m28.14|d-0.53|Na"
+  },
+  {
+    "num": 86,
+    "entry_sig": "CR3_WL|c3|r36.4|a23.1|m28.14|d0.12|Na"
+  },
+  {
+    "num": 87,
+    "entry_sig": "CR3_WL|c2|r37.2|a22|m19.23|d-0.42|Na"
+  },
+  {
+    "num": 88,
+    "entry_sig": "CR3_WL|c2|r31.2|a22|m19.23|d-0.81|Na"
+  },
+  {
+    "num": 89,
+    "entry_sig": "CR3_WU|c3|r52.5|a22.6|m-0.97|d0.09|NB"
+  },
+  {
+    "num": 90,
+    "entry_sig": "CR3_WU|c5|r49.8|a23.2|m-7.18|d0.14|RB"
+  },
+  {
+    "num": 91,
+    "entry_sig": "CR3_WL|c3|r23|a18.3|m13.32|d-1.72|NaO"
+  },
+  {
+    "num": 92,
+    "entry_sig": "CR3_WU|c2|r48.9|a18.2|m1.17|d0.71|NB"
+  },
+  {
+    "num": 93,
+    "entry_sig": "CR3_WL|c2|r45.3|a18.2|m1.17|d-0.36|Na"
+  },
+  {
+    "num": 94,
+    "entry_sig": "CR3_WL|c2|r39.9|a18.2|m1.17|d-0.41|Na"
+  },
+  {
+    "num": 95,
+    "entry_sig": "CR3_WL|c1|r36.9|a18.2|m-14.35|d-0.09|Na"
+  },
+  {
+    "num": 96,
+    "entry_sig": "CR3_WU|c3|r55|a18.2|m-14.35|d0.69|NB"
+  },
+  {
+    "num": 97,
+    "entry_sig": "CR3_WL|c1|r40.2|a18.4|m-21.13|d-0.1|Na"
+  },
+  {
+    "num": 98,
+    "entry_sig": "CR3_WU|c3|r65.9|a18.4|m-21.13|d0.76|NB"
+  },
+  {
+    "num": 99,
+    "entry_sig": "CR3_WL|c2|r34.5|a19.1|m-31.78|d-2.31|Ra"
+  },
+  {
+    "num": 100,
+    "entry_sig": "CR3_WL|c2|r45.4|a19.9|m-28.65|d-0.52|Ra"
+  },
+  {
+    "num": 101,
+    "entry_sig": "CR3_WL|c2|r43.5|a20.7|m-24.81|d-0.24|Ra"
+  },
+  {
+    "num": 102,
+    "entry_sig": "CR3_WU|c5|r56.6|a20.7|m-24.81|d0.38|RB"
+  },
+  {
+    "num": 103,
+    "entry_sig": "CR3_WL|c2|r39.1|a21.4|m-20.71|d-1.24|Ra"
+  },
+  {
+    "num": 104,
+    "entry_sig": "CR3_WL|c3|r23.7|a21.4|m-20.71|d-0.83|RaO"
+  },
+  {
+    "num": 105,
+    "entry_sig": "CR3_WL|c2|r33.9|a22.9|m-24.56|d-0.1|Ra"
+  },
+  {
+    "num": 106,
+    "entry_sig": "CR3_WU|c5|r68.5|a24.5|m-28.59|d2.72|RB"
+  },
+  {
+    "num": 107,
+    "entry_sig": "CR3_WL|c2|r44.8|a24.5|m-28.59|d-0.8|Ra"
+  },
+  {
+    "num": 108,
+    "entry_sig": "CR3_WU|c5|r64.5|a23.9|m-24.14|d1.27|RB"
+  },
+  {
+    "num": 109,
+    "entry_sig": "CR3_WU|c5|r58.8|a22.9|m-8.44|d-0.18|Rb"
+  },
+  {
+    "num": 110,
+    "entry_sig": "CR3_WU|c5|r56.6|a26.2|m-12.69|d0.72|RB"
+  },
+  {
+    "num": 111,
+    "entry_sig": "CR3_WL|c2|r37.3|a26.2|m-12.69|d-0.06|Ra"
+  },
+  {
+    "num": 112,
+    "entry_sig": "CR3_WU|c5|r63.6|a26.2|m-12.69|d0.9|RB"
+  },
+  {
+    "num": 113,
+    "entry_sig": "CR3_WU|c5|r63.3|a26.3|m-12.27|d0.09|RB"
+  },
+  {
+    "num": 114,
+    "entry_sig": "CR3_WL|c2|r38.9|a26.3|m-12.27|d-0.98|Ra"
+  },
+  {
+    "num": 115,
+    "entry_sig": "CR3_WU|c5|r59.7|a25.7|m-13.1|d0.75|RB"
+  },
+  {
+    "num": 116,
+    "entry_sig": "CR3_WL|c2|r47.7|a25.7|m-13.1|d-0.52|Ra"
+  },
+  {
+    "num": 117,
+    "entry_sig": "CR3_WU|c6|r60.5|a24.9|m-9.62|d-0.06|RB"
+  },
+  {
+    "num": 118,
+    "entry_sig": "CR3_WU|c4|r64.6|a24.9|m-9.62|d0.95|Rb"
+  },
+  {
+    "num": 119,
+    "entry_sig": "CR3_WU|c4|r69.4|a23.7|m-0.48|d-0.27|Rb"
+  },
+  {
+    "num": 120,
+    "entry_sig": "CR3_WU|c3|r74.6|a22.6|m12.82|d0.23|RbO"
+  },
+  {
+    "num": 121,
+    "entry_sig": "CR3_WU|c3|r71.9|a22.6|m12.82|d0.32|RbO"
+  },
+  {
+    "num": 122,
+    "entry_sig": "CR3_WL|c3|r43.4|a22.4|m24.74|d-0.34|NA"
+  },
+  {
+    "num": 123,
+    "entry_sig": "CR3_WU|c1|r61.9|a22.2|m30.42|d1.36|Nb"
+  },
+  {
+    "num": 124,
+    "entry_sig": "CR3_WL|c3|r36.2|a22.2|m30.42|d-0.41|NA"
+  },
+  {
+    "num": 125,
+    "entry_sig": "CR3_WL|c4|r37.5|a22|m29.78|d0.18|NA"
+  },
+  {
+    "num": 126,
+    "entry_sig": "CR3_WL|c4|r34.7|a22|m29.78|d0.01|NA"
+  },
+  {
+    "num": 127,
+    "entry_sig": "CR3_WU|c1|r63.6|a20.9|m23.94|d1.72|Nb"
+  },
+  {
+    "num": 128,
+    "entry_sig": "CR3_WL|c3|r33.6|a20.9|m23.94|d-1.86|NA"
+  },
+  {
+    "num": 129,
+    "entry_sig": "CR3_WL|c3|r36.8|a19.8|m20.34|d-0.5|NA"
+  },
+  {
+    "num": 130,
+    "entry_sig": "CR3_WU|c1|r53.6|a18.7|m13.72|d0.75|Nb"
+  },
+  {
+    "num": 131,
+    "entry_sig": "CR3_WL|c1|r42.9|a17.6|m7.99|d-0.11|Na"
+  },
+  {
+    "num": 132,
+    "entry_sig": "CR3_WL|c1|r39.6|a17.6|m7.99|d-0.14|Na"
+  },
+  {
+    "num": 133,
+    "entry_sig": "CR3_WL|c1|r40.2|a17.6|m7.99|d-0.11|Na"
+  },
+  {
+    "num": 134,
+    "entry_sig": "CR3_WU|c1|r58.3|a16.5|m4.64|d-0.08|Bb"
+  },
+  {
+    "num": 135,
+    "entry_sig": "CR3_WU|c1|r60.1|a17.8|m10.86|d0.8|Bb"
+  },
+  {
+    "num": 136,
+    "entry_sig": "CR3_WU|c2|r61.5|a20|m15.71|d0.43|Bb"
+  },
+  {
+    "num": 137,
+    "entry_sig": "CR3_WL|c5|r45.7|a22|m19.99|d-1.07|BA"
+  },
+  {
+    "num": 138,
+    "entry_sig": "CR3_WL|c5|r33.5|a22|m19.99|d-0.93|BA"
+  },
+  {
+    "num": 139,
+    "entry_sig": "CR3_WU|c2|r54.8|a22.4|m15|d1.3|Bb"
+  },
+  {
+    "num": 140,
+    "entry_sig": "CR3_WL|c5|r41|a22.4|m15|d-0.51|BA"
+  },
+  {
+    "num": 141,
+    "entry_sig": "CR3_WL|c5|r48.1|a22.7|m12.24|d-0.11|BA"
+  },
+  {
+    "num": 142,
+    "entry_sig": "CR3_WU|c3|r58.6|a22.7|m12.24|d-0.08|Bb"
+  },
+  {
+    "num": 143,
+    "entry_sig": "CR3_WU|c2|r59.4|a22.7|m12.24|d0.16|Bb"
+  },
+  {
+    "num": 144,
+    "entry_sig": "CR3_WL|c5|r47.6|a23.2|m11.36|d-0.46|BA"
+  },
+  {
+    "num": 145,
+    "entry_sig": "CR3_WU|c2|r61.5|a23.8|m10.04|d0.35|Bb"
+  },
+  {
+    "num": 146,
+    "entry_sig": "CR3_WU|c2|r67|a24|m8.38|d1.14|Bb"
+  },
+  {
+    "num": 147,
+    "entry_sig": "CR3_WU|c2|r58|a24.5|m5.96|d0.44|Bb"
+  },
+  {
+    "num": 148,
+    "entry_sig": "CR3_WL|c5|r52.2|a25|m6.01|d-0.54|BA"
+  },
+  {
+    "num": 149,
+    "entry_sig": "CR3_WU|c2|r65.4|a25|m6.01|d0.33|Bb"
+  },
+  {
+    "num": 150,
+    "entry_sig": "CR3_WU|c3|r61.2|a25|m6.01|d-0.19|Bb"
+  },
+  {
+    "num": 151,
+    "entry_sig": "CR3_WL|c5|r38.3|a25.9|m8.54|d-1.38|BA"
+  },
+  {
+    "num": 152,
+    "entry_sig": "CR3_WL|c6|r39.2|a25.2|m7.6|d0.09|BA"
+  },
+  {
+    "num": 153,
+    "entry_sig": "CR3_WU|c3|r56.8|a18.8|m-17.43|d1.02|NB"
+  },
+  {
+    "num": 154,
+    "entry_sig": "CR3_WL|c1|r45.6|a18.8|m-17.43|d-0.48|Na"
+  },
+  {
+    "num": 155,
+    "entry_sig": "CR3_WU|c3|r54|a18.7|m-14.71|d0.57|NB"
+  },
+  {
+    "num": 156,
+    "entry_sig": "CR3_WL|c1|r40.9|a18.7|m-14.71|d-0.35|Na"
+  },
+  {
+    "num": 157,
+    "entry_sig": "CR3_WL|c1|r45.3|a18.9|m-12.12|d-0.66|Ra"
+  },
+  {
+    "num": 158,
+    "entry_sig": "CR3_WU|c3|r60.9|a18.9|m-12.12|d0.97|Rb"
+  },
+  {
+    "num": 159,
+    "entry_sig": "CR3_WL|c2|r49.7|a18.4|m-7.81|d-0.56|RA"
+  },
+  {
+    "num": 160,
+    "entry_sig": "CR3_WL|c2|r48.8|a18.4|m-7.81|d-0.11|RA"
+  },
+  {
+    "num": 161,
+    "entry_sig": "CR3_WL|c1|r38.9|a18.4|m-7.81|d-1.2|Ra"
+  },
+  {
+    "num": 162,
+    "entry_sig": "CR3_WU|c3|r52.2|a17.8|m-5.86|d-0.08|Rb"
+  },
+  {
+    "num": 163,
+    "entry_sig": "CR3_WU|c2|r62.5|a17.3|m-3.57|d1.25|Rb"
+  },
+  {
+    "num": 164,
+    "entry_sig": "CR3_WU|c3|r74|a17.3|m-3.57|d1.09|RbO"
+  },
+  {
+    "num": 165,
+    "entry_sig": "CR3_WU|c2|r69.9|a17.3|m-3.57|d0.61|Rb"
+  },
+  {
+    "num": 166,
+    "entry_sig": "CR3_WU|c1|r64.8|a18|m8.01|d-0.11|Nb"
+  },
+  {
+    "num": 167,
+    "entry_sig": "CR3_WU|c2|r70.4|a18|m8.01|d-0.02|NbO"
+  },
+  {
+    "num": 168,
+    "entry_sig": "CR3_WL|c3|r43.1|a19.3|m20.37|d-1.3|NA"
+  },
+  {
+    "num": 169,
+    "entry_sig": "CR3_WL|c3|r38.2|a19.3|m20.37|d-0.74|NA"
+  },
+  {
+    "num": 170,
+    "entry_sig": "CR3_WL|c3|r44.2|a20.5|m24.66|d-0.33|NA"
+  },
+  {
+    "num": 171,
+    "entry_sig": "CR3_WL|c3|r38.1|a20.5|m24.66|d-0.74|NA"
+  },
+  {
+    "num": 172,
+    "entry_sig": "CR3_WL|c5|r55.9|a18.9|m19.05|d-0.25|BA"
+  },
+  {
+    "num": 173,
+    "entry_sig": "CR3_WL|c5|r46.7|a18.9|m19.05|d-0.26|BA"
+  },
+  {
+    "num": 174,
+    "entry_sig": "CR3_WU|c2|r60.8|a18.5|m19.59|d0.44|Bb"
+  },
+  {
+    "num": 175,
+    "entry_sig": "CR3_WU|c1|r63.4|a17.8|m2.01|d1.55|Bb"
+  },
+  {
+    "num": 176,
+    "entry_sig": "CR3_WU|c2|r65|a17.8|m2.01|d-0.02|Bb"
+  },
+  {
+    "num": 177,
+    "entry_sig": "CR3_WL|c5|r54|a18.7|m6.13|d-0.74|BA"
+  },
+  {
+    "num": 178,
+    "entry_sig": "CR3_WL|c6|r44|a21.4|m13.56|d0.39|BA"
+  },
+  {
+    "num": 179,
+    "entry_sig": "CR3_WL|c5|r37.9|a21.4|m13.56|d-0.63|BA"
+  },
+  {
+    "num": 180,
+    "entry_sig": "CR3_WU|c2|r68.1|a22.6|m10.8|d1.28|Bb"
+  },
+  {
+    "num": 181,
+    "entry_sig": "CR3_WL|c5|r46.7|a22.6|m10.8|d-1.12|BA"
+  },
+  {
+    "num": 182,
+    "entry_sig": "CR3_WU|c3|r62.1|a22.6|m10.8|d-0.13|Bb"
+  },
+  {
+    "num": 183,
+    "entry_sig": "CR3_WL|c5|r44.9|a23.8|m13.2|d-0.75|BA"
+  },
+  {
+    "num": 184,
+    "entry_sig": "CR3_WL|c5|r43.1|a25|m10|d-0.19|BA"
+  },
+  {
+    "num": 185,
+    "entry_sig": "CR3_WL|c5|r39.4|a25|m10|d-0.08|BA"
+  },
+  {
+    "num": 186,
+    "entry_sig": "CR3_WL|c4|r37.2|a25.9|m2.07|d-0.05|BA"
+  },
+  {
+    "num": 187,
+    "entry_sig": "CR3_WL|c4|r31.3|a25.9|m2.07|d0.16|Ba"
+  },
+  {
+    "num": 188,
+    "entry_sig": "CR3_WL|c4|r29.5|a25.9|m2.07|d-0.19|BaO"
+  },
+  {
+    "num": 189,
+    "entry_sig": "CR3_WL|c3|r40.9|a24.3|m-7.19|d1.24|Ba"
+  },
+  {
+    "num": 190,
+    "entry_sig": "CR3_WL|c2|r44.4|a24.3|m-7.19|d-0.06|Ba"
+  },
+  {
+    "num": 191,
+    "entry_sig": "CR3_WL|c3|r38.6|a21.3|m-16.29|d0.08|Ba"
+  },
+  {
+    "num": 192,
+    "entry_sig": "CR3_WL|c3|r26.8|a25.1|m-12.07|d-0.39|BaO"
+  },
+  {
+    "num": 193,
+    "entry_sig": "CR3_WU|c3|r73.8|a23.7|m-13.42|d1.95|BbO"
+  },
+  {
+    "num": 194,
+    "entry_sig": "CR3_WL|c3|r36.5|a23.6|m-13.61|d-1.45|BA"
+  },
+  {
+    "num": 195,
+    "entry_sig": "CR3_WU|c2|r75|a22.7|m25.36|d0.13|NbO"
+  },
+  {
+    "num": 196,
+    "entry_sig": "CR3_WL|c3|r35|a25.3|m27.13|d-1.08|NA"
+  },
+  {
+    "num": 197,
+    "entry_sig": "CR3_WL|c4|r39.9|a25.3|m27.13|d0.04|NA"
+  },
+  {
+    "num": 198,
+    "entry_sig": "CR3_WL|c6|r36.3|a26.1|m23.11|d0.14|BA"
+  },
+  {
+    "num": 199,
+    "entry_sig": "CR3_WL|c6|r42.8|a26.1|m23.11|d0.1|BA"
+  },
+  {
+    "num": 200,
+    "entry_sig": "CR3_WU|c2|r68.8|a23.3|m12.46|d1.13|Bb"
+  },
+  {
+    "num": 201,
+    "entry_sig": "CR3_WU|c1|r62.3|a22.4|m9.08|d0.99|Bb"
+  },
+  {
+    "num": 202,
+    "entry_sig": "CR3_WU|c1|r56.4|a21.6|m5.88|d0.88|Bb"
+  },
+  {
+    "num": 203,
+    "entry_sig": "CR3_WL|c4|r48.5|a21|m4.98|d-0.77|BA"
+  },
+  {
+    "num": 204,
+    "entry_sig": "CR3_WL|c5|r49.6|a21.1|m7.04|d-0.73|BA"
+  },
+  {
+    "num": 205,
+    "entry_sig": "CR3_WL|c5|r39|a21.1|m7.04|d-0.03|BA"
+  },
+  {
+    "num": 206,
+    "entry_sig": "CR3_WL|c5|r49.3|a21.3|m5.58|d-0.54|BA"
+  },
+  {
+    "num": 207,
+    "entry_sig": "CR3_WU|c3|r58.5|a21.4|m6.53|d-0.19|Bb"
+  },
+  {
+    "num": 208,
+    "entry_sig": "CR3_WL|c5|r47.8|a21.4|m6.53|d-1.05|BA"
+  },
+  {
+    "num": 209,
+    "entry_sig": "CR3_WU|c2|r56.6|a22.9|m7.19|d0.71|Bb"
+  },
+  {
+    "num": 210,
+    "entry_sig": "CR3_WU|c2|r54.1|a35.1|m-41.11|d0.71|NB"
+  },
+  {
+    "num": 211,
+    "entry_sig": "CR3_WU|c3|r55.3|a34.9|m-41.93|d0.26|NB"
+  },
+  {
+    "num": 212,
+    "entry_sig": "CR3_WL|c1|r55.7|a34|m-36.75|d-0.56|Na"
+  },
+  {
+    "num": 213,
+    "entry_sig": "CR3_WU|c3|r65.3|a34|m-36.75|d0.71|NB"
+  },
+  {
+    "num": 214,
+    "entry_sig": "CR3_WL|c1|r41.7|a34|m-36.75|d-1.92|Na"
+  },
+  {
+    "num": 215,
+    "entry_sig": "CR3_WL|c1|r35.8|a32.5|m-31.79|d-1.1|Na"
+  },
+  {
+    "num": 216,
+    "entry_sig": "CR3_WU|c5|r58.7|a32.1|m-28.89|d0.33|RB"
+  },
+  {
+    "num": 217,
+    "entry_sig": "CR3_WU|c6|r58.8|a31.7|m-24.43|d-0.05|RB"
+  },
+  {
+    "num": 218,
+    "entry_sig": "CR3_WU|c5|r65.4|a31.7|m-24.43|d0.42|RB"
+  },
+  {
+    "num": 219,
+    "entry_sig": "CR3_WL|c1|r46.8|a30.3|m-15.02|d-0.61|Ra"
+  },
+  {
+    "num": 220,
+    "entry_sig": "CR3_WL|c1|r40.3|a27.7|m-5.37|d-1.15|Ra"
+  },
+  {
+    "num": 221,
+    "entry_sig": "CR3_WL|c2|r50.3|a27.7|m-5.37|d-0.59|RA"
+  },
+  {
+    "num": 222,
+    "entry_sig": "CR3_WU|c3|r62.9|a24.7|m4.64|d-0.05|Rb"
+  },
+  {
+    "num": 223,
+    "entry_sig": "CR3_WL|c2|r45.4|a15.8|m37|d-1.14|NA"
+  },
+  {
+    "num": 224,
+    "entry_sig": "CR3_WL|c4|r43.8|a16.6|m39.58|d-0.43|BA"
+  },
+  {
+    "num": 225,
+    "entry_sig": "CR3_WU|c2|r71.8|a16.6|m39.58|d0.68|BbO"
+  },
+  {
+    "num": 226,
+    "entry_sig": "CR3_WL|c4|r42.5|a17.5|m41.31|d-1.22|BA"
+  },
+  {
+    "num": 227,
+    "entry_sig": "CR3_WU|c2|r66.2|a18.5|m41.54|d0.73|Bb"
+  },
+  {
+    "num": 228,
+    "entry_sig": "CR3_WL|c5|r47.8|a19.5|m37.35|d-0.65|BA"
+  },
+  {
+    "num": 229,
+    "entry_sig": "CR3_WL|c6|r38.8|a20.8|m28.71|d0.08|BA"
+  },
+  {
+    "num": 230,
+    "entry_sig": "CR3_WL|c5|r44.6|a21.1|m16.95|d-0.76|BA"
+  },
+  {
+    "num": 231,
+    "entry_sig": "CR3_WU|c2|r54.2|a21.4|m12.15|d0.24|Bb"
+  },
+  {
+    "num": 232,
+    "entry_sig": "CR3_WL|c5|r39.3|a19.5|m8.18|d0.58|Ba"
+  },
+  {
+    "num": 233,
+    "entry_sig": "CR3_WU|c2|r63.3|a19.1|m3.38|d0.86|Bb"
+  },
+  {
+    "num": 234,
+    "entry_sig": "CR3_WL|c5|r42.7|a18.7|m2.29|d-0.63|BA"
+  },
+  {
+    "num": 235,
+    "entry_sig": "CR3_WU|c3|r55.3|a18.4|m-1.05|d-0.03|Bb"
+  },
+  {
+    "num": 236,
+    "entry_sig": "CR3_WL|c3|r45.6|a18.4|m-1.05|d-0.67|BA"
+  },
+  {
+    "num": 237,
+    "entry_sig": "CR3_WU|c2|r59.8|a18.5|m-0.79|d0.5|Bb"
+  },
+  {
+    "num": 238,
+    "entry_sig": "CR3_WL|c3|r39.4|a18.6|m-1.24|d-0.18|BA"
+  },
+  {
+    "num": 239,
+    "entry_sig": "CR3_WL|c2|r36.4|a18.2|m-3.73|d-0.11|Ba"
+  },
+  {
+    "num": 240,
+    "entry_sig": "CR3_WL|c2|r25.4|a17.2|m-9.51|d-1.07|BaO"
+  },
+  {
+    "num": 241,
+    "entry_sig": "CR3_WU|c1|r66.5|a17.2|m-9.51|d1.27|Bb"
+  },
+  {
+    "num": 242,
+    "entry_sig": "CR3_WL|c1|r38.4|a16.1|m-8|d-1.25|Ba"
+  },
+  {
+    "num": 243,
+    "entry_sig": "CR3_WU|c2|r58.1|a15.2|m-10.4|d1.03|BB"
+  },
+  {
+    "num": 244,
+    "entry_sig": "CR3_WU|c3|r57.7|a15.2|m-10.4|d-0.21|BB"
+  },
+  {
+    "num": 245,
+    "entry_sig": "CR3_WU|c2|r80.7|a14.2|m-7.92|d1.47|BbO"
+  },
+  {
+    "num": 246,
+    "entry_sig": "CR3_WL|c2|r47.9|a14.2|m-7.92|d-1.6|BA"
+  },
+  {
+    "num": 247,
+    "entry_sig": "CR3_WL|c2|r40.5|a14.5|m-5.18|d-0.4|BA"
+  },
+  {
+    "num": 248,
+    "entry_sig": "CR3_WU|c1|r48.2|a14.7|m-4.09|d0.32|Bb"
+  },
+  {
+    "num": 249,
+    "entry_sig": "CR3_WL|c2|r40|a14.7|m-4.09|d-0.26|BA"
+  },
+  {
+    "num": 250,
+    "entry_sig": "CR3_WU|c1|r54.6|a14.7|m-4.09|d0.96|Bb"
+  }
+]

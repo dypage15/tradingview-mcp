@@ -1,0 +1,1850 @@
+{
+  "success": true,
+  "trade_count": 184,
+  "source": "internal_api",
+  "trades": [
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25934,
+      "q": 1,
+      "tm": 0,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25967.75,
+      "q": 1,
+      "tm": 1,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 26062,
+      "q": 1,
+      "tm": 2,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 26109.25,
+      "q": 1,
+      "tm": 3,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25967.25,
+      "q": 1,
+      "tm": 4,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25937.25,
+      "q": 1,
+      "tm": 5,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25454.5,
+      "q": 1,
+      "tm": 6,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25323.25,
+      "q": 1,
+      "tm": 7,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24918.75,
+      "q": 1,
+      "tm": 8,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24857.5,
+      "q": 1,
+      "tm": 9,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25017,
+      "q": 1,
+      "tm": 10,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "Session end flat",
+      "e": false,
+      "id": "Close position order",
+      "p": 24787.5,
+      "q": 1,
+      "tm": 11,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25073.5,
+      "q": 1,
+      "tm": 12,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25176.75,
+      "q": 1,
+      "tm": 13,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25366.5,
+      "q": 1,
+      "tm": 14,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25411.75,
+      "q": 1,
+      "tm": 15,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25560.25,
+      "q": 1,
+      "tm": 16,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25466.75,
+      "q": 1,
+      "tm": 17,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25450.75,
+      "q": 1,
+      "tm": 18,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25362.5,
+      "q": 1,
+      "tm": 19,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25465.75,
+      "q": 1,
+      "tm": 20,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25444.5,
+      "q": 1,
+      "tm": 21,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25135.75,
+      "q": 1,
+      "tm": 22,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25053.75,
+      "q": 1,
+      "tm": 23,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24967.75,
+      "q": 1,
+      "tm": 24,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25120.25,
+      "q": 1,
+      "tm": 25,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25039,
+      "q": 1,
+      "tm": 26,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25002.5,
+      "q": 1,
+      "tm": 27,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24888,
+      "q": 1,
+      "tm": 28,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24948.5,
+      "q": 1,
+      "tm": 29,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24974,
+      "q": 1,
+      "tm": 30,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24874.75,
+      "q": 1,
+      "tm": 31,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25237.25,
+      "q": 1,
+      "tm": 32,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25290.25,
+      "q": 1,
+      "tm": 33,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25058,
+      "q": 1,
+      "tm": 34,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24978,
+      "q": 1,
+      "tm": 35,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25064.75,
+      "q": 1,
+      "tm": 36,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25200.75,
+      "q": 1,
+      "tm": 37,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25096.25,
+      "q": 1,
+      "tm": 38,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25168.25,
+      "q": 1,
+      "tm": 39,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25127,
+      "q": 1,
+      "tm": 40,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25041,
+      "q": 1,
+      "tm": 41,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25214,
+      "q": 1,
+      "tm": 42,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25255.5,
+      "q": 1,
+      "tm": 43,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25132,
+      "q": 1,
+      "tm": 44,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25240.5,
+      "q": 1,
+      "tm": 45,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25277.75,
+      "q": 1,
+      "tm": 46,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "Session end flat",
+      "e": false,
+      "id": "Close position order",
+      "p": 25298.75,
+      "q": 1,
+      "tm": 47,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25095.25,
+      "q": 1,
+      "tm": 48,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25076.75,
+      "q": 1,
+      "tm": 49,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25117.5,
+      "q": 1,
+      "tm": 50,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25173.5,
+      "q": 1,
+      "tm": 51,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25048,
+      "q": 1,
+      "tm": 52,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25163.5,
+      "q": 1,
+      "tm": 53,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24809.5,
+      "q": 1,
+      "tm": 54,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24685.75,
+      "q": 1,
+      "tm": 55,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25036,
+      "q": 1,
+      "tm": 56,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24949.25,
+      "q": 1,
+      "tm": 57,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25101.75,
+      "q": 1,
+      "tm": 58,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25124.5,
+      "q": 1,
+      "tm": 59,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25387.5,
+      "q": 1,
+      "tm": 60,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25285.75,
+      "q": 1,
+      "tm": 61,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24979.25,
+      "q": 1,
+      "tm": 62,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25101.25,
+      "q": 1,
+      "tm": 63,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24751.25,
+      "q": 1,
+      "tm": 64,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24965.5,
+      "q": 1,
+      "tm": 65,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25085,
+      "q": 1,
+      "tm": 66,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25175.5,
+      "q": 1,
+      "tm": 67,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25314.75,
+      "q": 1,
+      "tm": 68,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25386.75,
+      "q": 1,
+      "tm": 69,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25184.25,
+      "q": 1,
+      "tm": 70,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25288.5,
+      "q": 1,
+      "tm": 71,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24872.25,
+      "q": 1,
+      "tm": 72,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24966,
+      "q": 1,
+      "tm": 73,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24867.75,
+      "q": 1,
+      "tm": 74,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24776.5,
+      "q": 1,
+      "tm": 75,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24986.25,
+      "q": 1,
+      "tm": 76,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24893,
+      "q": 1,
+      "tm": 77,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24591.75,
+      "q": 1,
+      "tm": 78,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24666.75,
+      "q": 1,
+      "tm": 79,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24907.5,
+      "q": 1,
+      "tm": 80,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24831,
+      "q": 1,
+      "tm": 81,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24914.75,
+      "q": 1,
+      "tm": 82,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24981.25,
+      "q": 1,
+      "tm": 83,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24991.75,
+      "q": 1,
+      "tm": 84,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "Session end flat",
+      "e": false,
+      "id": "Close position order",
+      "p": 25025.5,
+      "q": 1,
+      "tm": 85,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24901.5,
+      "q": 1,
+      "tm": 86,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24837.25,
+      "q": 1,
+      "tm": 87,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24801.25,
+      "q": 1,
+      "tm": 88,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24741.25,
+      "q": 1,
+      "tm": 89,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24514.5,
+      "q": 1,
+      "tm": 90,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24591.75,
+      "q": 1,
+      "tm": 91,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24584.5,
+      "q": 1,
+      "tm": 91,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "Session end flat",
+      "e": false,
+      "id": "Close position order",
+      "p": 24589.25,
+      "q": 1,
+      "tm": 92,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24295.5,
+      "q": 1,
+      "tm": 93,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24225.5,
+      "q": 1,
+      "tm": 94,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24509.5,
+      "q": 1,
+      "tm": 95,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24442,
+      "q": 1,
+      "tm": 96,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24345.5,
+      "q": 1,
+      "tm": 97,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24269,
+      "q": 1,
+      "tm": 98,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24417.5,
+      "q": 1,
+      "tm": 99,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24341.25,
+      "q": 1,
+      "tm": 100,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24354.5,
+      "q": 1,
+      "tm": 101,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24354,
+      "q": 1,
+      "tm": 102,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24155.75,
+      "q": 1,
+      "tm": 103,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24228.5,
+      "q": 1,
+      "tm": 104,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 23593.25,
+      "q": 1,
+      "tm": 105,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 23520.5,
+      "q": 1,
+      "tm": 106,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 23045.5,
+      "q": 1,
+      "tm": 107,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 23037.75,
+      "q": 1,
+      "tm": 108,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 23458.75,
+      "q": 1,
+      "tm": 109,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 23538,
+      "q": 1,
+      "tm": 110,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24187.25,
+      "q": 1,
+      "tm": 111,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24152.5,
+      "q": 1,
+      "tm": 112,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 23846.25,
+      "q": 1,
+      "tm": 113,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24007.75,
+      "q": 1,
+      "tm": 114,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24154.25,
+      "q": 1,
+      "tm": 115,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "Session end flat",
+      "e": false,
+      "id": "Close position order",
+      "p": 24214,
+      "q": 1,
+      "tm": 116,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24318.25,
+      "q": 1,
+      "tm": 117,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24256.75,
+      "q": 1,
+      "tm": 118,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24078.75,
+      "q": 1,
+      "tm": 119,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 23994,
+      "q": 1,
+      "tm": 120,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24209.5,
+      "q": 1,
+      "tm": 121,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24160,
+      "q": 1,
+      "tm": 122,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25122.25,
+      "q": 1,
+      "tm": 123,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "Session end flat",
+      "e": false,
+      "id": "Close position order",
+      "p": 25076.75,
+      "q": 1,
+      "tm": 124,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24987.75,
+      "q": 1,
+      "tm": 125,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25054,
+      "q": 1,
+      "tm": 126,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25325,
+      "q": 1,
+      "tm": 127,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25372,
+      "q": 1,
+      "tm": 128,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25274,
+      "q": 1,
+      "tm": 129,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25281.75,
+      "q": 1,
+      "tm": 130,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25271.75,
+      "q": 1,
+      "tm": 131,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25393.5,
+      "q": 1,
+      "tm": 132,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25709.25,
+      "q": 1,
+      "tm": 133,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25763.75,
+      "q": 1,
+      "tm": 134,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 26019.75,
+      "q": 1,
+      "tm": 135,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 26049.75,
+      "q": 1,
+      "tm": 136,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 26362.5,
+      "q": 1,
+      "tm": 137,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 26439.25,
+      "q": 1,
+      "tm": 138,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 26407.5,
+      "q": 1,
+      "tm": 139,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 26460.75,
+      "q": 1,
+      "tm": 140,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 26804,
+      "q": 1,
+      "tm": 141,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 26872.75,
+      "q": 1,
+      "tm": 142,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 26695,
+      "q": 1,
+      "tm": 143,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 26742.75,
+      "q": 1,
+      "tm": 144,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 26758.5,
+      "q": 1,
+      "tm": 145,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 26735.5,
+      "q": 1,
+      "tm": 146,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 26768.5,
+      "q": 1,
+      "tm": 147,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 26691.5,
+      "q": 1,
+      "tm": 148,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 26953.75,
+      "q": 1,
+      "tm": 149,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 26848,
+      "q": 1,
+      "tm": 150,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 27373,
+      "q": 1,
+      "tm": 151,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 27418,
+      "q": 1,
+      "tm": 152,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 27103.5,
+      "q": 1,
+      "tm": 153,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "Session end flat",
+      "e": false,
+      "id": "Close position order",
+      "p": 27156.25,
+      "q": 1,
+      "tm": 154,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 27244.5,
+      "q": 1,
+      "tm": 155,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 27178,
+      "q": 1,
+      "tm": 156,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 27240,
+      "q": 1,
+      "tm": 157,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 27318.25,
+      "q": 1,
+      "tm": 158,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 27343.5,
+      "q": 1,
+      "tm": 159,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 27431.75,
+      "q": 1,
+      "tm": 160,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 27770.75,
+      "q": 1,
+      "tm": 161,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 27795,
+      "q": 1,
+      "tm": 162,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 27904,
+      "q": 1,
+      "tm": 163,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 27928.25,
+      "q": 1,
+      "tm": 164,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 28774,
+      "q": 1,
+      "tm": 165,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 28728,
+      "q": 1,
+      "tm": 166,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 28966.75,
+      "q": 1,
+      "tm": 167,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 29066.75,
+      "q": 1,
+      "tm": 168,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 29373.75,
+      "q": 1,
+      "tm": 169,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 29291.5,
+      "q": 1,
+      "tm": 170,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 29388.75,
+      "q": 1,
+      "tm": 171,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 29427.25,
+      "q": 1,
+      "tm": 172,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 29223.5,
+      "q": 1,
+      "tm": 173,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 29113.5,
+      "q": 1,
+      "tm": 174,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 29336.75,
+      "q": 1,
+      "tm": 175,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 29339.5,
+      "q": 1,
+      "tm": 176,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 29615.5,
+      "q": 1,
+      "tm": 177,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 29696,
+      "q": 1,
+      "tm": 178,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 29166.75,
+      "q": 1,
+      "tm": 187,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 29285.25,
+      "q": 1,
+      "tm": 189,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 29449.25,
+      "q": 1,
+      "tm": 190,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 29368.5,
+      "q": 1,
+      "tm": 193,
+      "tp": "STOP"
+    }
+  ],
+  "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+  "pick_note": null,
+  "candidate_count": 6
+}

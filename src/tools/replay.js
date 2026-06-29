@@ -27,7 +27,7 @@ export function registerReplayTools(server) {
     catch (err) { return jsonResult({ success: false, error: err.message }, true); }
   });
 
-  server.tool('replay_trade', 'Execute a trade action in replay mode (buy, sell, or close position)', {
+  server.tool('replay_trade', 'Bar Replay only: buy/sell/close via _replayApi after replay_start. Does not create Strategy Tester (Pine backtest) trades.', {
     action: z.string().describe('Trade action: buy, sell, or close'),
   }, async ({ action }) => {
     try { return jsonResult(await core.trade({ action })); }

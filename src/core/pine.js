@@ -4,6 +4,7 @@
  * They throw on error (callers catch and format).
  */
 import { evaluate, evaluateAsync, getClient } from '../connection.js';
+import * as chart from './chart.js';
 
 // ── Monaco finder (injected into TV page) ──
 const FIND_MONACO = `
@@ -35,6 +36,9 @@ const FIND_MONACO = `
   })()
 `;
 
+/** Fallback when React fiber no longer exposes monacoEnv (read Monaco buffer via hidden textarea). Single line — avoid ASI breaking `return` + newline in evaluate() templates. */
+const FIND_PINE_TEXTAREA = `document.querySelector('.monaco-editor.pine-editor-monaco textarea.inputarea')`;
+
 /**
  * Opens the Pine Editor panel and waits for Monaco to become available.
  * Returns true if editor is accessible, false on timeout.
@@ -43,7 +47,8 @@ export async function ensurePineEditorOpen() {
   const already = await evaluate(`
     (function() {
       var m = ${FIND_MONACO};
-      return m !== null;
+      if (m !== null) return true;
+      return ${FIND_PINE_TEXTAREA} !== null;
     })()
   `);
   if (already) return true;
@@ -67,7 +72,11 @@ export async function ensurePineEditorOpen() {
 
   for (let i = 0; i < 50; i++) {
     await new Promise(r => setTimeout(r, 200));
-    const ready = await evaluate(`(function() { return ${FIND_MONACO} !== null; })()`);
+    const ready = await evaluate(`
+      (function() {
+        return ${FIND_MONACO} !== null || ${FIND_PINE_TEXTAREA} !== null;
+      })()
+    `);
     if (ready) return true;
   }
   return false;
@@ -207,6 +216,14 @@ export async function check({ source }) {
   const result = await response.json();
   const errors = [];
   const warnings = [];
+
+  if (result?.success === false) {
+    if (typeof result.reason === 'string' && result.reason.trim() !== '')
+      errors.push({ message: result.reason.trim() });
+    else if (typeof result.error === 'string' && result.error.trim() !== '')
+      errors.push({ message: result.error.trim() });
+  }
+
   const inner = result?.result;
 
   if (inner) {
@@ -251,13 +268,17 @@ export async function getSource() {
   const source = await evaluate(`
     (function() {
       var m = ${FIND_MONACO};
-      if (!m) return null;
-      return m.editor.getValue();
+      if (m && m.editor && typeof m.editor.getValue === 'function') {
+        try { return m.editor.getValue(); } catch (e) {}
+      }
+      var ta = ${FIND_PINE_TEXTAREA};
+      if (ta && typeof ta.value === 'string') return ta.value;
+      return null;
     })()
   `);
 
   if (source === null || source === undefined) {
-    throw new Error('Monaco editor found but getValue() returned null.');
+    throw new Error('Monaco editor found but could not read source (fiber + textarea both failed).');
   }
 
   return { success: true, source, line_count: source.split('\n').length, char_count: source.length };
@@ -348,32 +369,82 @@ export async function save() {
   const editorReady = await ensurePineEditorOpen();
   if (!editorReady) throw new Error('Could not open Pine Editor.');
 
-  const c = await getClient();
-  await c.Input.dispatchKeyEvent({ type: 'keyDown', modifiers: 2, key: 's', code: 'KeyS', windowsVirtualKeyCode: 83 });
-  await c.Input.dispatchKeyEvent({ type: 'keyUp', key: 's', code: 'KeyS' });
-  await new Promise(r => setTimeout(r, 800));
-
-  // Handle "Save Script" name dialog that appears for new/unsaved scripts
-  const dialogHandled = await evaluate(`
+  const action = await evaluate(`
     (function() {
-      var saveBtn = null;
       var btns = document.querySelectorAll('button');
+      var toolbarSave = null;
+      var dialogSave = null;
       for (var i = 0; i < btns.length; i++) {
         var text = btns[i].textContent.trim();
-        if (text === 'Save' && btns[i].offsetParent !== null) {
-          // Check if it's in a dialog (not the Pine Editor save button)
-          var parent = btns[i].closest('[class*="dialog"], [class*="modal"], [class*="popup"], [role="dialog"]');
-          if (parent) { saveBtn = btns[i]; break; }
-        }
+        if (!text || btns[i].offsetParent === null) continue;
+        var inDialog = btns[i].closest('[class*="dialog"], [class*="modal"], [class*="popup"], [role="dialog"]');
+        if (text === 'Save' && inDialog) dialogSave = btns[i];
+        if (!toolbarSave && btns[i].className.indexOf('saveButton') !== -1) toolbarSave = btns[i];
+        if (!toolbarSave && /^Save$/i.test(text) && !inDialog && btns[i].getBoundingClientRect().y < 120) toolbarSave = btns[i];
       }
-      if (saveBtn) { saveBtn.click(); return true; }
-      return false;
+      if (toolbarSave) { toolbarSave.click(); return 'toolbar_save_click'; }
+      if (dialogSave) { dialogSave.click(); return 'dialog_save_click'; }
+      return null;
     })()
   `);
 
-  if (dialogHandled) await new Promise(r => setTimeout(r, 500));
+  if (!action) {
+    const c = await getClient();
+    await c.Input.dispatchKeyEvent({ type: 'keyDown', modifiers: 2, key: 's', code: 'KeyS', windowsVirtualKeyCode: 83 });
+    await c.Input.dispatchKeyEvent({ type: 'keyUp', key: 's', code: 'KeyS' });
+  }
 
-  return { success: true, action: dialogHandled ? 'saved_with_dialog' : 'Ctrl+S_dispatched' };
+  await new Promise(r => setTimeout(r, 2500));
+
+  const savedState = await evaluate(`
+    (function() {
+      var header = document.querySelector('.pine-editor-header') || document.querySelector('[class*="pine-editor"]');
+      if (!header) return { saved_text: null };
+      var t = header.textContent || '';
+      return { saved_text: /Saved/i.test(t) ? 'Saved' : /Save/i.test(t) ? 'unsaved' : null };
+    })()
+  `);
+
+  return {
+    success: true,
+    action: action || 'Ctrl+S_dispatched',
+    saved_state: savedState?.saved_text ?? null,
+  };
+}
+
+/** Monaco diagnostics that typically clear after removing the stray study then Add/Update from the editor again. */
+export function markersLookLikeStalePineParse(errors) {
+  if (!Array.isArray(errors) || errors.length === 0) return false;
+  return errors.some((e) => {
+    const m = String(e?.message ?? '');
+    return /cannot\s+parse|can't\s+parse|could\s+not\s+parse|couldn'?t\s+parse|pars(e|ing).*pinescript|pinescript.*pars|failed\s+to\s+pars/i.test(
+      m,
+    );
+  });
+}
+
+async function staleParseDetachFromChart(opts = {}) {
+  const idPref = String(opts.recover_entity_id || '').trim();
+  const needle = String(opts.recover_study_contains || '').trim();
+
+  try {
+    if (idPref) {
+      await chart.manageIndicator({ action: 'remove', entity_id: idPref });
+      return { removed: true, entity_id: idPref, by: 'entity_id' };
+    }
+    if (!needle) return { removed: false, reason: 'no_selector' };
+
+    const state = await chart.getState();
+    const studies = state.studies || [];
+    const low = needle.toLowerCase();
+    const hit = studies.find((s) => String(s.name || '').toLowerCase().includes(low));
+    if (!hit?.id) return { removed: false, reason: 'no_matching_study', needle };
+
+    await chart.manageIndicator({ action: 'remove', entity_id: hit.id });
+    return { removed: true, entity_id: hit.id, by: 'name_substring', matched_name: hit.name };
+  } catch (e) {
+    return { removed: false, reason: String(e.message) };
+  }
 }
 
 export async function getConsole() {
@@ -426,7 +497,8 @@ export async function getConsole() {
   return { success: true, entries: entries || [], entry_count: entries?.length || 0 };
 }
 
-export async function smartCompile() {
+/** One toolbar compile/add pass + Monaco markers (no parse-recovery retry). */
+export async function pineEditorToolbarCompilePass() {
   const editorReady = await ensurePineEditorOpen();
   if (!editorReady) throw new Error('Could not open Pine Editor.');
 
@@ -440,7 +512,7 @@ export async function smartCompile() {
     })()
   `);
 
-  const buttonClicked = await evaluate(`
+  let buttonClicked = await evaluate(`
     (function() {
       var btns = document.querySelectorAll('button');
       var addBtn = null;
@@ -452,8 +524,8 @@ export async function smartCompile() {
           btns[i].click();
           return 'Save and add to chart';
         }
-        if (!addBtn && /^add to chart$/i.test(text)) addBtn = btns[i];
-        if (!updateBtn && /^update on chart$/i.test(text)) updateBtn = btns[i];
+        if (!addBtn && /add to chart/i.test(text) && !/save and add/i.test(text)) addBtn = btns[i];
+        if (!updateBtn && /update on chart/i.test(text)) updateBtn = btns[i];
         if (!saveBtn && btns[i].className.indexOf('saveButton') !== -1 && btns[i].offsetParent !== null) saveBtn = btns[i];
       }
       if (addBtn) { addBtn.click(); return 'Add to chart'; }
@@ -469,7 +541,34 @@ export async function smartCompile() {
     await c.Input.dispatchKeyEvent({ type: 'keyUp', key: 'Enter', code: 'Enter' });
   }
 
-  await new Promise(r => setTimeout(r, 2500));
+  // After save, TV often reveals "Add to chart" / "Update on chart" once compile finishes — second pass.
+  await new Promise(r => setTimeout(r, 3200));
+  const secondPass = await evaluate(`
+    (function() {
+      var btns = document.querySelectorAll('button');
+      for (var i = 0; i < btns.length; i++) {
+        var text = btns[i].textContent.trim();
+        if (/save and add to chart/i.test(text)) {
+          btns[i].click();
+          return 'Save and add to chart (2nd pass)';
+        }
+        if (/add to chart/i.test(text) && !/save and add/i.test(text)) {
+          btns[i].click();
+          return 'Add to chart (2nd pass)';
+        }
+        if (/update on chart/i.test(text)) {
+          btns[i].click();
+          return 'Update on chart (2nd pass)';
+        }
+      }
+      return null;
+    })()
+  `);
+  if (secondPass) {
+    buttonClicked = secondPass;
+  }
+
+  await new Promise(r => setTimeout(r, 1200));
 
   const errors = await evaluate(`
     (function() {
@@ -505,6 +604,54 @@ export async function smartCompile() {
   };
 }
 
+/**
+ * Smart compile + optional stale-parse recovery (TV sometimes leaves a broken study; removing it then re-saving fixes "cannot parse" markers).
+ *
+ * Options:
+ *   recover_parse?: boolean — explicit on/off for recovery pass (omit to allow env TV_PINE_RECOVER_PARSE=1)
+ *   recover_entity_id?: string — study entity id to remove (from chart_get_state)
+ *   recover_study_contains?: string — substring match against chart study names (recommended if no entity id)
+ */
+export async function smartCompile(opts = {}) {
+  const o = opts && typeof opts === 'object' ? opts : {};
+  let wantRecover = false;
+  if (o.recover_parse === true) wantRecover = true;
+  else if (o.recover_parse === false) wantRecover = false;
+  else wantRecover = String(process.env.TV_PINE_RECOVER_PARSE || '').trim() === '1';
+
+  const first = await pineEditorToolbarCompilePass();
+
+  const hasSelector = String(o.recover_entity_id || '').trim() !== '' || String(o.recover_study_contains || '').trim() !== '';
+
+  let detachNote = null;
+  const shouldTryRecover =
+    wantRecover &&
+    first.has_errors &&
+    markersLookLikeStalePineParse(first.errors) &&
+    hasSelector;
+
+  if (shouldTryRecover) {
+    detachNote = await staleParseDetachFromChart(o);
+    if (detachNote.removed) {
+      await new Promise((r) => setTimeout(r, 900));
+      const second = await pineEditorToolbarCompilePass();
+      return {
+        ...second,
+        recover_parse_attempted: true,
+        recover_parse_removed: detachNote,
+        recover_parse_first_pass: first,
+      };
+    }
+  }
+
+  const out = {
+    ...first,
+    recover_parse_attempted: shouldTryRecover === true && detachNote !== null,
+  };
+  if (detachNote !== null && detachNote !== undefined) out.recover_parse_removed = detachNote;
+  return out;
+}
+
 export async function newScript({ type }) {
   const editorReady = await ensurePineEditorOpen();
   if (!editorReady) throw new Error('Could not open Pine Editor.');
@@ -534,7 +681,56 @@ export async function newScript({ type }) {
   return { success: true, type, action: 'new_script_created', template: typeMap[type] };
 }
 
-export async function openScript({ name }) {
+export async function openScriptById({ script_id }) {
+  const editorReady = await ensurePineEditorOpen();
+  if (!editorReady) throw new Error('Could not open Pine Editor.');
+
+  const escapedId = JSON.stringify(script_id);
+
+  const result = await evaluateAsync(`
+    (function() {
+      var id = ${escapedId};
+      return fetch('https://pine-facade.tradingview.com/pine-facade/list/?filter=saved', { credentials: 'include' })
+        .then(function(r) { return r.json(); })
+        .then(function(scripts) {
+          if (!Array.isArray(scripts)) return { error: 'pine-facade returned unexpected data' };
+          var match = null;
+          for (var i = 0; i < scripts.length; i++) {
+            if (scripts[i].scriptIdPart === id) { match = scripts[i]; break; }
+          }
+          if (!match) return { error: 'Script id not found: ' + id };
+          var verRaw = match.version != null ? String(match.version) : '1';
+          var ver = verRaw.replace(/\\.0$/, '') || '1';
+          return fetch('https://pine-facade.tradingview.com/pine-facade/get/' + id + '/' + ver, { credentials: 'include' })
+            .then(function(r2) { return r2.json(); })
+            .then(function(data) {
+              var source = data.source || '';
+              if (!source) return { error: 'Script source is empty', name: match.scriptName || match.scriptTitle };
+              var m = ${FIND_MONACO};
+              if (m) {
+                m.editor.setValue(source);
+                return {
+                  success: true,
+                  name: match.scriptName || match.scriptTitle,
+                  script_id: id,
+                  version: ver,
+                  lines: source.split('\\n').length,
+                };
+              }
+              return { error: 'Monaco editor not found to inject source' };
+            });
+        })
+        .catch(function(e) { return { error: e.message }; });
+    })()
+  `);
+
+  if (result?.error) throw new Error(result.error);
+  return { success: true, name: result.name, script_id: result.script_id, version: result.version, lines: result.lines, source: 'internal_api', opened: true };
+}
+
+export async function openScript({ name, script_id }) {
+  if (script_id) return openScriptById({ script_id });
+
   const editorReady = await ensurePineEditorOpen();
   if (!editorReady) throw new Error('Could not open Pine Editor.');
 
@@ -550,20 +746,29 @@ export async function openScript({ name }) {
           var match = null;
           for (var i = 0; i < scripts.length; i++) {
             var sn = (scripts[i].scriptName || '').toLowerCase();
-            var st = (scripts[i].scriptTitle || '').toLowerCase();
-            if (sn === target || st === target) { match = scripts[i]; break; }
+            if (sn === target) { match = scripts[i]; break; }
           }
           if (!match) {
             for (var j = 0; j < scripts.length; j++) {
-              var sn2 = (scripts[j].scriptName || '').toLowerCase();
-              var st2 = (scripts[j].scriptTitle || '').toLowerCase();
-              if (sn2.indexOf(target) !== -1 || st2.indexOf(target) !== -1) { match = scripts[j]; break; }
+              var st = (scripts[j].scriptTitle || '').toLowerCase();
+              if (st === target) { match = scripts[j]; break; }
             }
+          }
+          if (!match) {
+            var best = null;
+            for (var k = 0; k < scripts.length; k++) {
+              var sn2 = (scripts[k].scriptName || '').toLowerCase();
+              if (sn2.indexOf(target) !== -1) {
+                if (!best || sn2.length < best.len) best = { script: scripts[k], len: sn2.length };
+              }
+            }
+            if (best) match = best.script;
           }
           if (!match) return {error: 'Script "' + target + '" not found. Use pine_list_scripts to see available scripts.'};
 
           var id = match.scriptIdPart;
-          var ver = match.version || 1;
+          var verRaw = match.version != null ? String(match.version) : '1';
+          var ver = verRaw.replace(/\\.0$/, '') || '1';
           return fetch('https://pine-facade.tradingview.com/pine-facade/get/' + id + '/' + ver, { credentials: 'include' })
             .then(function(r2) { return r2.json(); })
             .then(function(data) {

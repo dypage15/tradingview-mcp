@@ -1,0 +1,253 @@
+//@version=6
+// Session levels only — IB / London / Asia H·L·50, Chicago time
+indicator("Session levels (extract)", shorttitle="SessLvls", overlay=true, max_lines_count=200, max_labels_count=100)
+
+// ── Display / session window ────────────────────────────────────
+i_showSess   = input.bool(true,  "Session Levels", group="Display")
+i_lightChart = input.bool(false, "Light chart (hide session lines)", group="Display")
+
+i_flatHr     = input.int(15, "Flatten — hour (Chicago)", group="Session Exit", minval=12, maxval=17)
+i_flatMn     = input.int(0,  "Flatten — minute (Chicago)", group="Session Exit", minval=0, maxval=55, step=5)
+
+i_sessLvlEndUseFlat = input.bool(true, "Level lines end at flatten time (CT)", group="Display")
+i_sessLvlEndHr = input.int(16, "Level lines end — hour (Chicago)", group="Display", minval=10, maxval=20)
+i_sessLvlEndMn = input.int(0, "Level lines end — minute (Chicago)", group="Display", minval=0, maxval=55, step=5)
+
+// ── Time (CT) ───────────────────────────────────────────────────
+hr = hour(time, "America/Chicago")
+mn = minute(time, "America/Chicago")
+newDay = ta.change(time("D")) != 0
+
+isAsia   = hr >= 18 or hr < 1
+isLondon = hr >= 1 and hr < 4
+isIB     = (hr == 8 and mn >= 30) or (hr == 9 and mn < 30)
+
+pastFlat = (hr > i_flatHr) or (hr == i_flatHr and mn >= i_flatMn)
+pastSessLvlEnd = i_sessLvlEndUseFlat ? pastFlat : ((hr > i_sessLvlEndHr) or (hr == i_sessLvlEndHr and mn >= i_sessLvlEndMn))
+sessLvlActive = not pastSessLvlEnd
+
+// ── Session ranges ──────────────────────────────────────────────
+var float ibH = na
+var float ibL = na
+var float ib50 = na
+var bool ibOK = false
+var float lonH = na
+var float lonL = na
+var float lon50 = na
+var bool lonOK = false
+var float asiaH = na
+var float asiaL = na
+var bool asiaOK = false
+
+var int ibStartBar = na
+var int lonStartBar = na
+var int asiaStartBar = na
+
+var line lnIbH = na
+var line lnIbL = na
+var line lnIb50 = na
+var line lnLonH = na
+var line lnLonL = na
+var line lnLon50 = na
+var line lnAsH = na
+var line lnAsL = na
+
+var label lblIbH = na
+var label lblIbL = na
+var label lblIb50 = na
+var label lblLonH = na
+var label lblLonL = na
+var label lblLon50 = na
+var label lblAsH = na
+var label lblAsL = na
+
+var array<line> sessLineHist = array.new_line(0)
+var array<label> sessLabelHist = array.new_label(0)
+
+cIBSolid = #42A5F5
+cLonSolid = #AB47BC
+cAsiaSolid = #FF7043
+cIB = color.new(cIBSolid, 15)
+cIB50c = color.new(cIBSolid, 50)
+cLon = color.new(cLonSolid, 15)
+cLon50c = color.new(cLonSolid, 50)
+cAsia = color.new(cAsiaSolid, 15)
+
+pushLn(line ln) =>
+    if not na(ln)
+        array.push(sessLineHist, ln)
+
+pushLb(label lb) =>
+    if not na(lb)
+        array.push(sessLabelHist, lb)
+
+if newDay
+    pushLn(lnIbH)
+    pushLn(lnIbL)
+    pushLn(lnIb50)
+    pushLn(lnLonH)
+    pushLn(lnLonL)
+    pushLn(lnLon50)
+    pushLn(lnAsH)
+    pushLn(lnAsL)
+    pushLb(lblIbH)
+    pushLb(lblIbL)
+    pushLb(lblIb50)
+    pushLb(lblLonH)
+    pushLb(lblLonL)
+    pushLb(lblLon50)
+    pushLb(lblAsH)
+    pushLb(lblAsL)
+    lnIbH := na
+    lnIbL := na
+    lnIb50 := na
+    lnLonH := na
+    lnLonL := na
+    lnLon50 := na
+    lnAsH := na
+    lnAsL := na
+    lblIbH := na
+    lblIbL := na
+    lblIb50 := na
+    lblLonH := na
+    lblLonL := na
+    lblLon50 := na
+    lblAsH := na
+    lblAsL := na
+    while array.size(sessLineHist) > 380
+        line.delete(array.shift(sessLineHist))
+    while array.size(sessLabelHist) > 180
+        label.delete(array.shift(sessLabelHist))
+    ibH := na
+    ibL := na
+    ib50 := na
+    ibOK := false
+    lonH := na
+    lonL := na
+    lon50 := na
+    lonOK := false
+    asiaH := na
+    asiaL := na
+    asiaOK := false
+    ibStartBar := na
+    lonStartBar := na
+    asiaStartBar := na
+
+if isAsia
+    if na(asiaStartBar)
+        asiaStartBar := bar_index
+    asiaH := na(asiaH) ? high : math.max(asiaH, high)
+    asiaL := na(asiaL) ? low : math.min(asiaL, low)
+if isAsia[1] and not isAsia
+    asiaOK := true
+
+if isLondon
+    if na(lonStartBar)
+        lonStartBar := bar_index
+    lonH := na(lonH) ? high : math.max(lonH, high)
+    lonL := na(lonL) ? low : math.min(lonL, low)
+    lon50 := (lonH + lonL) / 2
+if isLondon[1] and not isLondon
+    lonOK := true
+
+if isIB
+    if na(ibStartBar)
+        ibStartBar := bar_index
+    ibH := na(ibH) ? high : math.max(ibH, high)
+    ibL := na(ibL) ? low : math.min(ibL, low)
+    ib50 := (ibH + ibL) / 2
+if isIB[1] and not isIB
+    ibOK := true
+
+ibLvlDraw = ibOK and sessLvlActive
+
+sessLineOn = not i_lightChart and i_showSess
+
+if not sessLineOn
+    if not na(lnIbH)
+        line.delete(lnIbH)
+        lnIbH := na
+    if not na(lnIbL)
+        line.delete(lnIbL)
+        lnIbL := na
+    if not na(lnIb50)
+        line.delete(lnIb50)
+        lnIb50 := na
+    if not na(lnLonH)
+        line.delete(lnLonH)
+        lnLonH := na
+    if not na(lnLonL)
+        line.delete(lnLonL)
+        lnLonL := na
+    if not na(lnLon50)
+        line.delete(lnLon50)
+        lnLon50 := na
+    if not na(lnAsH)
+        line.delete(lnAsH)
+        lnAsH := na
+    if not na(lnAsL)
+        line.delete(lnAsL)
+        lnAsL := na
+    while array.size(sessLineHist) > 0
+        line.delete(array.shift(sessLineHist))
+    while array.size(sessLabelHist) > 0
+        label.delete(array.shift(sessLabelHist))
+else
+    if ibLvlDraw and not na(ibH)
+        if na(lnIbH)
+            sB = not na(ibStartBar) ? ibStartBar : bar_index
+            lnIbH := line.new(sB, ibH, bar_index, ibH, xloc=xloc.bar_index, color=cIB, width=2, style=line.style_solid)
+            lblIbH := label.new(sB, ibH, "IB H", xloc=xloc.bar_index, style=label.style_none, textcolor=cIBSolid, size=size.tiny)
+        else
+            line.set_xy2(lnIbH, bar_index, ibH)
+    if ibLvlDraw and not na(ibL)
+        if na(lnIbL)
+            sB = not na(ibStartBar) ? ibStartBar : bar_index
+            lnIbL := line.new(sB, ibL, bar_index, ibL, xloc=xloc.bar_index, color=cIB, width=2, style=line.style_solid)
+            lblIbL := label.new(sB, ibL, "IB L", xloc=xloc.bar_index, style=label.style_none, textcolor=cIBSolid, size=size.tiny)
+        else
+            line.set_xy2(lnIbL, bar_index, ibL)
+    if ibLvlDraw and not na(ib50)
+        if na(lnIb50)
+            sB = not na(ibStartBar) ? ibStartBar : bar_index
+            lnIb50 := line.new(sB, ib50, bar_index, ib50, xloc=xloc.bar_index, color=cIB50c, width=1, style=line.style_dashed)
+            lblIb50 := label.new(sB, ib50, "IB 50", xloc=xloc.bar_index, style=label.style_none, textcolor=color.new(cIBSolid, 40), size=size.tiny)
+        else
+            line.set_xy2(lnIb50, bar_index, ib50)
+
+    if sessLvlActive and lonOK and not na(lonH)
+        if na(lnLonH)
+            sB = not na(lonStartBar) ? lonStartBar : bar_index
+            lnLonH := line.new(sB, lonH, bar_index, lonH, xloc=xloc.bar_index, color=cLon, width=1, style=line.style_solid)
+            lblLonH := label.new(sB, lonH, "Lon H", xloc=xloc.bar_index, style=label.style_none, textcolor=cLonSolid, size=size.tiny)
+        else
+            line.set_xy2(lnLonH, bar_index, lonH)
+    if sessLvlActive and lonOK and not na(lonL)
+        if na(lnLonL)
+            sB = not na(lonStartBar) ? lonStartBar : bar_index
+            lnLonL := line.new(sB, lonL, bar_index, lonL, xloc=xloc.bar_index, color=cLon, width=1, style=line.style_solid)
+            lblLonL := label.new(sB, lonL, "Lon L", xloc=xloc.bar_index, style=label.style_none, textcolor=cLonSolid, size=size.tiny)
+        else
+            line.set_xy2(lnLonL, bar_index, lonL)
+    if sessLvlActive and lonOK and not na(lon50)
+        if na(lnLon50)
+            sB = not na(lonStartBar) ? lonStartBar : bar_index
+            lnLon50 := line.new(sB, lon50, bar_index, lon50, xloc=xloc.bar_index, color=cLon50c, width=1, style=line.style_dashed)
+            lblLon50 := label.new(sB, lon50, "Lon 50", xloc=xloc.bar_index, style=label.style_none, textcolor=color.new(cLonSolid, 40), size=size.tiny)
+        else
+            line.set_xy2(lnLon50, bar_index, lon50)
+
+    if sessLvlActive and asiaOK and not na(asiaH)
+        if na(lnAsH)
+            sB = not na(asiaStartBar) ? asiaStartBar : bar_index
+            lnAsH := line.new(sB, asiaH, bar_index, asiaH, xloc=xloc.bar_index, color=cAsia, width=1, style=line.style_solid)
+            lblAsH := label.new(sB, asiaH, "Asia H", xloc=xloc.bar_index, style=label.style_none, textcolor=cAsiaSolid, size=size.tiny)
+        else
+            line.set_xy2(lnAsH, bar_index, asiaH)
+    if sessLvlActive and asiaOK and not na(asiaL)
+        if na(lnAsL)
+            sB = not na(asiaStartBar) ? asiaStartBar : bar_index
+            lnAsL := line.new(sB, asiaL, bar_index, asiaL, xloc=xloc.bar_index, color=cAsia, width=1, style=line.style_solid)
+            lblAsL := label.new(sB, asiaL, "Asia L", xloc=xloc.bar_index, style=label.style_none, textcolor=cAsiaSolid, size=size.tiny)
+        else
+            line.set_xy2(lnAsL, bar_index, asiaL)

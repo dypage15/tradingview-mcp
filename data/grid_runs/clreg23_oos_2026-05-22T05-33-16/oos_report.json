@@ -1,0 +1,51 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\clreg23_oos_2026-05-22T05-33-16",
+  "method": "calendar_70pct_train_by_exit_time",
+  "spec": {
+    "rsiMode": "Combined",
+    "rsiLen": 6,
+    "confLookback": 3,
+    "cloudSmooth": 3,
+    "minBarsBetween": 0,
+    "minCloudSep": 0,
+    "riskMode": "Points",
+    "tpPoints": 30,
+    "slPoints": 15
+  },
+  "entity_id": "tHzDzY",
+  "symbol": "CME_MINI:MNQ1!",
+  "timeframe": "5",
+  "date_range": {
+    "from": "2026-02-09T03:20:00.000Z",
+    "to": "2026-05-22T05:30:00.000Z",
+    "split": "2026-04-21T14:27:00.000Z",
+    "train_frac": 0.7
+  },
+  "full_window": {
+    "trades": 551,
+    "netProfit": 2581.2599999999366,
+    "profitFactor": 1.1294622616148167,
+    "percentProfitable": 0.37749546279491836
+  },
+  "train": {
+    "trades": 404,
+    "netProfit": -476.960000000003,
+    "profitFactor": 0.9604901946166123,
+    "percentProfitable": 36.633663366336634,
+    "expectancy": -1.180594059405948
+  },
+  "test": {
+    "trades": 147,
+    "netProfit": 3058.220000000012,
+    "profitFactor": 1.3887709467378933,
+    "percentProfitable": 40.816326530612244,
+    "expectancy": 20.804217687074914
+  },
+  "oos_pass": true,
+  "split_detail": {
+    "report_trades": 551,
+    "train_trades": 404,
+    "test_trades": 147
+  },
+  "report_trades_used": 551
+}

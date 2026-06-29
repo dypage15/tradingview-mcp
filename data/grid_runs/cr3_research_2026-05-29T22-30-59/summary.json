@@ -1,0 +1,391 @@
+{
+  "run_directory": "c:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\cr3_research_2026-05-29T22-30-59",
+  "timestamp": "2026-05-29T22:30:59.015Z",
+  "symbol": "CME_MINI:MNQ1!",
+  "timeframe": "5",
+  "entity_id": "eMrsNq",
+  "spec": {
+    "htfTF": "5",
+    "cloudSmooth": 3,
+    "zOptLow": 20,
+    "zOptHigh": 35,
+    "tpPoints": 20,
+    "slPoints": 10,
+    "useSession": true,
+    "sessStart": "0930-1200",
+    "enableResearch": true,
+    "outcomeLB": 10,
+    "clusterBars": 12,
+    "useTrendTier": true,
+    "useWickTier": false,
+    "wickMinConf": 3,
+    "adxEntryHigh": 45,
+    "useVwap2Bar": false,
+    "minWickConfDisplay": 3
+  },
+  "inputs_applied": {
+    "in_0": "5",
+    "in_1": 9,
+    "in_2": 21,
+    "in_3": 50,
+    "in_4": 3,
+    "in_5": 5,
+    "in_6": 0.15,
+    "in_7": 12,
+    "in_8": 26,
+    "in_9": 9,
+    "in_10": 1,
+    "in_11": 14,
+    "in_12": 14,
+    "in_13": 14,
+    "in_14": 20,
+    "in_15": 35,
+    "in_16": true,
+    "in_17": 21,
+    "in_18": 14,
+    "in_19": 9,
+    "in_20": "Direction Change",
+    "in_21": true,
+    "in_22": true,
+    "in_23": 20,
+    "in_24": 2,
+    "in_25": 14,
+    "in_26": 30,
+    "in_27": 70,
+    "in_28": 3,
+    "in_29": 20,
+    "in_30": 10,
+    "in_31": true,
+    "in_32": "0930-1200",
+    "in_33": true,
+    "in_34": true,
+    "in_35": 10,
+    "in_36": 12,
+    "in_37": 0,
+    "in_38": true,
+    "in_39": true,
+    "in_40": true,
+    "in_41": false,
+    "in_42": 3,
+    "in_43": 45,
+    "in_44": false,
+    "in_45": true,
+    "in_46": true,
+    "in_47": true,
+    "in_48": true
+  },
+  "research": {
+    "parsed": true,
+    "outcomeLB": 10,
+    "buckets": [
+      {
+        "signal": "W_L_1",
+        "n": 64,
+        "winPct": 45.3,
+        "avgPts": -0.16,
+        "avgMfe": 62.57,
+        "avgMae": 67.86
+      },
+      {
+        "signal": "W_L_2",
+        "n": 60,
+        "winPct": 65,
+        "avgPts": 20.05,
+        "avgMfe": 66.56,
+        "avgMae": 58.9
+      },
+      {
+        "signal": "W_L_3+",
+        "n": 38,
+        "winPct": 60.5,
+        "avgPts": 9.29,
+        "avgMfe": 64.15,
+        "avgMae": 75.13
+      },
+      {
+        "signal": "W_L_OS",
+        "n": 9,
+        "winPct": 55.6,
+        "avgPts": -36.42,
+        "avgMfe": 57.11,
+        "avgMae": 119.33
+      },
+      {
+        "signal": "W_L_CT",
+        "n": 64,
+        "winPct": 59.4,
+        "avgPts": 15.84,
+        "avgMfe": 72.47,
+        "avgMae": 66.52
+      },
+      {
+        "signal": "W_U_1",
+        "n": 63,
+        "winPct": 44.4,
+        "avgPts": -14.79,
+        "avgMfe": 56.61,
+        "avgMae": 64.02
+      },
+      {
+        "signal": "W_U_2",
+        "n": 67,
+        "winPct": 50.7,
+        "avgPts": 0.57,
+        "avgMfe": 55.44,
+        "avgMae": 58.45
+      },
+      {
+        "signal": "W_U_3+",
+        "n": 45,
+        "winPct": 42.2,
+        "avgPts": 15.96,
+        "avgMfe": 67.79,
+        "avgMae": 42.85
+      },
+      {
+        "signal": "W_U_OB",
+        "n": 9,
+        "winPct": 55.6,
+        "avgPts": 3.67,
+        "avgMfe": 58.78,
+        "avgMae": 40.14
+      },
+      {
+        "signal": "W_U_CT",
+        "n": 131,
+        "winPct": 44.3,
+        "avgPts": 1.36,
+        "avgMfe": 53.85,
+        "avgMae": 50.24
+      },
+      {
+        "signal": "T_L",
+        "n": 2,
+        "winPct": 50,
+        "avgPts": 5.88,
+        "avgMfe": 34.38,
+        "avgMae": 18
+      },
+      {
+        "signal": "T_S",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      },
+      {
+        "signal": "E_L",
+        "n": 2,
+        "winPct": 50,
+        "avgPts": 5.88,
+        "avgMfe": 34.38,
+        "avgMae": 18
+      },
+      {
+        "signal": "E_S",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      },
+      {
+        "signal": "WK_L",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      },
+      {
+        "signal": "WK_S",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      }
+    ],
+    "wickRows": [
+      {
+        "signal": "W_L_1",
+        "n": 64,
+        "winPct": 45.3,
+        "avgPts": -0.16,
+        "avgMfe": 62.57,
+        "avgMae": 67.86
+      },
+      {
+        "signal": "W_L_2",
+        "n": 60,
+        "winPct": 65,
+        "avgPts": 20.05,
+        "avgMfe": 66.56,
+        "avgMae": 58.9
+      },
+      {
+        "signal": "W_L_3+",
+        "n": 38,
+        "winPct": 60.5,
+        "avgPts": 9.29,
+        "avgMfe": 64.15,
+        "avgMae": 75.13
+      },
+      {
+        "signal": "W_L_OS",
+        "n": 9,
+        "winPct": 55.6,
+        "avgPts": -36.42,
+        "avgMfe": 57.11,
+        "avgMae": 119.33
+      },
+      {
+        "signal": "W_L_CT",
+        "n": 64,
+        "winPct": 59.4,
+        "avgPts": 15.84,
+        "avgMfe": 72.47,
+        "avgMae": 66.52
+      },
+      {
+        "signal": "W_U_1",
+        "n": 63,
+        "winPct": 44.4,
+        "avgPts": -14.79,
+        "avgMfe": 56.61,
+        "avgMae": 64.02
+      },
+      {
+        "signal": "W_U_2",
+        "n": 67,
+        "winPct": 50.7,
+        "avgPts": 0.57,
+        "avgMfe": 55.44,
+        "avgMae": 58.45
+      },
+      {
+        "signal": "W_U_3+",
+        "n": 45,
+        "winPct": 42.2,
+        "avgPts": 15.96,
+        "avgMfe": 67.79,
+        "avgMae": 42.85
+      },
+      {
+        "signal": "W_U_OB",
+        "n": 9,
+        "winPct": 55.6,
+        "avgPts": 3.67,
+        "avgMfe": 58.78,
+        "avgMae": 40.14
+      },
+      {
+        "signal": "W_U_CT",
+        "n": 131,
+        "winPct": 44.3,
+        "avgPts": 1.36,
+        "avgMfe": 53.85,
+        "avgMae": 50.24
+      }
+    ],
+    "trendRows": [
+      {
+        "signal": "T_L",
+        "n": 2,
+        "winPct": 50,
+        "avgPts": 5.88,
+        "avgMfe": 34.38,
+        "avgMae": 18
+      },
+      {
+        "signal": "T_S",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      }
+    ],
+    "entryRows": [
+      {
+        "signal": "E_L",
+        "n": 2,
+        "winPct": 50,
+        "avgPts": 5.88,
+        "avgMfe": 34.38,
+        "avgMae": 18
+      },
+      {
+        "signal": "E_S",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      }
+    ],
+    "wickEntryRows": [
+      {
+        "signal": "WK_L",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      },
+      {
+        "signal": "WK_S",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      }
+    ],
+    "bestByWin": {
+      "signal": "W_L_2",
+      "n": 60,
+      "winPct": 65,
+      "avgPts": 20.05,
+      "avgMfe": 66.56,
+      "avgMae": 58.9
+    },
+    "bestByPts": {
+      "signal": "W_L_2",
+      "n": 60,
+      "winPct": 65,
+      "avgPts": 20.05,
+      "avgMfe": 66.56,
+      "avgMae": 58.9
+    },
+    "studyName": "Cloud Regime v3.0 — Full Stack",
+    "row_count": 16
+  },
+  "strategy_tester": {
+    "totalTrades": 0,
+    "netProfit": 0,
+    "profitFactor": 0,
+    "percentProfitable": 0,
+    "dateRange": {
+      "from": null,
+      "to": null
+    }
+  },
+  "random_baseline": {
+    "simulated_trades": 100,
+    "tpPts": 20,
+    "slPts": 10,
+    "netPts": 500,
+    "winPct": 50,
+    "profitFactor": 2,
+    "expectancy": 5,
+    "note": "Null baseline — random direction at same TP/SL; not session-aware"
+  },
+  "success_criteria": {
+    "clustered_wick_n_lt_raw_labels": true,
+    "bucket_win_gt_55": true,
+    "bucket_avg_pts_gt_5": true,
+    "bucket_n_gte_30": true
+  }
+}

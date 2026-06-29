@@ -1,0 +1,122 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// 02 — RSI CONFLUENCE
+// Independent confluence indicator — Next Level Foundry
+// ══════════════════════════════════════════════════════════════════════════════
+// Outputs: RSI value, OS/OB state, slope direction, curl signal,
+//          deceleration state, and a 0–3 quality score for the data recorder.
+// Score logic:
+//   3 = in OS/OB zone + curl confirmed (slope crossed zero)
+//   2 = in OS/OB zone + slope decelerating toward curl
+//   1 = in OS/OB zone + slope still moving deeper (not exhausted yet)
+//   0 = midzone
+// ══════════════════════════════════════════════════════════════════════════════
+
+//@version=6
+indicator("02 — RSI Confluence", shorttitle="NLF RSI", overlay=false, max_bars_back=500)
+
+
+// ─── INPUTS ──────────────────────────────────────────────────────────────────
+
+grp_rsi = "═══ RSI ═══"
+rsiLen        = input.int(6, "RSI Length", minval=2, group=grp_rsi, tooltip="ChartArt default: 6. Standard exhaustion: 14.")
+rsiOversold   = input.int(30, "Oversold level", minval=10, maxval=49, group=grp_rsi)
+rsiOverbought = input.int(70, "Overbought level", minval=51, maxval=90, group=grp_rsi)
+
+grp_slope = "═══ SLOPE ═══"
+slopeLen    = input.int(5, "Slope Lookback (bars)", minval=2, group=grp_slope)
+steepThresh = input.float(1.5, "Steep Threshold (RSI pts/bar)", minval=0.1, step=0.1, group=grp_slope, tooltip="RSI linear regression slope above this = steep. Below half = flat.")
+
+grp_panel = "═══ PANEL ═══"
+showPanel = input.bool(true, "Show Panel", group=grp_panel)
+panelPos  = input.string("Bottom Left", "Position", options=["Top Right", "Top Left", "Bottom Right", "Bottom Left", "Middle Right", "Middle Left"], group=grp_panel)
+
+
+// ─── RSI ─────────────────────────────────────────────────────────────────────
+
+rsiVal = ta.rsi(close, rsiLen)
+
+isOversold    = rsiVal <= rsiOversold
+isOverbought  = rsiVal >= rsiOverbought
+inZone        = isOversold or isOverbought
+isApproaching = (rsiVal <= rsiOversold + 5 and not isOversold) or (rsiVal >= rsiOverbought - 5 and not isOverbought)
+
+
+// ─── SLOPE ───────────────────────────────────────────────────────────────────
+
+slopeRaw   = ta.linreg(rsiVal, slopeLen, 0) - ta.linreg(rsiVal, slopeLen, 1)
+slopePrior = ta.linreg(rsiVal, slopeLen, 1) - ta.linreg(rsiVal, slopeLen, 2)
+mildThresh = steepThresh * 0.5
+
+slopeLabel = slopeRaw > steepThresh ? "▲▲ steep" : slopeRaw > mildThresh ? "▲  mild" : slopeRaw < -steepThresh ? "▼▼ steep" : slopeRaw < -mildThresh ? "▼  mild" : "──  flat"
+
+
+// ─── CURL DETECTION ──────────────────────────────────────────────────────────
+
+curlLong  = isOversold and slopeRaw > 0 and slopePrior <= 0
+curlShort = isOverbought and slopeRaw < 0 and slopePrior >= 0
+anyCurl   = curlLong or curlShort
+
+decelLong  = isOversold and slopeRaw < 0 and slopeRaw > slopePrior
+decelShort = isOverbought and slopeRaw > 0 and slopeRaw < slopePrior
+anyDecel   = decelLong or decelShort
+
+
+// ─── QUALITY SCORE (0–3) ─────────────────────────────────────────────────────
+
+rsiScore = inZone and anyCurl ? 3 : inZone and anyDecel ? 2 : inZone ? 1 : 0
+
+qualLabel = rsiScore == 3 ? "HIGH" : rsiScore == 2 ? "MED" : rsiScore == 1 ? "LOW" : "—"
+qualClr   = rsiScore == 3 ? color.new(#06d6a0, 0) : rsiScore == 2 ? color.new(#f59e0b, 0) : rsiScore == 1 ? color.new(#ff3860, 0) : color.new(#8b89a0, 0)
+
+posVal = panelPos == "Top Left" ? position.top_left : panelPos == "Bottom Right" ? position.bottom_right : panelPos == "Bottom Left" ? position.bottom_left : panelPos == "Middle Right" ? position.middle_right : panelPos == "Middle Left" ? position.middle_left : position.top_right
+
+
+// ─── PLOTS ───────────────────────────────────────────────────────────────────
+
+rsiLineClr = isOversold ? color.new(#06d6a0, 0) : isOverbought ? color.new(#ff3860, 0) : color.new(#a855f7, 0)
+plot(rsiVal, "RSI", color=rsiLineClr, linewidth=2)
+
+plot(curlLong ? rsiVal : na, "Curl Up", color=color.new(#06d6a0, 0), style=plot.style_circles, linewidth=5)
+plot(curlShort ? rsiVal : na, "Curl Down", color=color.new(#ff3860, 0), style=plot.style_circles, linewidth=5)
+plot(decelLong ? rsiVal : na, "Decel Long", color=color.new(#f59e0b, 0), style=plot.style_circles, linewidth=3)
+plot(decelShort ? rsiVal : na, "Decel Short", color=color.new(#f59e0b, 0), style=plot.style_circles, linewidth=3)
+
+hline(rsiOverbought, "Overbought", color=color.new(#ff3860, 50), linestyle=hline.style_dashed, linewidth=1)
+hline(50, "Midline", color=color.new(color.gray, 60), linestyle=hline.style_dotted, linewidth=1)
+hline(rsiOversold, "Oversold", color=color.new(#06d6a0, 50), linestyle=hline.style_dashed, linewidth=1)
+
+bgcolor(isOversold and barstate.isconfirmed ? color.new(#06d6a0, 90) : na, title="Oversold Zone")
+bgcolor(isOverbought and barstate.isconfirmed ? color.new(#ff3860, 90) : na, title="Overbought Zone")
+
+
+// ─── PANEL ───────────────────────────────────────────────────────────────────
+
+var table rsiPanel = table.new(posVal, 2, 7, bgcolor=color.new(#0a0a0f, 10), border_color=color.new(#a855f7, 70), border_width=1, frame_color=color.new(#a855f7, 50), frame_width=1)
+
+if barstate.islast and showPanel
+    table.cell(rsiPanel, 0, 0, "RSI CONFLUENCE", text_color=color.new(#a855f7, 0), text_size=size.small, text_halign=text.align_left, bgcolor=color.new(#12121e, 10))
+    table.cell(rsiPanel, 1, 0, "score  " + str.tostring(rsiScore), text_color=qualClr, text_size=size.small, text_halign=text.align_right, bgcolor=color.new(#12121e, 10))
+
+    rsiClr = isOversold ? color.new(#06d6a0, 0) : isOverbought ? color.new(#ff3860, 0) : color.new(#e8e6f0, 0)
+    table.cell(rsiPanel, 0, 1, "RSI", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(rsiPanel, 1, 1, str.tostring(rsiVal, "#.##"), text_color=rsiClr, text_size=size.tiny, text_halign=text.align_right)
+
+    stateText = isOversold ? "oversold" : isOverbought ? "overbought" : isApproaching ? "approaching" : "midzone"
+    stateClr  = isOversold ? color.new(#06d6a0, 0) : isOverbought ? color.new(#ff3860, 0) : isApproaching ? color.new(#f59e0b, 0) : color.new(#8b89a0, 0)
+    table.cell(rsiPanel, 0, 2, "State", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(rsiPanel, 1, 2, stateText, text_color=stateClr, text_size=size.tiny, text_halign=text.align_right)
+
+    slopeClr = slopeRaw > 0 ? color.new(#06d6a0, 0) : slopeRaw < 0 ? color.new(#ff3860, 0) : color.gray
+    table.cell(rsiPanel, 0, 3, "Slope", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(rsiPanel, 1, 3, slopeLabel, text_color=slopeClr, text_size=size.tiny, text_halign=text.align_right)
+
+    table.cell(rsiPanel, 0, 4, "Slope val", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(rsiPanel, 1, 4, str.tostring(slopeRaw, "#.###"), text_color=color.new(#e8e6f0, 0), text_size=size.tiny, text_halign=text.align_right)
+
+    curlText = curlLong ? "▲ CURL UP" : curlShort ? "▼ CURL DOWN" : decelLong ? "slowing ↑" : decelShort ? "slowing ↓" : "—"
+    curlClr  = curlLong or curlShort ? qualClr : color.new(#f59e0b, 0)
+    table.cell(rsiPanel, 0, 5, "Curl / decel", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(rsiPanel, 1, 5, curlText, text_color=curlClr, text_size=size.tiny, text_halign=text.align_right)
+
+    table.cell(rsiPanel, 0, 6, "Quality", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(rsiPanel, 1, 6, qualLabel, text_color=qualClr, text_size=size.tiny, text_halign=text.align_right)

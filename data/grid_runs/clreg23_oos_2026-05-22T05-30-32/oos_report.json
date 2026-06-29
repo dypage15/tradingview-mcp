@@ -1,0 +1,56 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\clreg23_oos_2026-05-22T05-30-32",
+  "method": "trade_list_split",
+  "spec": {
+    "rsiMode": "Combined",
+    "rsiLen": 6,
+    "confLookback": 3,
+    "cloudSmooth": 3,
+    "minBarsBetween": 0,
+    "minCloudSep": 0,
+    "riskMode": "Points",
+    "tpPoints": 30,
+    "slPoints": 15
+  },
+  "entity_id": "tHzDzY",
+  "symbol": "CME_MINI:MNQ1!",
+  "timeframe": "5",
+  "date_range": {
+    "from": "2026-02-09T03:20:00.000Z",
+    "to": "2026-05-22T05:20:00.000Z",
+    "split": "2026-04-21T14:20:00.000Z",
+    "train_frac": 0.7
+  },
+  "full_window": {
+    "trades": 551,
+    "netProfit": 2581.2599999999366,
+    "profitFactor": 1.1294622616148167,
+    "percentProfitable": 0.37749546279491836
+  },
+  "train": {
+    "trades": 0,
+    "netProfit": 0,
+    "profitFactor": 0,
+    "percentProfitable": 0,
+    "expectancy": null
+  },
+  "test": {
+    "trades": 0,
+    "netProfit": 0,
+    "profitFactor": 0,
+    "percentProfitable": 0,
+    "expectancy": null
+  },
+  "oos_pass": false,
+  "trade_sample_fields": [
+    "b",
+    "c",
+    "e",
+    "id",
+    "p",
+    "q",
+    "tm",
+    "tp"
+  ],
+  "trade_count_fetched": 200
+}

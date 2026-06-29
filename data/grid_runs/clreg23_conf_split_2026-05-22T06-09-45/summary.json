@@ -1,0 +1,83 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\clreg23_conf_split_2026-05-22T06-09-45",
+  "symbol": "CME_MINI:MNQ1!",
+  "timeframe": "5",
+  "session": "Asia + NY (Arizona)",
+  "cloud": {
+    "smooth": 3,
+    "tp": 30,
+    "sl": 15,
+    "confLookback": 3
+  },
+  "rsi_spec": {
+    "mode": "Combined",
+    "len": 6
+  },
+  "bb_spec": {
+    "len": 20,
+    "mult": 2,
+    "mode": "Proximity",
+    "buffer": 1.5
+  },
+  "results": [
+    {
+      "label": "Cloud+RSI",
+      "confluenceMode": "RSI",
+      "totalTrades": 353,
+      "percentProfitable": 39.376770538243626,
+      "profitFactor": 1.0000854199155502,
+      "netProfit": 0.7800000000588625,
+      "expectancy": 0.002209631728212075,
+      "execution_table": {
+        "parsed": true,
+        "dataSource": "engine",
+        "signalsLong": 173,
+        "signalsShort": 182,
+        "fillsLong": 0,
+        "fillsShort": 0,
+        "closedTrades": 353,
+        "engineClosed": 353,
+        "recordedWins": 139,
+        "recordedLosses": 214,
+        "winPct": 39.4,
+        "netPts": 0.78,
+        "profitFactor": 1,
+        "bullFlips": 303,
+        "bearFlips": 309,
+        "missedLong": 130,
+        "missedShort": 127
+      },
+      "metrics_source": "tester_or_engine"
+    },
+    {
+      "label": "Cloud+BB",
+      "confluenceMode": "BB",
+      "totalTrades": 98,
+      "percentProfitable": 38.775510204081634,
+      "profitFactor": 0.9595657455208025,
+      "netProfit": -106.51999999999771,
+      "expectancy": -1.0869387755101807,
+      "execution_table": {
+        "parsed": true,
+        "dataSource": "engine",
+        "signalsLong": 50,
+        "signalsShort": 50,
+        "fillsLong": 0,
+        "fillsShort": 0,
+        "closedTrades": 98,
+        "engineClosed": 98,
+        "recordedWins": 38,
+        "recordedLosses": 60,
+        "winPct": 38.8,
+        "netPts": -106.52,
+        "profitFactor": 0.96,
+        "bullFlips": 303,
+        "bearFlips": 309,
+        "missedLong": 253,
+        "missedShort": 259
+      },
+      "metrics_source": "tester_or_engine"
+    }
+  ],
+  "winner": "Cloud+RSI"
+}

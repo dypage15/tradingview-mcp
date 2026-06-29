@@ -1,0 +1,66 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\cr3_grid_2026-05-29T22-31-04",
+  "scenario_count": 54,
+  "profitable_count": 0,
+  "best_trades": null,
+  "best_research": {
+    "scenarioId": 4,
+    "spec": {
+      "htfTF": "5",
+      "cloudSmooth": 3,
+      "zOptLow": 18,
+      "zOptHigh": 35,
+      "tpPoints": 20,
+      "slPoints": 10,
+      "useSession": true,
+      "sessStart": "0930-1200",
+      "enableResearch": true,
+      "outcomeLB": 20,
+      "clusterBars": 12,
+      "useTrendTier": true,
+      "useWickTier": false,
+      "wickMinConf": 2,
+      "adxEntryHigh": 35,
+      "useVwap2Bar": false,
+      "minWickConfDisplay": 3,
+      "adxBandLabel": "18-35",
+      "sessionLabel": "morning"
+    },
+    "error": null,
+    "totalTrades": 0,
+    "percentProfitable": 0,
+    "profitFactor": 0,
+    "netProfit": 0,
+    "expectancy": null,
+    "research": {
+      "parsed": true,
+      "bestBucket": {
+        "signal": "W_L_2",
+        "n": 274,
+        "winPct": 59.1,
+        "avgPts": 12.51,
+        "avgMfe": 73.12,
+        "avgMae": 67.91
+      },
+      "trendTL": {
+        "signal": "T_L",
+        "n": 2,
+        "winPct": 0,
+        "avgPts": -43.88,
+        "avgMfe": 67.75,
+        "avgMae": 97.25
+      },
+      "trendTS": {
+        "signal": "T_S",
+        "n": 4,
+        "winPct": 50,
+        "avgPts": 53.56,
+        "avgMfe": 140.56,
+        "avgMae": 44.56
+      }
+    },
+    "metConstraint": false,
+    "score": -5000
+  },
+  "top_trades": []
+}

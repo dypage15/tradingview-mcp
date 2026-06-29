@@ -1,0 +1,438 @@
+// ----------------------------------------------------------------------------
+// ERL → IRL ENGINE — AUTOMATED STRATEGY PACK (research / backtest scaffold)
+//
+// Purpose: Mirrors the SAME math core as “ERL → IRL Engine v2.x [NLF]” indicators
+// (swings, sweeps, BwD, SR pivot trend, scoring, engine draw-target) so you can
+// run TradingView Strategy Tester and tune entries/stops/targets objectively.
+//
+// NOT financial advice — validate on your instruments, timeframe, commissions.
+//
+// ENTRY PLAYBOOK (matches panel + alert philosophy):
+//  · Continuation: price re-enters displacement zone AFTER BwD, confidence gated
+//  · Reversal SR: SR confluence aligns with directional bias (+ score thresholds)
+//
+// EXITS:
+//  · Stop from entry = slATRMult × ATR (configurable side)
+//  · Take-profit = engine Draw Target price when valid; otherwise ATR risk-reward
+//
+// PROPERTIES (defaults aligned to common TV “Strategy properties” pane):
+//  · Initial capital 100k · fixed order size qty 1 · pyramiding 0
+//  · Commission 0.025% · Slippage 3 ticks · Verify limit 0 ticks = TV UI default
+//  · Margin below: 100% = prop-style full-reserve sim (fewer margin-call artefacts in Tester).
+//    Use 10/10 to match a typical TV properties screenshot.
+//
+// ----------------------------------------------------------------------------
+//@version=6
+strategy(
+     title                   = "ERL → IRL Engine Strategy [NLF]",
+     shorttitle              = "NLF Strat",
+     overlay                 = true,
+     pyramiding              = 0,
+     calc_on_every_tick      = false,
+     process_orders_on_close = true,
+     initial_capital         = 100000,
+     default_qty_type        = strategy.fixed,
+     default_qty_value       = 1,
+     commission_type         = strategy.commission.percent,
+     commission_value        = 0.025,
+     slippage                = 3,
+     max_lines_count         = 250,
+     max_labels_count        = 120,
+     max_boxes_count         = 50,
+     margin_long             = 100,
+     margin_short            = 100)
+
+// Screenshots often show 10% — change header above to 10/10 when matching that dialog.
+
+// HHMM helpers (930 → minutes from midnight NY)
+minsFromHm(hm) => math.floor(hm / 100) * 60 + hm % 100
+
+// === Intraday (NY flatten, entry window limits trade count vs 24h) ===========
+gSess = "Intraday (NY)"
+sessionTZ       = input.string("America/New_York", "Timezone (gates + session score)", group = gSess)
+entryOpenHm     = input.int(930,  "Earliest NEW entry time (HHMM)", minval = 0, maxval = 2359, group = gSess)
+entryCutoffHm   = input.int(1530, "Last time for NEW entries (HHMM)", minval = 0, maxval = 2359, group = gSess)
+nycFlatHm       = input.int(1600, "Flat all — NY session end (HHMM)", minval = 0, maxval = 2359, group = gSess)
+minBarsBetween  = input.int(96,   "Min bars between NEW entries", minval = 0, maxval = 500, group = gSess)
+
+// === ENGINE INPUTS ============================================================
+gCore = "Core (same knobs as NLF advisor)"
+swingLen    = input.int(15,   "Swing strength (bars each side)", minval = 3,  group = gCore)
+maxLookback = input.int(300,  "Max pivot lookback (bars)",        minval = 50, group = gCore)
+bwdATRMult  = input.float(1.2, "BwD body min × ATR",               minval = 0.3, step = 0.1, group = gCore)
+bwdBodyPct  = input.int(55,    "BwD body % of candle",             minval = 30,  maxval = 90, group = gCore)
+sweepCool   = input.int(20,    "Sweep cooldown (bars)",            minval = 0,  group = gCore)
+sweepLock   = input.bool(true, "Lock sweep level",                 group = gCore)
+srLen       = input.int(21,    "SR lookback length",               minval = 5,  group = gCore)
+sessionOn   = input.bool(true, "Apply session scoring",            group = gCore)
+
+// === Visualization (strategy Tester still shows arrows / bands) ============
+gPlot = "Visuals"
+showVis     = input.bool(true,  "Liquidity visuals (ERL / IRL / EQ lines)", group = gPlot)
+showSignals = input.bool(true,  "Entry signal markers",                    group = gPlot)
+shadePos    = input.bool(true,  "Background tint while in position", group = gPlot)
+barSRCol    = input.bool(true,  "SR-style candle tint (like NLF advisor)", group = gPlot)
+
+cErHi = color.new(#f87171, 58)
+cErLo = color.new(#4ade80, 58)
+cEq = color.new(#22d3ee, 74)
+
+// === TRADING RULES ============================================================
+gTrade      = "Entry filters"
+tradeCont    = input.bool(true, "Allow continuation: BwD zone re-entry", group = gTrade)
+tradeRevSr   = input.bool(true, "Allow reversal on SR ↔ bias confluence",   group = gTrade)
+minScoreCont = input.int(78, "Min confidence (continuation)", minval = 0, maxval = 100, group = gTrade)
+minScoreRev  = input.int(78, "Min confidence (reversal SR)",    minval = 0, maxval = 100, group = gTrade)
+
+gExit       = "Exits"
+slATRmult     = input.float(2.0, "Hard stop × ATR from entry",          minval = 0.2, step = 0.1, group = gExit)
+useEngineTp   = input.bool(true, "TP at engine Draw Target px",           group = gExit)
+atrTpFallback = input.float(3.0, "Fallback TP if target invalid (+ long / − short) × ATR", minval = 0.25, step = 0.25, group = gExit)
+debugTpHint = input.bool(false, "Plot live TP hints", group = gExit)
+
+// ----------------------------------------------------------------------------
+//  ATR + PDH / PDL + SR + SWING RANGE — identical logic to NLF advisor
+// ----------------------------------------------------------------------------
+atr        = ta.atr(14)
+bodySize   = math.abs(close - open)
+candleRng  = high - low
+bodyRatio  = candleRng > 0 ? bodySize / candleRng : 0.0
+
+pdh = request.security(syminfo.tickerid, "D", high[1], lookahead = barmerge.lookahead_on)
+pdl = request.security(syminfo.tickerid, "D", low[1], lookahead = barmerge.lookahead_on)
+
+srH    = bar_index > 5 and high[5] < high[4] and high[4] < high[3] and high[3] > high[2] and high[2] > high[1] ? 1 : 0
+srL    = bar_index > 5 and low[5]  > low[4]  and low[4]  > low[3]  and low[3]  < low[2]  and low[2]  < low[1]  ? 1 : 0
+srHn   = math.sum(srH, srLen)
+srLn   = math.sum(srL, srLen)
+srHval = srH > 0 ? high[3] : 0.0
+srLval = srL > 0 ? low[3]  : 0.0
+srHsum = math.sum(srHval, srLen)
+srLsum = math.sum(srLval, srLen)
+srR    = srLn > 0 and srHn > 0 ? math.abs(srHsum / srHn - srLsum / srLn) : 0.0
+
+var float hvalc = na
+var float lvalc = na
+var float hvalr = na
+var float lvalr = na
+
+hvalc := srHval > 0 and srR > 0 ? srHval : hvalc[1]
+lvalc := srLval > 0 and srR > 0 ? srLval : lvalc[1]
+hvalr := srHval > 0 and srR > 0 ? srHval - srR : hvalr[1]
+lvalr := srLval > 0 and srR > 0 ? srLval + srR : lvalr[1]
+
+var int srTrend = 0
+srTrend := close > lvalr and close > hvalr ? 1 : close < lvalr and close < hvalr ? -1 : srTrend[1]
+
+srLongEntry  = srTrend == 1  and close > hvalc
+srShortEntry = srTrend == -1 and close < lvalc
+
+var int srLong  = 0
+var int srShort = 0
+srLong  := srTrend == 1  and close > hvalc ? 1 : srTrend == -1 ? -1 : srLong[1]
+srShort := srTrend == -1 and close < lvalc ? 1 : srTrend == 1  ? -1 : srShort[1]
+
+ph = ta.pivothigh(swingLen, swingLen)
+pl = ta.pivotlow(swingLen, swingLen)
+
+var array<float> phPx  = array.new<float>()
+var array<int>   phBar = array.new<int>()
+var array<float> plPx  = array.new<float>()
+var array<int>   plBar = array.new<int>()
+
+if not na(ph)
+    array.push(phPx, ph)
+    array.push(phBar, bar_index - swingLen)
+if not na(pl)
+    array.push(plPx, pl)
+    array.push(plBar, bar_index - swingLen)
+
+cutoff = bar_index - maxLookback
+while array.size(phBar) > 0 and array.get(phBar, 0) < cutoff
+    array.shift(phBar)
+    array.shift(phPx)
+while array.size(plBar) > 0 and array.get(plBar, 0) < cutoff
+    array.shift(plBar)
+    array.shift(plPx)
+
+float rangeHi    = na
+int   rangeHiBar = na
+float rangeLo    = na
+int   rangeLoBar = na
+
+if array.size(phPx) > 0
+    for i = 0 to array.size(phPx) - 1
+        v = array.get(phPx, i)
+        if na(rangeHi) or v > rangeHi
+            rangeHi    := v
+            rangeHiBar := array.get(phBar, i)
+
+if array.size(plPx) > 0
+    for i = 0 to array.size(plPx) - 1
+        v = array.get(plPx, i)
+        if na(rangeLo) or v < rangeLo
+            rangeLo    := v
+            rangeLoBar := array.get(plBar, i)
+
+eq = na(rangeHi) or na(rangeLo) ? na : (rangeHi + rangeLo) / 2.0
+
+hh   = hour(time, sessionTZ)
+mm   = minute(time, sessionTZ)
+tVal = hh * 100 + mm
+inLon   = tVal >= 300 and tVal < 1200
+inNY    = tVal >= 930 and tVal < 1600
+inSess  = inLon or inNY
+
+// Intraday clock (minutes from midnight in session TZ)
+mnNow     = hh * 60 + mm
+mnEnterO  = minsFromHm(entryOpenHm)
+mnEnterX  = minsFromHm(entryCutoffHm)
+mnFlatNY  = minsFromHm(nycFlatHm)
+nyEntryWin = mnNow >= mnEnterO and mnNow < mnEnterX
+nyPastClose = mnNow >= mnFlatNY
+
+var string lastSweepType = "NONE"
+var int    lastSweepBar  = na
+var float  bslSweptLvl   = na
+var float  sslSweptLvl   = na
+var int    lastBSLBar    = na
+var int    lastSSLBar    = na
+
+bslERL  = not na(rangeHi) and high > rangeHi and close < rangeHi
+sslERL  = not na(rangeLo) and low < rangeLo and close > rangeLo
+bslPDH  = not na(pdh) and high > pdh and close < pdh
+sslPDL  = not na(pdl) and low < pdl and close > pdl
+
+bslNewLvl = not sweepLock or na(bslSweptLvl) or (rangeHi != bslSweptLvl and pdh != bslSweptLvl)
+sslNewLvl = not sweepLock or na(sslSweptLvl) or (rangeLo != sslSweptLvl and pdl != sslSweptLvl)
+bslCool   = na(lastBSLBar) or bar_index - lastBSLBar >= sweepCool
+sslCool   = na(lastSSLBar) or bar_index - lastSSLBar >= sweepCool
+
+bslSweep  = (bslERL or bslPDH) and bslNewLvl and bslCool
+sslSweep  = (sslERL or sslPDL) and sslNewLvl and sslCool
+
+if bslSweep
+    lastSweepType := "BSL"
+    lastSweepBar  := bar_index
+    bslSweptLvl   := bslPDH ? pdh : rangeHi
+    lastBSLBar    := bar_index
+if sslSweep
+    lastSweepType := "SSL"
+    lastSweepBar  := bar_index
+    sslSweptLvl   := sslPDL ? pdl : rangeLo
+    lastSSLBar    := bar_index
+
+bwdSizeOK = bodySize >= atr * bwdATRMult
+bwdBodyOK = bodyRatio >= bwdBodyPct / 100.0
+
+bullBwD_ERL = not na(rangeHi) and close > rangeHi and open <= rangeHi and bwdSizeOK and bwdBodyOK
+bearBwD_ERL = not na(rangeLo) and close < rangeLo and open >= rangeLo and bwdSizeOK and bwdBodyOK
+bullBwD_PDH = not na(pdh) and close > pdh and open <= pdh and bwdSizeOK and bwdBodyOK
+bearBwD_PDL = not na(pdl) and close < pdl and open >= pdl and bwdSizeOK and bwdBodyOK
+
+bullBwD = (bullBwD_ERL or bullBwD_PDH) and not bearBwD_ERL and not bearBwD_PDL
+bearBwD = (bearBwD_ERL or bearBwD_PDL) and not bullBwD_ERL and not bullBwD_PDH
+
+var string lastBwDType = "NONE"
+var int    lastBwDBar  = na
+var float  bwdZoneTop  = na
+var float  bwdZoneBot  = na
+var float  flippedLvl  = na
+var bool   flippedBull = false
+var float  extensionHi = na
+var float  extensionLo = na
+
+if bullBwD
+    lastBwDType := "BULL"
+    lastBwDBar  := bar_index
+    bwdZoneTop  := math.max(open, close)
+    bwdZoneBot  := math.min(open, close)
+    flippedLvl  := bullBwD_PDH ? pdh : rangeHi
+    flippedBull := true
+    extensionHi := high
+    extensionLo := na
+    bslSweptLvl := bullBwD_PDH ? pdh : rangeHi
+    lastBSLBar  := bar_index
+
+if bearBwD
+    lastBwDType := "BEAR"
+    lastBwDBar  := bar_index
+    bwdZoneTop  := math.max(open, close)
+    bwdZoneBot  := math.min(open, close)
+    flippedLvl  := bearBwD_PDL ? pdl : rangeLo
+    flippedBull := false
+    extensionLo := low
+    extensionHi := na
+    sslSweptLvl := bearBwD_PDL ? pdl : rangeLo
+    lastSSLBar  := bar_index
+
+if lastBwDType == "BULL" and not na(extensionHi)
+    extensionHi := math.max(extensionHi, high)
+if lastBwDType == "BEAR" and not na(extensionLo)
+    extensionLo := math.min(extensionLo, low)
+
+inBwDZone = lastBwDType != "NONE" and not na(bwdZoneTop) and not na(lastBwDBar) and bar_index > lastBwDBar and high >= bwdZoneBot and low <= bwdZoneTop
+
+if not na(flippedLvl) and not na(lastBwDBar)
+    barsSinceFlip = bar_index - lastBwDBar
+    farFromFlip   = math.abs(close - flippedLvl) > atr * 10
+    if (barsSinceFlip > 200 and not inBwDZone) or farFromFlip
+        flippedLvl  := na
+        flippedBull := false
+
+barsSweep = na(lastSweepBar) ? 99999 : bar_index - lastSweepBar
+barsBwD   = na(lastBwDBar) ? 99999 : bar_index - lastBwDBar
+
+string mode = "WAIT"
+string bias = "NEUTRAL"
+
+if lastSweepType == "NONE" and lastBwDType == "NONE"
+    mode := "WAIT"
+    bias := "NEUTRAL"
+else if barsSweep <= barsBwD and lastSweepType != "NONE"
+    if lastSweepType == "BSL"
+        mode := "REVERSAL"
+        bias := "SHORT"
+    else if lastSweepType == "SSL"
+        mode := "REVERSAL"
+        bias := "LONG"
+else if lastBwDType != "NONE"
+    if lastBwDType == "BULL"
+        mode := "CONTINUATION"
+        bias := "LONG"
+    else if lastBwDType == "BEAR"
+        mode := "CONTINUATION"
+        bias := "SHORT"
+
+aboveEq = not na(eq) and close > eq
+belowEq = not na(eq) and close <= eq
+
+drawTargetPx = mode == "REVERSAL"
+     ? (bias == "SHORT" ? (aboveEq ? eq : rangeLo) : (belowEq ? eq : rangeHi))
+     : mode == "CONTINUATION"
+         ? (inBwDZone ? (bwdZoneTop + bwdZoneBot) / 2.0 : bias == "LONG" ? extensionHi : extensionLo)
+         : na
+
+// Score (mirror NLF advisory)
+var int score = 0
+score := 0
+if mode == "REVERSAL" and lastSweepType != "NONE"
+    score += 35
+if mode == "CONTINUATION" and lastBwDType != "NONE"
+    score += 35
+
+if not na(pdh) and not na(pdl) and mode != "WAIT"
+    eventLvl = mode == "REVERSAL" ? (lastSweepType == "BSL" ? bslSweptLvl : sslSweptLvl) : (lastBwDType == "BULL" ? bwdZoneTop : bwdZoneBot)
+    keyLvl   = mode == "REVERSAL" ? (lastSweepType == "BSL" ? pdh : pdl) : (lastBwDType == "BULL" ? pdh : pdl)
+    if not na(eventLvl) and not na(keyLvl) and math.abs(eventLvl - keyLvl) < atr * 1.5
+        score += 15
+
+if sessionOn
+    score += inSess ? 20 : -10
+
+if srTrend == 1 and bias == "LONG"
+    score += 15
+else if srTrend == -1 and bias == "SHORT"
+    score += 15
+else if (srTrend == 1 and bias == "SHORT") or (srTrend == -1 and bias == "LONG")
+    score -= 10
+
+if mode == "CONTINUATION" and inBwDZone
+    score += 20
+
+freshBars = mode == "REVERSAL" ? barsSweep : barsBwD
+score     += freshBars < 20 ? 20 : freshBars < 50 ? 12 : freshBars < 100 ? 6 : 0
+
+if not na(rangeHi) and not na(rangeLo)
+    score += 10
+
+score := math.max(0, math.min(score, 100))
+
+// Edge triggers aligned with alerts
+bwdZoneEntry = mode == "CONTINUATION" and inBwDZone and not inBwDZone[1]
+highScoreEdge = score >= 75 and not (score[1] >= 75)
+
+// Matches indicator: first bar of SR entry + bias + engine score >= 60
+srLongAlign  = srLongEntry and not srLongEntry[1] and bias == "LONG" and score >= 60
+srShortAlign = srShortEntry and not srShortEntry[1] and bias == "SHORT" and score >= 60
+
+longCont  = tradeCont and mode == "CONTINUATION" and bias == "LONG" and bwdZoneEntry and score >= minScoreCont
+shortCont = tradeCont and mode == "CONTINUATION" and bias == "SHORT" and bwdZoneEntry and score >= minScoreCont
+
+longRev   = tradeRevSr and mode == "REVERSAL" and bias == "LONG" and srLongAlign and score >= minScoreRev
+shortRev  = tradeRevSr and mode == "REVERSAL" and bias == "SHORT" and srShortAlign and score >= minScoreRev
+
+longRaw   = longCont or longRev
+shortRaw  = shortCont or shortRev
+
+var int lastEntryBi = na
+enteredBar = strategy.position_size != 0 and strategy.position_size[1] == 0
+if enteredBar
+    lastEntryBi := bar_index
+
+betweenOk = minBarsBetween <= 0 or na(lastEntryBi) or bar_index - lastEntryBi >= minBarsBetween
+
+longSig = longRaw and nyEntryWin and betweenOk
+shortSig = shortRaw and nyEntryWin and betweenOk
+
+// Close opposite side first; new entries only NY window + staggered entries
+if longSig and strategy.position_size < 0
+    strategy.close("S", comment = "cover short -> long setup")
+if shortSig and strategy.position_size > 0
+    strategy.close("L", comment = "sell long -> short setup")
+
+if strategy.position_size == 0 and longSig and not shortSig
+    strategy.entry("L", strategy.long)
+
+if strategy.position_size == 0 and shortSig and not longSig
+    strategy.entry("S", strategy.short)
+
+// -----------------------------------------------------------------------------
+// exits
+// -----------------------------------------------------------------------------
+avgAll = strategy.position_avg_price
+
+stpLongRaw  = avgAll - atr * slATRmult
+stpShortRaw = avgAll + atr * slATRmult
+
+tpLng = strategy.position_size > 0 ? (useEngineTp and not na(drawTargetPx) and drawTargetPx > avgAll ? drawTargetPx : avgAll + atr * atrTpFallback) : na
+tpSh = strategy.position_size < 0 ? (useEngineTp and not na(drawTargetPx) and drawTargetPx < avgAll ? drawTargetPx : avgAll - atr * atrTpFallback) : na
+
+if strategy.position_size > 0 and not na(tpLng)
+    strategy.exit("XL", from_entry = "L", limit = tpLng, stop = stpLongRaw)
+
+if strategy.position_size < 0 and not na(tpSh)
+    strategy.exit("XS", from_entry = "S", limit = tpSh, stop = stpShortRaw)
+
+if barstate.isconfirmed and nyPastClose
+    strategy.cancel_all()
+    strategy.close_all(comment = "NY EOD flat")
+
+// --- Visual overlays (were disabled → chart looked blank) ----------------------------
+bgLong = shadePos and strategy.position_size > 0 ? color.new(#4ade80, 93) :
+     shadePos and strategy.position_size < 0 ? color.new(#f87171, 93) :
+     na
+bgcolor(bgLong)
+
+scrBarTint = srLong > 0 ? color.new(#818cf8, 72) :
+     srShort > 0 ? color.new(#f472b6, 72) :
+     srTrend == 1 ? color.new(#818cf8, 88) :
+     srTrend == -1 ? color.new(#f472b6, 88) :
+     na
+barcolor(barSRCol ? scrBarTint : na)
+
+plotshape(showSignals and longSig and strategy.position_size == 0,
+     title = "NLF long cue", style = shape.triangleup,
+     location = location.belowbar, color = color.teal, text = "L")
+
+plotshape(showSignals and shortSig and strategy.position_size == 0,
+     title = "NLF short cue", style = shape.triangledown,
+     location = location.abovebar, color = color.maroon, text = "S")
+
+plot(showVis and not na(rangeHi) ? rangeHi : na, title = "ERL High ref", linewidth = 2, color = cErHi)
+plot(showVis and not na(rangeLo) ? rangeLo : na, title = "ERL Low ref", linewidth = 2, color = cErLo)
+plot(showVis and not na(eq) ? eq : na, title = "IRL Eq ref", linewidth = 1,
+     style = plot.style_circles, color = cEq)
+
+plot(debugTpHint and strategy.position_size > 0 ? tpLng : na, "Live long TP hint", color = color.new(color.teal, 0), linewidth = 2)
+plot(debugTpHint and strategy.position_size < 0 ? tpSh : na, "Live short TP hint", color = color.new(color.orange, 0), linewidth = 2)

@@ -1,0 +1,483 @@
+{
+  "source": "c:\\Users\\dypag\\Downloads\\CR_v3_CME_MINI_MNQ1!_2026-05-29_ec5eb.xlsx",
+  "total_trades": 250,
+  "net_pnl": 2114.5,
+  "by_side": {
+    "Long": {
+      "n": 144,
+      "w": 65,
+      "pnl": 1018.4399999999989,
+      "mfe": 2963.7800000000057,
+      "mae": 2193.389999999995,
+      "wr": 45.1,
+      "avg_pnl": 7.07,
+      "avg_mfe": 20.6,
+      "avg_mae": 15.2
+    },
+    "Short": {
+      "n": 106,
+      "w": 47,
+      "pnl": 1096.0599999999995,
+      "mfe": 2262.570000000004,
+      "mae": 1584.6099999999963,
+      "wr": 44.3,
+      "avg_pnl": 10.34,
+      "avg_mfe": 21.3,
+      "avg_mae": 14.9
+    }
+  },
+  "by_entry_signal": {
+    "CR3_WL": {
+      "n": 144,
+      "w": 65,
+      "pnl": 1018.4399999999989,
+      "mfe": 2963.7800000000057,
+      "mae": 2193.389999999995,
+      "wr": 45.1,
+      "avg_pnl": 7.07,
+      "avg_mfe": 20.6,
+      "avg_mae": 15.2
+    },
+    "CR3_WU": {
+      "n": 106,
+      "w": 47,
+      "pnl": 1096.0599999999995,
+      "mfe": 2262.570000000004,
+      "mae": 1584.6099999999963,
+      "wr": 44.3,
+      "avg_pnl": 10.34,
+      "avg_mfe": 21.3,
+      "avg_mae": 14.9
+    }
+  },
+  "by_exit_signal": {
+    "WL_Exit": {
+      "n": 112,
+      "w": 45,
+      "pnl": 860.1199999999992,
+      "mfe": 2680.8900000000044,
+      "mae": 1991.9699999999957,
+      "wr": 40.2,
+      "avg_pnl": 7.68,
+      "avg_mfe": 23.9,
+      "avg_mae": 17.8
+    },
+    "WS_Exit": {
+      "n": 74,
+      "w": 35,
+      "pnl": 1081.2399999999996,
+      "mfe": 1908.4300000000028,
+      "mae": 1304.1899999999976,
+      "wr": 47.3,
+      "avg_pnl": 14.61,
+      "avg_mfe": 25.8,
+      "avg_mae": 17.6
+    },
+    "ADX_Block": {
+      "n": 64,
+      "w": 32,
+      "pnl": 173.13999999999982,
+      "mfe": 637.030000000001,
+      "mae": 481.8400000000001,
+      "wr": 50.0,
+      "avg_pnl": 2.71,
+      "avg_mfe": 10.0,
+      "avg_mae": 7.5
+    }
+  },
+  "by_exit_class": {
+    "SL_20": {
+      "n": 96,
+      "w": 0,
+      "pnl": -4009.03999999999,
+      "mfe": 1211.9800000000025,
+      "mae": 1998.2599999999961,
+      "wr": 0.0,
+      "avg_pnl": -41.76,
+      "avg_mfe": 12.6,
+      "avg_mae": 20.8
+    },
+    "TP_40": {
+      "n": 78,
+      "w": 78,
+      "pnl": 6143.280000000011,
+      "mfe": 3098.3200000000033,
+      "mae": 913.429999999998,
+      "wr": 100.0,
+      "avg_pnl": 78.76,
+      "avg_mfe": 39.7,
+      "avg_mae": 11.7
+    },
+    "ADX_Block": {
+      "n": 64,
+      "w": 32,
+      "pnl": 173.13999999999982,
+      "mfe": 637.030000000001,
+      "mae": 481.8400000000001,
+      "wr": 50.0,
+      "avg_pnl": 2.71,
+      "avg_mfe": 10.0,
+      "avg_mae": 7.5
+    },
+    "Other": {
+      "n": 12,
+      "w": 2,
+      "pnl": -192.88000000000005,
+      "mfe": 279.02,
+      "mae": 384.47,
+      "wr": 16.7,
+      "avg_pnl": -16.07,
+      "avg_mfe": 23.3,
+      "avg_mae": 32.0
+    }
+  },
+  "by_day": {
+    "2026-05-19": {
+      "n": 24,
+      "w": 12,
+      "pnl": 276.73999999999984,
+      "mfe": 469.67999999999995,
+      "mae": 379.44000000000005,
+      "wr": 50.0,
+      "avg_pnl": 11.53,
+      "avg_mfe": 19.6,
+      "avg_mae": 15.8
+    },
+    "2026-05-15": {
+      "n": 23,
+      "w": 10,
+      "pnl": 224.47999999999985,
+      "mfe": 597.4300000000001,
+      "mae": 416.13000000000005,
+      "wr": 43.5,
+      "avg_pnl": 9.76,
+      "avg_mfe": 26.0,
+      "avg_mae": 18.1
+    },
+    "2026-05-21": {
+      "n": 22,
+      "w": 8,
+      "pnl": -19.780000000000033,
+      "mfe": 463.17999999999995,
+      "mae": 356.07,
+      "wr": 36.4,
+      "avg_pnl": -0.9,
+      "avg_mfe": 21.1,
+      "avg_mae": 16.2
+    },
+    "2026-05-12": {
+      "n": 21,
+      "w": 10,
+      "pnl": 165.96000000000006,
+      "mfe": 271.23999999999995,
+      "mae": 187.01000000000002,
+      "wr": 47.6,
+      "avg_pnl": 7.9,
+      "avg_mfe": 12.9,
+      "avg_mae": 8.9
+    },
+    "2026-05-18": {
+      "n": 19,
+      "w": 13,
+      "pnl": 789.4399999999999,
+      "mfe": 560.8600000000001,
+      "mae": 301.14,
+      "wr": 68.4,
+      "avg_pnl": 41.55,
+      "avg_mfe": 29.5,
+      "avg_mae": 15.8
+    },
+    "2026-05-20": {
+      "n": 19,
+      "w": 8,
+      "pnl": 213.94,
+      "mfe": 523.9200000000001,
+      "mae": 315.64,
+      "wr": 42.1,
+      "avg_pnl": 11.26,
+      "avg_mfe": 27.6,
+      "avg_mae": 16.6
+    },
+    "2026-05-29": {
+      "n": 19,
+      "w": 8,
+      "pnl": -120.05999999999996,
+      "mfe": 184.97999999999996,
+      "mae": 210.89000000000001,
+      "wr": 42.1,
+      "avg_pnl": -6.32,
+      "avg_mfe": 9.7,
+      "avg_mae": 11.1
+    },
+    "2026-05-14": {
+      "n": 17,
+      "w": 9,
+      "pnl": 140.42,
+      "mfe": 291.28999999999996,
+      "mae": 217.52,
+      "wr": 52.9,
+      "avg_pnl": 8.26,
+      "avg_mfe": 17.1,
+      "avg_mae": 12.8
+    },
+    "2026-05-22": {
+      "n": 17,
+      "w": 4,
+      "pnl": -9.080000000000041,
+      "mfe": 417.47999999999996,
+      "mae": 328.77,
+      "wr": 23.5,
+      "avg_pnl": -0.53,
+      "avg_mfe": 24.6,
+      "avg_mae": 19.3
+    },
+    "2026-05-13": {
+      "n": 16,
+      "w": 6,
+      "pnl": 40.66000000000003,
+      "mfe": 333.85,
+      "mae": 279.96,
+      "wr": 37.5,
+      "avg_pnl": 2.54,
+      "avg_mfe": 20.9,
+      "avg_mae": 17.5
+    },
+    "2026-05-26": {
+      "n": 15,
+      "w": 7,
+      "pnl": 217.39999999999998,
+      "mfe": 349.40999999999997,
+      "mae": 239.65,
+      "wr": 46.7,
+      "avg_pnl": 14.49,
+      "avg_mfe": 23.3,
+      "avg_mae": 16.0
+    },
+    "2026-05-11": {
+      "n": 13,
+      "w": 7,
+      "pnl": 126.87999999999998,
+      "mfe": 252.71999999999997,
+      "mae": 166.03,
+      "wr": 53.8,
+      "avg_pnl": 9.76,
+      "avg_mfe": 19.4,
+      "avg_mae": 12.8
+    },
+    "2026-05-27": {
+      "n": 13,
+      "w": 3,
+      "pnl": -198.12000000000006,
+      "mfe": 243.77999999999997,
+      "mae": 252.53,
+      "wr": 23.1,
+      "avg_pnl": -15.24,
+      "avg_mfe": 18.8,
+      "avg_mae": 19.4
+    },
+    "2026-05-28": {
+      "n": 9,
+      "w": 4,
+      "pnl": 29.34000000000001,
+      "mfe": 147.45999999999998,
+      "mae": 97.54,
+      "wr": 44.4,
+      "avg_pnl": 3.26,
+      "avg_mfe": 16.4,
+      "avg_mae": 10.8
+    },
+    "2026-05-25": {
+      "n": 3,
+      "w": 3,
+      "pnl": 236.28000000000003,
+      "mfe": 119.07,
+      "mae": 29.68,
+      "wr": 100.0,
+      "avg_pnl": 78.76,
+      "avg_mfe": 39.7,
+      "avg_mae": 9.9
+    }
+  },
+  "by_hour": {
+    "15": {
+      "n": 43,
+      "w": 20,
+      "pnl": 299.6799999999997,
+      "mfe": 824.170000000001,
+      "mae": 606.0799999999996,
+      "wr": 46.5,
+      "avg_pnl": 6.97,
+      "avg_mfe": 19.2,
+      "avg_mae": 14.1
+    },
+    "13": {
+      "n": 42,
+      "w": 14,
+      "pnl": -120.08000000000004,
+      "mfe": 821.7200000000005,
+      "mae": 659.5199999999996,
+      "wr": 33.3,
+      "avg_pnl": -2.86,
+      "avg_mfe": 19.6,
+      "avg_mae": 15.7
+    },
+    "11": {
+      "n": 41,
+      "w": 19,
+      "pnl": 669.6599999999997,
+      "mfe": 1026.910000000001,
+      "mae": 699.7099999999995,
+      "wr": 46.3,
+      "avg_pnl": 16.33,
+      "avg_mfe": 25.0,
+      "avg_mae": 17.1
+    },
+    "12": {
+      "n": 40,
+      "w": 21,
+      "pnl": 556.8999999999999,
+      "mfe": 863.2200000000009,
+      "mae": 612.1499999999996,
+      "wr": 52.5,
+      "avg_pnl": 13.92,
+      "avg_mfe": 21.6,
+      "avg_mae": 15.3
+    },
+    "14": {
+      "n": 39,
+      "w": 15,
+      "pnl": 73.63999999999989,
+      "mfe": 779.9100000000008,
+      "mae": 607.0899999999996,
+      "wr": 38.5,
+      "avg_pnl": 1.89,
+      "avg_mfe": 20.0,
+      "avg_mae": 15.6
+    },
+    "16": {
+      "n": 26,
+      "w": 14,
+      "pnl": 243.75999999999993,
+      "mfe": 485.24999999999994,
+      "mae": 308.81000000000006,
+      "wr": 53.8,
+      "avg_pnl": 9.38,
+      "avg_mfe": 18.7,
+      "avg_mae": 11.9
+    },
+    "10": {
+      "n": 19,
+      "w": 9,
+      "pnl": 390.93999999999994,
+      "mfe": 425.16999999999996,
+      "mae": 284.64,
+      "wr": 47.4,
+      "avg_pnl": 20.58,
+      "avg_mfe": 22.4,
+      "avg_mae": 15.0
+    }
+  },
+  "adx_block": {
+    "n": 64,
+    "wins": 32,
+    "pnl": 173.14,
+    "avg_pnl": 2.71,
+    "avg_mfe": 10.0
+  },
+  "tp_sl_counts": {
+    "tp_40pt": 78,
+    "sl_20pt": 96,
+    "adx_block": 64,
+    "other": 12
+  },
+  "other_exits_pnl": -192.88,
+  "rth_vs_other": {
+    "rth_0930_1600": {
+      "n": 224,
+      "pnl": 1870.74,
+      "wr": 43.8
+    },
+    "outside_rth": {
+      "n": 26,
+      "pnl": 243.76,
+      "wr": 53.8
+    }
+  },
+  "properties": {
+    "Trading range": "May 11, 2026, 10:32 \u2014 May 29, 2026, 16:59",
+    "Backtesting range": "May 10, 2026, 18:00 \u2014 May 29, 2026, 16:59",
+    "Symbol": "CME_MINI:MNQ1!",
+    "Timeframe": "1 minute",
+    "Point value": "2",
+    "Chart type": "Candles",
+    "Currency": "USD",
+    "Tick size": "0.25",
+    "Precision": "Default",
+    "HTF (Cloud / MACD / ADX)": "30",
+    "Fast EMA": "9",
+    "Slow EMA": "21",
+    "SMA Baseline": "50",
+    "Cloud Smoothing": "3",
+    "EMA Slope Lookback": "5",
+    "EMA Steep Threshold": "0.15",
+    "Fast Length": "12",
+    "Slow Length": "26",
+    "Signal Length": "9",
+    "Proximity Buffer (ATR\u00d7)": "1",
+    "ATR Length": "14",
+    "VWAP Entry Trigger": "2-Bar",
+    "ADX / DI Length": "14",
+    "ADX Smoothing": "14",
+    "Optimal Floor": "18",
+    "Optimal Ceiling": "35",
+    "Enable D-RSI Filter": "On",
+    "RSI Length": "21",
+    "D-RSI Smoothing": "14",
+    "Signal Line Length": "9",
+    "Signal Mode": "Direction Change",
+    "Plot Bollinger Bands": "On",
+    "Show BB Wick Labels": "On",
+    "BB Length": "20",
+    "BB Std Dev": "2",
+    "RSI Length (label data)": "14",
+    "RSI Oversold": "30",
+    "RSI Overbought": "70",
+    "Min Confluence to Show Label": "3",
+    "Take Profit (pts)": "40",
+    "Stop Loss (pts)": "20",
+    "Enable Session Filter": "On",
+    "Trading Window": "09:30 \u2014 16:00",
+    "Enable Trend Tier": "Off",
+    "Enable Wick Reversal Tier": "On",
+    "Wick Entry Min Confluence": "1",
+    "Wick Long Requires RSI OS": "Off",
+    "Wick Short Requires RSI OB": "Off",
+    "Show Performance Table": "On",
+    "Enable Research Mode": "On",
+    "Outcome Lookback (bars)": "100",
+    "Event Cluster (bars)": "10",
+    "Win Threshold (pts)": "0",
+    "Track MFE / MAE": "On",
+    "Show Research Table": "On",
+    "ADX Entry Ceiling": "35",
+    "Trend \u2014 ADX gate": "On",
+    "Trend \u2014 D-RSI filter": "On",
+    "Trend \u2014 Cloud slope": "On",
+    "Trend \u2014 Session filter": "On",
+    "Initial capital": "1000000",
+    "Order size": "1 contracts",
+    "Pyramiding": "0 orders",
+    "Commission": "0.62",
+    "Slippage": "1 ticks",
+    "Verify price for limit orders": "0 ticks",
+    "Margin for long positions": "100%",
+    "Margin for short positions": "100%",
+    "Recalculate after order is filled": "Off",
+    "Recalculate on every tick": "Off",
+    "Recalculate on bar close": "On",
+    "Backtesting precision. Use bar magnifier": "Off"
+  },
+  "performance_match": {
+    "net_profit_sheet": "2114.5"
+  }
+}

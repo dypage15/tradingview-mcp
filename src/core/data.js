@@ -2,11 +2,148 @@
  * Core data access logic.
  */
 import { evaluate, evaluateAsync, KNOWN_PATHS } from '../connection.js';
+import { strategyTesterClickUpdateReportIfPresent } from './ui.js';
+import { buildResolveBenchStudyHandlesBlock } from './studyBenchResolve.js';
 
 const MAX_OHLCV_BARS = 500;
-const MAX_TRADES = 20;
+/** Upper bound for trade list extraction; override with env TV_MAX_TRADES_HARD_CAP (e.g. advisor needs more rows). */
+const MAX_TRADES = Number(process.env.TV_MAX_TRADES_HARD_CAP || 200);
 const CHART_API = KNOWN_PATHS.chartApi;
 const BARS_PATH = KNOWN_PATHS.mainSeriesBars;
+
+/** Escape for embedding in Runtime.evaluate single-quoted string */
+function embedStrategyPickFilter() {
+  const explicit = process.env.ADVISOR_STRATEGY_SUBSTRING;
+  const alias = process.env.TV_STRATEGY_NAME;
+  let raw;
+  if (explicit !== undefined) {
+    raw = explicit.trim();
+  } else if (alias !== undefined && alias !== null) {
+    raw = alias.trim();
+  } else {
+    // No env set: do not filter by name (otherwise a hard-coded substring can pin the wrong study when
+    // multiple strategies exist on the chart). Set ADVISOR_STRATEGY_SUBSTRING or TV_STRATEGY_NAME to pin one.
+    raw = '';
+  }
+  return raw.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, ' ');
+}
+
+/**
+ * Embedded in Runtime.evaluate: pick the Pine strategy study (metrics / trades / equity).
+ * With no env vars, name filtering is off (highest internal score wins among strategies on chart).
+ * Set ADVISOR_STRATEGY_SUBSTRING or TV_STRATEGY_NAME to pin one study (e.g. "CBC LIQUIDITY PRO V6 FIXED").
+ * Built per call so process.env reflects the current run (e.g. advisor subprocess inheriting .env).
+ */
+function pickStrategyDetailJs() {
+  const escaped = embedStrategyPickFilter();
+  return `
+function strategyDataReadyBonus(s) {
+  var bonus = 0;
+  try {
+    if (s.reportData) {
+      var rd = typeof s.reportData === 'function' ? s.reportData() : s.reportData;
+      if (rd != null && typeof rd === 'object' && typeof rd.value === 'function') rd = rd.value();
+      if (rd != null && typeof rd === 'object') {
+        bonus += 150;
+        try {
+          var rkeys = Object.keys(rd);
+          if (rkeys.length > 0) bonus += 100;
+        } catch (rk) {}
+        if (Array.isArray(rd.trades) && rd.trades.length > 0) bonus += 120;
+        if (Array.isArray(rd.filledOrders) && rd.filledOrders.length > 0) bonus += 120;
+      }
+    }
+  } catch (e1) {}
+  try {
+    if (s.ordersData) {
+      var od = typeof s.ordersData === 'function' ? s.ordersData() : s.ordersData;
+      if (od != null && typeof od === 'object' && typeof od.value === 'function') od = od.value();
+      if (Array.isArray(od)) bonus += od.length > 0 ? 250 : 50;
+    }
+  } catch (e2) {}
+  return bonus;
+}
+function extractStrategyOrdersList(strat) {
+  var orders = null;
+  try {
+    if (strat.ordersData) {
+      orders = typeof strat.ordersData === 'function' ? strat.ordersData() : strat.ordersData;
+      if (orders != null && typeof orders === 'object' && typeof orders.value === 'function') orders = orders.value();
+    }
+  } catch (e) { orders = null; }
+  if (orders != null && Array.isArray(orders)) return orders;
+  try {
+    if (strat.reportData) {
+      var rd = typeof strat.reportData === 'function' ? strat.reportData() : strat.reportData;
+      if (rd != null && typeof rd === 'object' && typeof rd.value === 'function') rd = rd.value();
+      if (rd != null && typeof rd === 'object') {
+        if (Array.isArray(rd.trades)) return rd.trades;
+        if (Array.isArray(rd.filledOrders)) return rd.filledOrders;
+      }
+    }
+  } catch (e2) {}
+  return null;
+}
+function pickStrategySourceDetailed(sources) {
+  var NAME_FILTER = '${escaped}';
+  var candidates = [];
+  for (var i = 0; i < sources.length; i++) {
+    var s = sources[i];
+    if (!s.metaInfo) continue;
+    var meta = s.metaInfo();
+    if (!(s.reportData || s.performance || s.ordersData)) continue;
+    var score = 0;
+    if (meta.isTVScriptStrategy === true) score += 100;
+    if (s.reportData) score += 50;
+    var desc = (meta.description || meta.shortDescription || '');
+    if (/strategy/i.test(desc)) score += 10;
+    score += strategyDataReadyBonus(s);
+    candidates.push({ s: s, score: score, desc: desc });
+  }
+  var pickNote = null;
+  if (candidates.length === 0) {
+    return { strat: null, name: '', pickNote: null, candidateCount: 0 };
+  }
+  function pickBest(arr) {
+    var best = arr[0];
+    for (var k = 1; k < arr.length; k++) {
+      if (arr[k].score > best.score) best = arr[k];
+    }
+    return best;
+  }
+  var pool = candidates;
+  if (NAME_FILTER) {
+    var filtered = [];
+    var nf = NAME_FILTER.toLowerCase();
+    for (var j = 0; j < candidates.length; j++) {
+      if (candidates[j].desc.toLowerCase().indexOf(nf) !== -1) filtered.push(candidates[j]);
+    }
+    if (filtered.length >= 1) {
+      pool = filtered;
+      if (filtered.length > 1) {
+        pickNote = 'Multiple strategies match ADVISOR_STRATEGY_SUBSTRING — picked highest internal score among matches.';
+      }
+    } else {
+      pickNote = 'ADVISOR_STRATEGY_SUBSTRING did not match any strategy name; using best-scoring strategy on chart.';
+      pool = candidates;
+    }
+  } else if (candidates.length > 1) {
+    pickNote = 'Multiple strategies on chart — picked highest internal score. Set ADVISOR_STRATEGY_SUBSTRING (e.g. Sweep v2) to pin one.';
+  }
+  var best = pickBest(pool);
+  return { strat: best.s, name: best.desc, pickNote: pickNote, candidateCount: candidates.length };
+}
+function pickStrategySource(sources) {
+  var d = pickStrategySourceDetailed(sources);
+  if (d.strat) return d.strat;
+  for (var j = 0; j < sources.length; j++) {
+    var s2 = sources[j];
+    if (s2.metaInfo && s2.metaInfo().is_price_study === false && (s2.reportData || s2.performance || s2.ordersData)) return s2;
+  }
+  return null;
+}
+`;
+}
 
 function buildGraphicsJS(collectionName, mapKey, filter) {
   return `
@@ -107,11 +244,14 @@ export async function getOhlcv({ count, summary } = {}) {
 }
 
 export async function getIndicator({ entity_id }) {
+  const escapedId = String(entity_id || '').replace(/'/g, "\\'");
+  const resolveBlock = buildResolveBenchStudyHandlesBlock(escapedId);
   const data = await evaluate(`
     (function() {
+      ${resolveBlock}
       var api = ${CHART_API};
-      var study = api.getStudyById('${entity_id}');
-      if (!study) return { error: 'Study not found: ${entity_id}' };
+      var study = __resolveBenchStudyForInputs(api);
+      if (!study) return { error: 'Study not found: ${escapedId}' };
       var result = { name: null, inputs: null, visible: null };
       try { result.visible = study.isVisible(); } catch(e) {}
       try { result.inputs = study.getInputValues(); } catch(e) { result.inputs_error = e.message; }
@@ -133,86 +273,184 @@ export async function getIndicator({ entity_id }) {
 }
 
 export async function getStrategyResults() {
+  await strategyTesterClickUpdateReportIfPresent();
   const results = await evaluate(`
     (function() {
       try {
         var chart = ${CHART_API}._chartWidget;
         var sources = chart.model().model().dataSources();
-        var strat = null;
-        for (var i = 0; i < sources.length; i++) {
-          var s = sources[i];
-          if (s.metaInfo && s.metaInfo().is_price_study === false && (s.reportData || s.performance)) { strat = s; break; }
-        }
-        if (!strat) return {metrics: {}, source: 'internal_api', error: 'No strategy found on chart. Add a strategy indicator first.'};
+        ${pickStrategyDetailJs()}
+        var pick = pickStrategySourceDetailed(sources);
+        var strat = pick.strat;
+        if (!strat) return {metrics: {}, source: 'internal_api', strategyName: pick.name, pickNote: pick.pickNote, candidateCount: pick.candidateCount, error: 'No strategy found on chart. Add a strategy indicator first.'};
         var metrics = {};
         if (strat.reportData) {
           var rd = typeof strat.reportData === 'function' ? strat.reportData() : strat.reportData;
           if (rd && typeof rd === 'object') {
             if (typeof rd.value === 'function') rd = rd.value();
-            if (rd) { var keys = Object.keys(rd); for (var k = 0; k < keys.length; k++) { var val = rd[keys[k]]; if (val !== null && val !== undefined && typeof val !== 'function') metrics[keys[k]] = val; } }
+            if (rd) {
+              var skipBulk = { buyHold: 1, buyHoldPercent: 1, filledOrders: 1, trades: 1, performance: 1 };
+              var keys = Object.keys(rd);
+              for (var k = 0; k < keys.length; k++) {
+                var key = keys[k];
+                if (skipBulk[key]) continue;
+                var val = rd[key];
+                if (val !== null && val !== undefined && typeof val === 'object' && typeof val.value === 'function') {
+                  try { val = val.value(); } catch (ev) { continue; }
+                }
+                if (val !== null && val !== undefined && typeof val !== 'function') {
+                  if (Array.isArray(val) && val.length > 100) continue;
+                  metrics[key] = val;
+                }
+              }
+            }
+            if (rd && rd.performance) {
+              var perfInner = rd.performance;
+              if (typeof perfInner.value === 'function') perfInner = perfInner.value();
+              if (perfInner && perfInner.all) {
+                var allInner = perfInner.all;
+                if (typeof allInner.value === 'function') allInner = allInner.value();
+                if (allInner && typeof allInner === 'object') {
+                  var akeys = Object.keys(allInner);
+                  for (var ai = 0; ai < akeys.length; ai++) {
+                    var ak = akeys[ai];
+                    var aval = allInner[ak];
+                    if (aval !== null && aval !== undefined && typeof aval === 'function') continue;
+                    if (aval !== null && aval !== undefined && typeof aval === 'object' && typeof aval.value === 'function') aval = aval.value();
+                    if (aval !== null && aval !== undefined && typeof aval !== 'function') metrics[ak] = aval;
+                  }
+                }
+              }
+            }
           }
         }
         if (Object.keys(metrics).length === 0 && strat.performance) {
           var perf = strat.performance();
           if (perf && typeof perf.value === 'function') perf = perf.value();
-          if (perf && typeof perf === 'object') { var pkeys = Object.keys(perf); for (var p = 0; p < pkeys.length; p++) { var pval = perf[pkeys[p]]; if (pval !== null && pval !== undefined && typeof pval !== 'function') metrics[pkeys[p]] = pval; } }
+          if (perf && typeof perf === 'object') {
+            var pkeys = Object.keys(perf);
+            for (var p = 0; p < pkeys.length; p++) {
+              var pval = perf[pkeys[p]];
+              if (pval !== null && pval !== undefined && typeof pval === 'object' && typeof pval.value === 'function') {
+                try { pval = pval.value(); } catch (ep) { continue; }
+              }
+              if (pval !== null && pval !== undefined && typeof pval !== 'function') metrics[pkeys[p]] = pval;
+            }
+          }
         }
-        return {metrics: metrics, source: 'internal_api'};
+        var reportReady = false;
+        try {
+          var rd0 = strat.reportData ? (typeof strat.reportData === 'function' ? strat.reportData() : strat.reportData) : null;
+          if (rd0 != null && typeof rd0 === 'object' && typeof rd0.value === 'function') rd0 = rd0.value();
+          reportReady = !!(rd0 && typeof rd0 === 'object' && Object.keys(rd0).length > 0);
+        } catch (er) { reportReady = false; }
+        return {metrics: metrics, source: 'internal_api', strategyName: pick.name, pickNote: pick.pickNote, candidateCount: pick.candidateCount, report_ready: reportReady};
       } catch(e) { return {metrics: {}, source: 'internal_api', error: e.message}; }
     })()
   `);
-  return { success: true, metric_count: Object.keys(results?.metrics || {}).length, source: results?.source, metrics: results?.metrics || {}, error: results?.error };
+  const metricCount = Object.keys(results?.metrics || {}).length;
+  const hint =
+    !results?.error && metricCount === 0 && results?.report_ready === false
+      ? 'Strategy Tester has no report yet for the selected study (reportData is empty). Open Strategy Tester, wait for the backtest to finish, fix compile/runtime errors, or run a deep backtest. Charts with only a loading strategy show zero metrics until calculation completes.'
+      : undefined;
+  return {
+    success: true,
+    metric_count: metricCount,
+    source: results?.source,
+    metrics: results?.metrics || {},
+    strategy_name: results?.strategyName,
+    pick_note: results?.pickNote,
+    candidate_count: results?.candidateCount,
+    error: results?.error,
+    report_ready: results?.report_ready,
+    hint,
+  };
 }
 
 export async function getTrades({ max_trades } = {}) {
+  await strategyTesterClickUpdateReportIfPresent();
   const limit = Math.min(max_trades || 20, MAX_TRADES);
   const trades = await evaluate(`
     (function() {
       try {
         var chart = ${CHART_API}._chartWidget;
         var sources = chart.model().model().dataSources();
-        var strat = null;
-        for (var i = 0; i < sources.length; i++) {
-          var s = sources[i];
-          if (s.metaInfo && s.metaInfo().is_price_study === false && (s.ordersData || s.reportData)) { strat = s; break; }
-        }
-        if (!strat) return {trades: [], source: 'internal_api', error: 'No strategy found on chart.'};
-        var orders = null;
-        if (strat.ordersData) { orders = typeof strat.ordersData === 'function' ? strat.ordersData() : strat.ordersData; if (orders && typeof orders.value === 'function') orders = orders.value(); }
+        ${pickStrategyDetailJs()}
+        var pick = pickStrategySourceDetailed(sources);
+        var strat = pick.strat;
+        if (!strat) return {trades: [], source: 'internal_api', strategyName: pick.name, pickNote: pick.pickNote, candidateCount: pick.candidateCount, error: 'No strategy found on chart.'};
+        var orders = extractStrategyOrdersList(strat);
         if (!orders || !Array.isArray(orders)) {
-          if (strat._orders) orders = strat._orders;
-          else if (strat.tradesData) { orders = typeof strat.tradesData === 'function' ? strat.tradesData() : strat.tradesData; if (orders && typeof orders.value === 'function') orders = orders.value(); }
+          if (strat._orders && Array.isArray(strat._orders)) orders = strat._orders;
+          else if (strat.tradesData) {
+            try {
+              orders = typeof strat.tradesData === 'function' ? strat.tradesData() : strat.tradesData;
+              if (orders != null && typeof orders === 'object' && typeof orders.value === 'function') orders = orders.value();
+            } catch (et) { orders = null; }
+          }
         }
-        if (!orders || !Array.isArray(orders)) return {trades: [], source: 'internal_api', error: 'ordersData() returned non-array.'};
+        if (!orders || !Array.isArray(orders)) {
+          return {
+            trades: [],
+            source: 'internal_api',
+            strategyName: pick.name,
+            pickNote: pick.pickNote,
+            candidateCount: pick.candidateCount,
+            error: 'No trade list available yet.',
+            hint: 'TradingView only populates orders after the strategy backtest completes. Open Strategy Tester, confirm there are no compile errors, wait for calculation (or run Deep Backtesting). If you use ADVISOR_STRATEGY_SUBSTRING / TV_STRATEGY_NAME, ensure it matches the study that actually has results.'
+          };
+        }
         var result = [];
         for (var t = 0; t < Math.min(orders.length, ${limit}); t++) {
           var o = orders[t];
           if (typeof o === 'object' && o !== null) {
             var trade = {};
             var okeys = Object.keys(o);
-            for (var k = 0; k < okeys.length; k++) { var v = o[okeys[k]]; if (v !== null && v !== undefined && typeof v !== 'function' && typeof v !== 'object') trade[okeys[k]] = v; }
+            for (var k = 0; k < okeys.length; k++) {
+              var key = okeys[k];
+              var v = o[key];
+              if (v === null || v === undefined || typeof v === 'function') continue;
+              if (typeof v !== 'object') trade[key] = v;
+              else {
+                var sk = Object.keys(v);
+                for (var si = 0; si < sk.length; si++) {
+                  var sv = v[sk[si]];
+                  if (sv !== null && sv !== undefined && typeof sv !== 'function' && typeof sv !== 'object') {
+                    trade[key + '_' + sk[si]] = sv;
+                  }
+                }
+              }
+            }
             result.push(trade);
           }
         }
-        return {trades: result, source: 'internal_api'};
+        return {trades: result, source: 'internal_api', strategyName: pick.name, pickNote: pick.pickNote, candidateCount: pick.candidateCount};
       } catch(e) { return {trades: [], source: 'internal_api', error: e.message}; }
     })()
   `);
-  return { success: true, trade_count: trades?.trades?.length || 0, source: trades?.source, trades: trades?.trades || [], error: trades?.error };
+  return {
+    success: true,
+    trade_count: trades?.trades?.length || 0,
+    source: trades?.source,
+    trades: trades?.trades || [],
+    strategy_name: trades?.strategyName,
+    pick_note: trades?.pickNote,
+    candidate_count: trades?.candidateCount,
+    error: trades?.error,
+  };
 }
 
 export async function getEquity() {
+  await strategyTesterClickUpdateReportIfPresent();
   const equity = await evaluate(`
     (function() {
       try {
         var chart = ${CHART_API}._chartWidget;
         var sources = chart.model().model().dataSources();
-        var strat = null;
-        for (var i = 0; i < sources.length; i++) {
-          var s = sources[i];
-          if (s.metaInfo && s.metaInfo().is_price_study === false && (s.reportData || s.performance)) { strat = s; break; }
-        }
-        if (!strat) return {data: [], source: 'internal_api', error: 'No strategy found on chart.'};
+        ${pickStrategyDetailJs()}
+        var pick = pickStrategySourceDetailed(sources);
+        var strat = pick.strat;
+        if (!strat) return {data: [], source: 'internal_api', strategyName: pick.name, pickNote: pick.pickNote, candidateCount: pick.candidateCount, error: 'No strategy found on chart.'};
         var data = [];
         if (strat.equityData) {
           var eq = typeof strat.equityData === 'function' ? strat.equityData() : strat.equityData;
@@ -233,13 +471,24 @@ export async function getEquity() {
             if (perf && typeof perf.value === 'function') perf = perf.value();
             if (perf && typeof perf === 'object') { var pkeys = Object.keys(perf); for (var p = 0; p < pkeys.length; p++) { if (/equity|drawdown|profit|net/i.test(pkeys[p])) perfData[pkeys[p]] = perf[pkeys[p]]; } }
           }
-          if (Object.keys(perfData).length > 0) return {data: [], equity_summary: perfData, source: 'internal_api', note: 'Full equity curve not available via API; equity summary metrics returned instead.'};
+          if (Object.keys(perfData).length > 0) return {data: [], equity_summary: perfData, source: 'internal_api', strategyName: pick.name, pickNote: pick.pickNote, candidateCount: pick.candidateCount, note: 'Full equity curve not available via API; equity summary metrics returned instead.'};
         }
-        return {data: data, source: 'internal_api'};
+        return {data: data, source: 'internal_api', strategyName: pick.name, pickNote: pick.pickNote, candidateCount: pick.candidateCount};
       } catch(e) { return {data: [], source: 'internal_api', error: e.message}; }
     })()
   `);
-  return { success: true, data_points: equity?.data?.length || 0, source: equity?.source, data: equity?.data || [], equity_summary: equity?.equity_summary, note: equity?.note, error: equity?.error };
+  return {
+    success: true,
+    data_points: equity?.data?.length || 0,
+    source: equity?.source,
+    data: equity?.data || [],
+    equity_summary: equity?.equity_summary,
+    note: equity?.note,
+    strategy_name: equity?.strategyName,
+    pick_note: equity?.pickNote,
+    candidate_count: equity?.candidateCount,
+    error: equity?.error,
+  };
 }
 
 export async function getQuote({ symbol } = {}) {

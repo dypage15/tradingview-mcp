@@ -1,0 +1,203 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\clreg23_refine_2026-05-22T05-11-08",
+  "scenario_count": 72,
+  "profitable_count": 4,
+  "best": {
+    "scenarioId": 0,
+    "spec": {
+      "rsiMode": "Combined",
+      "rsiLen": 6,
+      "confLookback": 3,
+      "cloudSmooth": 3,
+      "minBarsBetween": 0,
+      "minCloudSep": 0,
+      "riskMode": "Points",
+      "tpPoints": 30,
+      "slPoints": 15,
+      "tpAtrMult": 2,
+      "slAtrMult": 1
+    },
+    "error": null,
+    "totalTrades": 551,
+    "percentProfitable": 37.74954627949184,
+    "profitFactor": 1.1294622616148167,
+    "netProfit": 2581.2599999999366,
+    "expectancy": 4.684682395644168,
+    "execution_table": {
+      "parsed": true,
+      "dataSource": "engine",
+      "signalsLong": 302,
+      "signalsShort": 307,
+      "fillsLong": 0,
+      "fillsShort": 0,
+      "closedTrades": 551,
+      "engineClosed": 551,
+      "recordedWins": 208,
+      "recordedLosses": 343,
+      "winPct": 37.7,
+      "netPts": 2581.26,
+      "profitFactor": 1.13,
+      "bullFlips": 303,
+      "bearFlips": 309,
+      "missedLong": 1,
+      "missedShort": 2
+    },
+    "metrics_source": "tester_or_engine",
+    "metConstraint": true,
+    "score": 217.33219709273132
+  },
+  "top8": [
+    {
+      "spec": {
+        "rsiMode": "Combined",
+        "rsiLen": 6,
+        "confLookback": 3,
+        "cloudSmooth": 3,
+        "minBarsBetween": 0,
+        "minCloudSep": 0,
+        "riskMode": "Points",
+        "tpPoints": 30,
+        "slPoints": 15,
+        "tpAtrMult": 2,
+        "slAtrMult": 1
+      },
+      "net": 2581.2599999999366,
+      "pf": 1.1294622616148167,
+      "wr": 37.74954627949184,
+      "trades": 551
+    },
+    {
+      "spec": {
+        "rsiMode": "Combined",
+        "rsiLen": 6,
+        "confLookback": 3,
+        "cloudSmooth": 3,
+        "minBarsBetween": 3,
+        "minCloudSep": 0,
+        "riskMode": "Points",
+        "tpPoints": 30,
+        "slPoints": 15,
+        "tpAtrMult": 2,
+        "slAtrMult": 1
+      },
+      "net": 2581.2599999999366,
+      "pf": 1.1294622616148167,
+      "wr": 37.74954627949184,
+      "trades": 551
+    },
+    {
+      "spec": {
+        "rsiMode": "Combined",
+        "rsiLen": 6,
+        "confLookback": 3,
+        "cloudSmooth": 3,
+        "minBarsBetween": 0,
+        "minCloudSep": 0,
+        "riskMode": "Points",
+        "tpPoints": 35,
+        "slPoints": 18,
+        "tpAtrMult": 2,
+        "slAtrMult": 1
+      },
+      "net": 2568.9999999999163,
+      "pf": 1.1217980021145115,
+      "wr": 37.27272727272727,
+      "trades": 550
+    },
+    {
+      "spec": {
+        "rsiMode": "Combined",
+        "rsiLen": 6,
+        "confLookback": 3,
+        "cloudSmooth": 3,
+        "minBarsBetween": 3,
+        "minCloudSep": 0,
+        "riskMode": "Points",
+        "tpPoints": 35,
+        "slPoints": 18,
+        "tpAtrMult": 2,
+        "slAtrMult": 1
+      },
+      "net": 2568.9999999999163,
+      "pf": 1.1217980021145115,
+      "wr": 37.27272727272727,
+      "trades": 550
+    },
+    {
+      "spec": {
+        "rsiMode": "Combined",
+        "rsiLen": 6,
+        "confLookback": 3,
+        "cloudSmooth": 3,
+        "minBarsBetween": 0,
+        "minCloudSep": 0,
+        "riskMode": "ATR Multiple",
+        "tpPoints": 30,
+        "slPoints": 15,
+        "tpAtrMult": 2.5,
+        "slAtrMult": 1.25
+      },
+      "net": 1314.9599999997663,
+      "pf": 1.044624016799494,
+      "wr": 33.589251439539346,
+      "trades": 521
+    },
+    {
+      "spec": {
+        "rsiMode": "Combined",
+        "rsiLen": 6,
+        "confLookback": 3,
+        "cloudSmooth": 3,
+        "minBarsBetween": 3,
+        "minCloudSep": 0,
+        "riskMode": "ATR Multiple",
+        "tpPoints": 30,
+        "slPoints": 15,
+        "tpAtrMult": 2.5,
+        "slAtrMult": 1.25
+      },
+      "net": 1314.9599999997663,
+      "pf": 1.044624016799494,
+      "wr": 33.589251439539346,
+      "trades": 521
+    },
+    {
+      "spec": {
+        "rsiMode": "Combined",
+        "rsiLen": 6,
+        "confLookback": 3,
+        "cloudSmooth": 3,
+        "minBarsBetween": 6,
+        "minCloudSep": 0,
+        "riskMode": "ATR Multiple",
+        "tpPoints": 30,
+        "slPoints": 15,
+        "tpAtrMult": 2,
+        "slAtrMult": 1
+      },
+      "net": -522.0600000001286,
+      "pf": 0.9762341351494015,
+      "wr": 34.973637961335676,
+      "trades": 569
+    },
+    {
+      "spec": {
+        "rsiMode": "Combined",
+        "rsiLen": 6,
+        "confLookback": 3,
+        "cloudSmooth": 3,
+        "minBarsBetween": 6,
+        "minCloudSep": 0,
+        "riskMode": "Points",
+        "tpPoints": 35,
+        "slPoints": 18,
+        "tpAtrMult": 2,
+        "slAtrMult": 1
+      },
+      "net": -821.5199999998931,
+      "pf": 0.9495942481780193,
+      "wr": 36.99825479930192,
+      "trades": 573
+    }
+  ]
+}

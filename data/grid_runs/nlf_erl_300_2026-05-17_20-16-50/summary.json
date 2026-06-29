@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-05-17T20:18:06.184Z",
+  "runCount": 1,
+  "outDir": "data/grid_runs/nlf_erl_300_2026-05-17_20-16-50",
+  "grid_source_mode": "rewrite",
+  "requested_source_mode": "rewrite",
+  "baseline_inputs_restored_ids": {},
+  "min_trades_per_day_requirement": 1,
+  "best_overall_met_constraint": null,
+  "best_that_failed_constraint": null,
+  "top_feasible": [],
+  "top_raw_profit_ignore_constraint": [],
+  "notes": [
+    "metConstraint requires ≥1 closed trade per calendar day of Tester trade-span AND numeric netProfit.",
+    "rewrite mode rewrites default input.int() lines per scenario (slow but works when CDP getInputValues is empty).",
+    "Tune MIN_TRADES_PER_DAY env or grid arrays in this script before another pass.",
+    "strategy_snapshot is NOT auto-synced — run npm run nlf:backtest-save for full JSON artifact after picking inputs."
+  ],
+  "compile_ack": {
+    "success": true,
+    "button_clicked": "Pine Save",
+    "has_errors": false,
+    "errors": [],
+    "study_added": false
+  },
+  "timeline": [
+    {
+      "pine_compile_initial": {
+        "success": true,
+        "button_clicked": "Pine Save",
+        "has_errors": false,
+        "errors": [],
+        "study_added": false
+      }
+    },
+    {
+      "scenarioId": 0,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    }
+  ]
+}

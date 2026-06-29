@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "evaluator": "evaluate-nlf-grid-run",
+  "generated_at": "2026-05-18T03:33:28.991Z",
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\nlf_erl_300_2026-05-17_22-45-40",
+  "inputs": {
+    "scenarios_ndjson": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\nlf_erl_300_2026-05-17_22-45-40\\scenarios.ndjson",
+    "summary_json": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\nlf_erl_300_2026-05-17_22-45-40\\summary.json",
+    "input_manifest_json": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\nlf_erl_300_2026-05-17_22-45-40\\input_manifest.json",
+    "pine_defaults_file": "C:\\Users\\dypag\\tradingview-mcp\\data\\erl-irl-engine-strategy.pine"
+  },
+  "measurement_contract": {
+    "primary_objective": "netProfit (Strategy Tester, grid scenario)",
+    "feasibility_flag": "metConstraint (includes min trades/calendar day + finite metrics when grid sets them)",
+    "note": "Per-trade filter conditioning requires exporting trades and labels from Pine/TV; this report uses scenario-level tuner buckets only."
+  },
+  "pine_file_tuner_defaults": {
+    "minBarsBetween": 48,
+    "minScoreCont": 72,
+    "minScoreRev": 72
+  },
+  "baseline_reference": {
+    "description": "pine_file_tuner_defaults: values from data/erl-irl-engine-strategy.pine input.int(...) lines. exact_pine_default_match: scenario with identical spec (often absent if grid omits that cell). nearest_spec_to_pine_defaults: smallest L1 distance in {mb,mc,mr} among successful metric rows. grid_corner_scenarioId_0: first NLF grid cell (not the same as Pine defaults).",
+    "exact_pine_default_match": null,
+    "nearest_spec_to_pine_defaults": {
+      "scenarioId": 279,
+      "spec": {
+        "scenarioId": 279,
+        "minBarsBetween": 40,
+        "minScoreCont": 70,
+        "minScoreRev": 75
+      },
+      "L1_distance": 13,
+      "netProfit": -2847.830250000001,
+      "metConstraint": false
+    },
+    "grid_corner_scenarioId_0": {
+      "scenarioId": 0,
+      "spec": {
+        "scenarioId": 0,
+        "minBarsBetween": 0,
+        "minScoreCont": 52,
+        "minScoreRev": 50
+      },
+      "netProfit": -6694.996000000001
+    }
+  },
+  "data_quality": {
+    "row_count_total": 300,
+    "row_count_parse_errors": 0,
+    "row_count_executor_errors": 0,
+    "row_count_with_numeric_net_profit": 300,
+    "report_ready_false_among_metric_rows": 0,
+    "unique_calendar_days_trade_span": [
+      104.33680555555556,
+      104.34027777777777,
+      104.34375,
+      104.34722222222223,
+      104.35069444444444,
+      104.35416666666667,
+      104.35763888888889,
+      104.36111111111111,
+      104.36458333333333,
+      104.36805555555556,
+      104.37152777777777,
+      104.375,
+      104.37847222222223,
+      104.38194444444444,
+      104.38541666666667,
+      104.38888888888889
+    ],
+    "span_drift_warning": "Multiple Tester trade-window lengths — compare scenarios only with same span, or fix capture.",
+    "strategy_names_seen": [
+      "ERL IRL Engine v2 Strategy [NLF]"
+    ]
+  },
+  "distributions": {
+    "all_metric_rows": {
+      "n": 300,
+      "net_profit": {
+        "mean": -5322.2957191666665,
+        "stddev": 1162.3131244193544,
+        "p0.01": -6694.996000000001,
+        "p0.05": -6694.996000000001,
+        "p0.1": -6480.199862500001,
+        "p0.25": -5933.434750000002,
+        "p0.5": -5714.482624999999,
+        "p0.75": -5052.282624999997,
+        "p0.9": -3456.6215999999868,
+        "p0.95": -2847.830250000001,
+        "p0.99": -2847.830250000001
+      },
+      "profit_factor": {
+        "mean": 0.5954891629825615,
+        "p0.01": 0.554945865842338,
+        "p0.05": 0.554945865842338,
+        "p0.1": 0.5659526651341374,
+        "p0.25": 0.5679275528625748,
+        "p0.5": 0.58075361267865,
+        "p0.75": 0.5989036682529166,
+        "p0.9": 0.649959902092846,
+        "p0.95": 0.6821624631388531,
+        "p0.99": 0.6821624631388531
+      },
+      "trades_per_calendar_day": {
+        "mean": 1.2969500000968524,
+        "p0.01": 0.9675681069753517,
+        "p0.05": 0.9677918422922983,
+        "p0.1": 1.0451786864141064,
+        "p0.25": 1.121107266435986,
+        "p0.5": 1.3558358140989903,
+        "p0.75": 1.4660267663385271,
+        "p0.9": 1.4960412663573748,
+        "p0.95": 1.504344253238517,
+        "p0.99": 1.5046921797004993
+      },
+      "total_trades": {
+        "mean": 135.35333333333332,
+        "p0.01": 101,
+        "p0.05": 101,
+        "p0.1": 109.10000000000001,
+        "p0.25": 117,
+        "p0.5": 141.5,
+        "p0.75": 153,
+        "p0.9": 156.10000000000002,
+        "p0.95": 157,
+        "p0.99": 157
+      }
+    },
+    "feasible_only_met_constraint": {
+      "n": 270,
+      "net_profit": {
+        "mean": -5595.33812546296,
+        "stddev": 867.8606119670401,
+        "p0.01": -6694.996000000001,
+        "p0.05": -6694.996000000001,
+        "p0.1": -6694.996000000001,
+        "p0.25": -5933.434750000002,
+        "p0.5": -5796.7955,
+        "p0.75": -5329.1585,
+        "p0.9": -3512.8758749999997,
+        "p0.95": -3512.8758749999997,
+        "p0.99": -3512.8758749999997
+      }
+    }
+  },
+  "feasibility": {
+    "metric_rows": 300,
+    "met_constraint_count": 270,
+    "met_constraint_rate": 0.9,
+    "summary_best_net_profit": -3512.8758749999997
+  },
+  "hypothesis_buckets_marginal": {
+    "by_minBarsBetween": [
+      {
+        "value": 0,
+        "bucket_dimension": "minBarsBetween",
+        "n": 30,
+        "feasible_count": 30,
+        "feasible_rate": 1,
+        "mean_net_profit": -6694.996000000005,
+        "median_net_profit": -6694.996000000001,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -6694.996000000001
+      },
+      {
+        "value": 2,
+        "bucket_dimension": "minBarsBetween",
+        "n": 30,
+        "feasible_count": 30,
+        "feasible_rate": 1,
+        "mean_net_profit": -6456.333625,
+        "median_net_profit": -6456.333625000001,
+        "min_net_profit": -6456.333625000001,
+        "max_net_profit": -6456.333625000001
+      },
+      {
+        "value": 4,
+        "bucket_dimension": "minBarsBetween",
+        "n": 30,
+        "feasible_count": 30,
+        "feasible_rate": 1,
+        "mean_net_profit": -5933.434750000004,
+        "median_net_profit": -5933.434750000002,
+        "min_net_profit": -5933.434750000002,
+        "max_net_profit": -5933.434750000002
+      },
+      {
+        "value": 6,
+        "bucket_dimension": "minBarsBetween",
+        "n": 30,
+        "feasible_count": 30,
+        "feasible_rate": 1,
+        "mean_net_profit": -5796.795500000005,
+        "median_net_profit": -5796.7955,
+        "min_net_profit": -5796.7955,
+        "max_net_profit": -5796.7955
+      },
+      {
+        "value": 8,
+        "bucket_dimension": "minBarsBetween",
+        "n": 30,
+        "feasible_count": 30,
+        "feasible_rate": 1,
+        "mean_net_profit": -5889.453749999996,
+        "median_net_profit": -5889.453749999997,
+        "min_net_profit": -5889.453749999997,
+        "max_net_profit": -5889.453749999997
+      },
+      {
+        "value": 11,
+        "bucket_dimension": "minBarsBetween",
+        "n": 30,
+        "feasible_count": 30,
+        "feasible_rate": 1,
+        "mean_net_profit": -5632.16975,
+        "median_net_profit": -5632.169749999998,
+        "min_net_profit": -5632.169749999998,
+        "max_net_profit": -5632.169749999998
+      },
+      {
+        "value": 15,
+        "bucket_dimension": "minBarsBetween",
+        "n": 30,
+        "feasible_count": 30,
+        "feasible_rate": 1,
+        "mean_net_profit": -5329.1585,
+        "median_net_profit": -5329.1585,
+        "min_net_profit": -5329.1585,
+        "max_net_profit": -5329.1585
+      },
+      {
+        "value": 20,
+        "bucket_dimension": "minBarsBetween",
+        "n": 30,
+        "feasible_count": 30,
+        "feasible_rate": 1,
+        "mean_net_profit": -5061.511820833329,
+        "median_net_profit": -5052.282624999997,
+        "min_net_profit": -5329.1585,
+        "max_net_profit": -5052.282624999997
+      },
+      {
+        "value": 28,
+        "bucket_dimension": "minBarsBetween",
+        "n": 30,
+        "feasible_count": 30,
+        "feasible_rate": 1,
+        "mean_net_profit": -3564.1894333333316,
+        "median_net_profit": -3512.8758749999997,
+        "min_net_profit": -5052.282624999997,
+        "max_net_profit": -3512.8758749999997
+      },
+      {
+        "value": 40,
+        "bucket_dimension": "minBarsBetween",
+        "n": 30,
+        "feasible_count": 0,
+        "feasible_rate": 0,
+        "mean_net_profit": -2864.9140625,
+        "median_net_profit": -2847.830250000001,
+        "min_net_profit": -2950.333125,
+        "max_net_profit": -2847.830250000001
+      }
+    ],
+    "by_minScoreCont": [
+      {
+        "value": 52,
+        "bucket_dimension": "minScoreCont",
+        "n": 50,
+        "feasible_count": 45,
+        "feasible_rate": 0.9,
+        "mean_net_profit": -5314.533062500001,
+        "median_net_profit": -5714.482624999999,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -2847.830250000001
+      },
+      {
+        "value": 58,
+        "bucket_dimension": "minScoreCont",
+        "n": 50,
+        "feasible_count": 45,
+        "feasible_rate": 0.9,
+        "mean_net_profit": -5314.533062500001,
+        "median_net_profit": -5714.482624999999,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -2847.830250000001
+      },
+      {
+        "value": 64,
+        "bucket_dimension": "minScoreCont",
+        "n": 50,
+        "feasible_count": 45,
+        "feasible_rate": 0.9,
+        "mean_net_profit": -5314.533062500001,
+        "median_net_profit": -5714.482624999999,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -2847.830250000001
+      },
+      {
+        "value": 70,
+        "bucket_dimension": "minScoreCont",
+        "n": 50,
+        "feasible_count": 45,
+        "feasible_rate": 0.9,
+        "mean_net_profit": -5314.533062500001,
+        "median_net_profit": -5714.482624999999,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -2847.830250000001
+      },
+      {
+        "value": 76,
+        "bucket_dimension": "minScoreCont",
+        "n": 50,
+        "feasible_count": 45,
+        "feasible_rate": 0.9,
+        "mean_net_profit": -5314.533062500001,
+        "median_net_profit": -5714.482624999999,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -2847.830250000001
+      },
+      {
+        "value": 82,
+        "bucket_dimension": "minScoreCont",
+        "n": 50,
+        "feasible_count": 45,
+        "feasible_rate": 0.9,
+        "mean_net_profit": -5361.1090025,
+        "median_net_profit": -5714.482624999999,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -2950.333125
+      }
+    ],
+    "by_minScoreRev": [
+      {
+        "value": 50,
+        "bucket_dimension": "minScoreRev",
+        "n": 60,
+        "feasible_count": 54,
+        "feasible_rate": 0.9,
+        "mean_net_profit": -5346.512820833334,
+        "median_net_profit": -5714.482624999999,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -2847.830250000001
+      },
+      {
+        "value": 56,
+        "bucket_dimension": "minScoreRev",
+        "n": 60,
+        "feasible_count": 54,
+        "feasible_rate": 0.9,
+        "mean_net_profit": -5316.241443750001,
+        "median_net_profit": -5714.482624999999,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -2847.830250000001
+      },
+      {
+        "value": 62,
+        "bucket_dimension": "minScoreRev",
+        "n": 60,
+        "feasible_count": 54,
+        "feasible_rate": 0.9,
+        "mean_net_profit": -5316.241443750001,
+        "median_net_profit": -5714.482624999999,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -2847.830250000001
+      },
+      {
+        "value": 68,
+        "bucket_dimension": "minScoreRev",
+        "n": 60,
+        "feasible_count": 54,
+        "feasible_rate": 0.9,
+        "mean_net_profit": -5316.241443750001,
+        "median_net_profit": -5714.482624999999,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -2847.830250000001
+      },
+      {
+        "value": 75,
+        "bucket_dimension": "minScoreRev",
+        "n": 60,
+        "feasible_count": 54,
+        "feasible_rate": 0.9,
+        "mean_net_profit": -5316.241443750001,
+        "median_net_profit": -5714.482624999999,
+        "min_net_profit": -6694.996000000001,
+        "max_net_profit": -2847.830250000001
+      }
+    ]
+  },
+  "raw_errors_sample": []
+}

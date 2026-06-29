@@ -1,0 +1,44 @@
+{
+  "entity": "dxTBlP",
+  "scenarios": 2,
+  "top": [
+    {
+      "n": 1,
+      "chartTf": "5",
+      "overrides": {
+        "in_3": true,
+        "in_6": "5",
+        "in_7": "30",
+        "in_29": 0.35,
+        "in_31": 3
+      },
+      "netProfit": -8747,
+      "metrics": {
+        "netProfit": -8747,
+        "netProfitPercent": -0.8747,
+        "percentProfitable": 0.40153452685422,
+        "profitFactor": 0.6703350544604831,
+        "totalTrades": 1173
+      }
+    },
+    {
+      "n": 3,
+      "chartTf": "5",
+      "overrides": {
+        "in_3": true,
+        "in_6": "5",
+        "in_7": "30",
+        "in_29": 0.5,
+        "in_31": 3
+      },
+      "netProfit": -8747,
+      "metrics": {
+        "netProfit": -8747,
+        "netProfitPercent": -0.8747,
+        "percentProfitable": 0.40153452685422,
+        "profitFactor": 0.6703350544604831,
+        "totalTrades": 1173
+      }
+    }
+  ]
+}

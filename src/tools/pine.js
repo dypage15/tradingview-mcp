@@ -35,8 +35,27 @@ export function registerPineTools(server) {
     catch (err) { return jsonResult({ success: false, error: err.message }, true); }
   });
 
-  server.tool('pine_smart_compile', 'Intelligent compile: detects button, compiles, checks errors, reports study changes', {}, async () => {
-    try { return jsonResult(await core.smartCompile()); }
+  server.tool('pine_smart_compile', 'Intelligent compile: detects button, compiles, checks errors, reports study changes. Optionally on stale "cannot parse" markers removes a chart study then re-adds from the editor (recover_parse).', {
+    recover_parse: z.boolean().optional().describe('If true with recover_study_contains or recover_entity_id, remove matching study then compile again when Monaco shows parse-shaped errors.'),
+    recover_entity_id: z.string().optional().describe('Entity id from chart_get_state — study to remove during parse recovery.'),
+    recover_study_contains: z.string().optional().describe('Substring to match chart study name for removal during parse recovery (e.g. "ERL IRL").'),
+  }, async ({ recover_parse, recover_entity_id, recover_study_contains }) => {
+    try {
+      const selectors =
+        !!(recover_entity_id || '').trim() ||
+        !!(recover_study_contains || '').trim();
+      let rp = recover_parse;
+      if (rp === undefined && selectors) rp = true;
+
+      const args = {};
+      if (rp !== undefined) args.recover_parse = rp;
+      const eid = String(recover_entity_id || '').trim();
+      const sub = String(recover_study_contains || '').trim();
+      if (eid) args.recover_entity_id = eid;
+      if (sub) args.recover_study_contains = sub;
+      const hasOpts = Object.keys(args).length > 0;
+      return jsonResult(await core.smartCompile(hasOpts ? args : {}));
+    }
     catch (err) { return jsonResult({ success: false, error: err.message }, true); }
   });
 
@@ -47,10 +66,11 @@ export function registerPineTools(server) {
     catch (err) { return jsonResult({ success: false, error: err.message }, true); }
   });
 
-  server.tool('pine_open', 'Open a saved Pine Script by name', {
-    name: z.string().describe('Name of the saved script to open (case-insensitive match)'),
-  }, async ({ name }) => {
-    try { return jsonResult(await core.openScript({ name })); }
+  server.tool('pine_open', 'Open a saved Pine Script by name or script_id', {
+    name: z.string().optional().describe('Name of the saved script to open (case-insensitive match)'),
+    script_id: z.string().optional().describe('Exact script id (e.g. USER;954e7ef8...) — preferred when duplicates exist'),
+  }, async ({ name, script_id }) => {
+    try { return jsonResult(await core.openScript({ name, script_id })); }
     catch (err) { return jsonResult({ success: false, source: 'internal_api', error: err.message }, true); }
   });
 

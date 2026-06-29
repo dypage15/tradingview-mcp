@@ -1,0 +1,400 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// 04 — CONFLUENCE DATA RECORDER
+// Next Level Foundry — quantitative signal measurement suite
+// ══════════════════════════════════════════════════════════════════════════════
+// No look-ahead: signals use only [n] where n >= 0 (past/current bar).
+// Outcomes: on bar t (confirmed close only), if signal fired on bar t-lb,
+// measure close[t] - close[t-lb] — exactly lb bars forward, one count per event.
+// No request.security, no negative offsets, no future data.
+
+//@version=6
+indicator("04 — Confluence Data Recorder", shorttitle="CDR", overlay=true, max_bars_back=1000)
+
+
+// ─── RECORDER ────────────────────────────────────────────────────────────────
+
+grp_rec = "═══ RECORDER ═══"
+showTable    = input.bool(true, "Show Data Table", group=grp_rec)
+outcomeLB    = input.int(10, "Outcome Lookback (bars)", group=grp_rec, minval=3, maxval=200)
+highQualOnly = input.bool(false, "High Quality Only (score >= 2)", group=grp_rec)
+winThresh    = input.float(0.0, "Win Threshold (pts, 0 = any +)", group=grp_rec, minval=0.0, step=0.5)
+confAlign    = input.int(3, "Pair align window (bars)", minval=0, maxval=10, group=grp_rec, tooltip="Cloud+RSI / pairs: RSI or BB may qualify on flip bar or up to N bars before flip (matches v2.1/v2.2).")
+tblPos       = input.string("Top Right", "Table Position", options=["Top Right", "Top Left", "Bottom Right", "Bottom Left", "Middle Right", "Middle Left"], group=grp_rec)
+
+
+// ─── CLOUD PARAMS ────────────────────────────────────────────────────────────
+
+grp_cloud = "═══ CLOUD ═══"
+fastEmaLen  = input.int(9, "Fast EMA", minval=2, group=grp_cloud)
+slowEmaLen  = input.int(21, "Slow EMA", minval=2, group=grp_cloud)
+smaLen      = input.int(50, "SMA Baseline", minval=5, group=grp_cloud)
+cloudSmooth = input.int(3, "Cloud Smoothing", minval=1, group=grp_cloud)
+cSlopeLen   = input.int(5, "EMA Slope Lookback", minval=2, group=grp_cloud)
+cSteepT     = input.float(0.15, "EMA Steep Threshold", minval=0.01, step=0.01, group=grp_cloud)
+
+
+// ─── RSI PARAMS ──────────────────────────────────────────────────────────────
+
+grp_rsi = "═══ RSI ═══"
+rsiLen        = input.int(6, "RSI Length", minval=2, group=grp_rsi)
+rsiOversold   = input.int(30, "Oversold Level", minval=10, maxval=49, group=grp_rsi)
+rsiOverbought = input.int(70, "Overbought Level", minval=51, maxval=90, group=grp_rsi)
+rSlopeLen     = input.int(5, "RSI Slope Lookback", minval=2, group=grp_rsi)
+rSteepT       = input.float(1.5, "RSI Steep Threshold", minval=0.1, step=0.1, group=grp_rsi)
+
+
+// ─── BB PARAMS ───────────────────────────────────────────────────────────────
+
+grp_bb = "═══ BOLLINGER BANDS ═══"
+bbLen        = input.int(20, "BB Length", minval=1, group=grp_bb)
+bbMult       = input.float(2.0, "BB Std Dev", minval=0.5, step=0.1, group=grp_bb)
+bbBufferMult = input.float(1.5, "Proximity Buffer ATR×", minval=0.0, step=0.25, group=grp_bb)
+bbAtrLen     = input.int(14, "ATR Length for Buffer", minval=2, group=grp_bb)
+bSlopeLen    = input.int(5, "Basis Slope Lookback", minval=2, group=grp_bb)
+bSteepT      = input.float(0.15, "Basis Steep Threshold", minval=0.01, step=0.01, group=grp_bb)
+widthLen     = input.int(20, "Width Baseline", minval=5, group=grp_bb)
+
+
+// ─── TABLE COLORS (var — stable for table helper functions) ───────────────────
+
+var color C_HBG  = color.new(#12121e, 5)
+var color C_SBG  = color.new(#0f0f1a, 5)
+var color C_LBG  = color.new(#1a1a2e, 5)
+var color C_LCLR = color.new(#8b89a0, 0)
+var color C_SCLR = color.new(#a855f7, 30)
+var color C_VAL  = color.new(#e8e6f0, 0)
+var color C_HEAD = color.new(#a855f7, 0)
+var color C_TBLBG = color.new(#0a0a0f, 5)
+var color C_TBLBD = color.new(#a855f7, 60)
+var color C_TBLFR = color.new(#a855f7, 40)
+
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+
+wrPct(int w, int n) =>
+    n > 0 ? w / n * 100.0 : -1.0
+
+fmtWR(float v) =>
+    v < 0 ? "—" : str.tostring(v, "#.#") + "%"
+
+fmtN(int n) =>
+    n == 0 ? "—" : str.tostring(n)
+
+fmtPts(float s, int n) =>
+    n > 0 ? str.tostring(s / n, "#.##") : "—"
+
+clrWR(float v) =>
+    v < 0 ? color.new(#8b89a0, 0) : v >= 60 ? color.new(#06d6a0, 0) : v >= 50 ? color.new(#f59e0b, 0) : color.new(#ff3860, 0)
+
+clrPts(float s, int n) =>
+    n <= 0 ? color.new(#8b89a0, 0) : s / n > 0 ? color.new(#06d6a0, 0) : color.new(#ff3860, 0)
+
+writeSep(table tbl, int row, string label) =>
+    table.cell(tbl, 0, row, label, text_color=C_SCLR, text_size=size.tiny, text_halign=text.align_left, bgcolor=C_SBG)
+    table.cell(tbl, 1, row, "", bgcolor=C_SBG)
+    table.cell(tbl, 2, row, "", bgcolor=C_SBG)
+    table.cell(tbl, 3, row, "", bgcolor=C_SBG)
+    table.cell(tbl, 4, row, "", bgcolor=C_SBG)
+    table.cell(tbl, 5, row, "", bgcolor=C_SBG)
+    table.cell(tbl, 6, row, "", bgcolor=C_SBG)
+
+writeRow(table tbl, int row, string label, int lc, int lw, float ls, int sc, int sw, float ss) =>
+    tot = lc + sc
+    wins = lw + sw
+    spts = ls + ss
+    lwr = wrPct(lw, lc)
+    swr = wrPct(sw, sc)
+    twr = wrPct(wins, tot)
+    table.cell(tbl, 0, row, label, text_color=C_VAL, text_size=size.tiny, text_halign=text.align_left)
+    table.cell(tbl, 1, row, fmtN(lc), text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center)
+    table.cell(tbl, 2, row, fmtWR(lwr), text_color=clrWR(lwr), text_size=size.tiny, text_halign=text.align_center)
+    table.cell(tbl, 3, row, fmtN(sc), text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center)
+    table.cell(tbl, 4, row, fmtWR(swr), text_color=clrWR(swr), text_size=size.tiny, text_halign=text.align_center)
+    table.cell(tbl, 5, row, fmtWR(twr), text_color=clrWR(twr), text_size=size.small, text_halign=text.align_center)
+    table.cell(tbl, 6, row, fmtPts(spts, tot), text_color=clrPts(spts, tot), text_size=size.tiny, text_halign=text.align_center)
+
+
+// ─── CLOUD ───────────────────────────────────────────────────────────────────
+
+fastEma = ta.ema(close, fastEmaLen)
+slowEma = ta.ema(close, slowEmaLen)
+smaBase = ta.sma(close, smaLen)
+rawBull = fastEma > slowEma and slowEma > smaBase
+rawBear = fastEma < slowEma and slowEma < smaBase
+bullCount = math.sum(rawBull ? 1 : 0, cloudSmooth)
+bearCount = math.sum(rawBear ? 1 : 0, cloudSmooth)
+cloudBull = bullCount == cloudSmooth
+cloudBear = bearCount == cloudSmooth
+flipToBull = cloudBull and not cloudBull[1]
+flipToBear = cloudBear and not cloudBear[1]
+
+catr = ta.atr(14)
+cSlopeRaw = ta.linreg(fastEma, cSlopeLen, 0) - ta.linreg(fastEma, cSlopeLen, 1)
+cSlopeNorm = catr > 0 ? cSlopeRaw / catr : 0.0
+cMild = cSteepT * 0.5
+cDirOk = (flipToBull and cSlopeNorm > 0) or (flipToBear and cSlopeNorm < 0)
+anyFlip = flipToBull or flipToBear
+
+cloudScore = anyFlip and cDirOk and math.abs(cSlopeNorm) >= cSteepT ? 3 : anyFlip and cDirOk and math.abs(cSlopeNorm) >= cMild ? 2 : anyFlip ? 1 : 0
+
+
+// ─── RSI ─────────────────────────────────────────────────────────────────────
+
+rsiVal = ta.rsi(close, rsiLen)
+rsiOS = rsiVal <= rsiOversold
+rsiOB = rsiVal >= rsiOverbought
+
+rSlopeRaw = ta.linreg(rsiVal, rSlopeLen, 0) - ta.linreg(rsiVal, rSlopeLen, 1)
+rSlopePrev = ta.linreg(rsiVal, rSlopeLen, 1) - ta.linreg(rsiVal, rSlopeLen, 2)
+
+rCurlL = rsiOS and rSlopeRaw > 0 and rSlopePrev <= 0
+rCurlS = rsiOB and rSlopeRaw < 0 and rSlopePrev >= 0
+rDecelL = rsiOS and rSlopeRaw < 0 and rSlopeRaw > rSlopePrev
+rDecelS = rsiOB and rSlopeRaw > 0 and rSlopeRaw < rSlopePrev
+
+rsiScore = (rsiOS or rsiOB) and (rCurlL or rCurlS) ? 3 : (rsiOS or rsiOB) and (rDecelL or rDecelS) ? 2 : (rsiOS or rsiOB) ? 1 : 0
+
+
+// ─── BOLLINGER BANDS ─────────────────────────────────────────────────────────
+
+bbBasis = ta.sma(close, bbLen)
+bbDev = bbMult * ta.stdev(close, bbLen)
+bbUpper = bbBasis + bbDev
+bbLower = bbBasis - bbDev
+atrBuf = ta.atr(bbAtrLen) * bbBufferMult
+bbCondL = close <= bbLower + atrBuf
+bbCondS = close >= bbUpper - atrBuf
+
+bbWidth = bbUpper - bbLower
+bbWidthMean = ta.sma(bbWidth, widthLen)
+bbExpanding = bbWidth > bbWidth[bSlopeLen] and bbWidth > bbWidthMean
+bbContracting = bbWidth < bbWidth[bSlopeLen] and bbWidth < bbWidthMean
+bbWidthNeut = not bbExpanding and not bbContracting
+
+bbScore = (bbCondL or bbCondS) and bbContracting ? 3 : (bbCondL or bbCondS) and bbWidthNeut ? 2 : (bbCondL or bbCondS) and bbExpanding ? 1 : 0
+
+
+// ─── LOOKBACK EVALUATION ─────────────────────────────────────────────────────
+
+lb = outcomeLB
+
+f_at_flip(bool cond, int sigOff, int align) =>
+    bool ok = cond[sigOff]
+    if align > 0
+        for i = 1 to align
+            ok := ok or cond[sigOff + i]
+    ok
+
+rsiExhLong = rsiVal <= rsiOversold
+rsiExhShort = rsiVal >= rsiOverbought
+
+cLongN = flipToBull[lb]
+cShortN = flipToBear[lb]
+rLongN = f_at_flip(rsiExhLong, lb, confAlign)
+rShortN = f_at_flip(rsiExhShort, lb, confAlign)
+bLongN = f_at_flip(bbCondL, lb, confAlign)
+bShortN = f_at_flip(bbCondS, lb, confAlign)
+
+cScN = cloudScore[lb]
+rScN = rsiScore[lb]
+bScN = bbScore[lb]
+
+minSc = highQualOnly ? 2 : 1
+
+cLf = cLongN and cScN >= minSc
+cSf = cShortN and cScN >= minSc
+rLf = rLongN and rScN >= minSc
+rSf = rShortN and rScN >= minSc
+bLf = bLongN and bScN >= minSc
+bSf = bShortN and bScN >= minSc
+
+crL = cLf and rLf
+crS = cSf and rSf
+cbL = cLf and bLf
+cbS = cSf and bSf
+rbL = rLf and bLf
+rbS = rSf and bSf
+allL = cLf and rLf and bLf
+allS = cSf and rSf and bSf
+hqL = cLongN and rLongN and bLongN and cScN >= 2 and rScN >= 2 and bScN >= 2
+hqS = cShortN and rShortN and bShortN and cScN >= 2 and rScN >= 2 and bScN >= 2
+
+delta = close - close[lb]
+longWin = delta > winThresh
+shortWin = delta < -winThresh
+lPts = delta
+sPts = -delta
+
+
+// ─── ACCUMULATORS ────────────────────────────────────────────────────────────
+
+var int cLC = 0
+var int cLW = 0
+var float cLS = 0.0
+var int cSC = 0
+var int cSW = 0
+var float cSS = 0.0
+var int rLC = 0
+var int rLW = 0
+var float rLS = 0.0
+var int rSC = 0
+var int rSW = 0
+var float rSS = 0.0
+var int bLC = 0
+var int bLW = 0
+var float bLS = 0.0
+var int bSC = 0
+var int bSW = 0
+var float bSS = 0.0
+var int crLC = 0
+var int crLW = 0
+var float crLS = 0.0
+var int crSC = 0
+var int crSW = 0
+var float crSS = 0.0
+var int cbLC = 0
+var int cbLW = 0
+var float cbLS = 0.0
+var int cbSC = 0
+var int cbSW = 0
+var float cbSS = 0.0
+var int rbLC = 0
+var int rbLW = 0
+var float rbLS = 0.0
+var int rbSC = 0
+var int rbSW = 0
+var float rbSS = 0.0
+var int aLC = 0
+var int aLW = 0
+var float aLS = 0.0
+var int aSC = 0
+var int aSW = 0
+var float aSS = 0.0
+var int hLC = 0
+var int hLW = 0
+var float hLS = 0.0
+var int hSC = 0
+var int hSW = 0
+var float hSS = 0.0
+var int totalBars = 0
+
+totalBars += 1
+
+// Only record on confirmed bar closes — avoids partial realtime close (repaint, not lookahead)
+if barstate.isconfirmed
+    if cLf
+        cLC += 1
+        cLS += lPts
+        if longWin
+            cLW += 1
+    if cSf
+        cSC += 1
+        cSS += sPts
+        if shortWin
+            cSW += 1
+    if rLf
+        rLC += 1
+        rLS += lPts
+        if longWin
+            rLW += 1
+    if rSf
+        rSC += 1
+        rSS += sPts
+        if shortWin
+            rSW += 1
+    if bLf
+        bLC += 1
+        bLS += lPts
+        if longWin
+            bLW += 1
+    if bSf
+        bSC += 1
+        bSS += sPts
+        if shortWin
+            bSW += 1
+    if crL
+        crLC += 1
+        crLS += lPts
+        if longWin
+            crLW += 1
+    if crS
+        crSC += 1
+        crSS += sPts
+        if shortWin
+            crSW += 1
+    if cbL
+        cbLC += 1
+        cbLS += lPts
+        if longWin
+            cbLW += 1
+    if cbS
+        cbSC += 1
+        cbSS += sPts
+        if shortWin
+            cbSW += 1
+    if rbL
+        rbLC += 1
+        rbLS += lPts
+        if longWin
+            rbLW += 1
+    if rbS
+        rbSC += 1
+        rbSS += sPts
+        if shortWin
+            rbSW += 1
+    if allL
+        aLC += 1
+        aLS += lPts
+        if longWin
+            aLW += 1
+    if allS
+        aSC += 1
+        aSS += sPts
+        if shortWin
+            aSW += 1
+    if hqL
+        hLC += 1
+        hLS += lPts
+        if longWin
+            hLW += 1
+    if hqS
+        hSC += 1
+        hSS += sPts
+        if shortWin
+            hSW += 1
+
+
+// ─── TABLE ───────────────────────────────────────────────────────────────────
+
+posVal = tblPos == "Top Left" ? position.top_left : tblPos == "Bottom Right" ? position.bottom_right : tblPos == "Bottom Left" ? position.bottom_left : tblPos == "Middle Right" ? position.middle_right : tblPos == "Middle Left" ? position.middle_left : position.top_right
+
+var table cdrPanel = table.new(posVal, 7, 13, bgcolor=C_TBLBG, border_color=C_TBLBD, border_width=1, frame_color=C_TBLFR, frame_width=2)
+
+if barstate.islast and showTable
+    qStr = highQualOnly ? "HQ filter ON" : "all signals"
+    infoStr = str.tostring(totalBars) + " bars  lb=" + str.tostring(outcomeLB) + "  " + qStr
+    table.cell(cdrPanel, 0, 0, "CONFLUENCE DATA RECORDER", text_color=C_HEAD, text_size=size.small, text_halign=text.align_left, bgcolor=C_HBG)
+    table.cell(cdrPanel, 1, 0, "", bgcolor=C_HBG)
+    table.cell(cdrPanel, 2, 0, "", bgcolor=C_HBG)
+    table.cell(cdrPanel, 3, 0, "", bgcolor=C_HBG)
+    table.cell(cdrPanel, 4, 0, "", bgcolor=C_HBG)
+    table.cell(cdrPanel, 5, 0, infoStr, text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_right, bgcolor=C_HBG)
+    table.cell(cdrPanel, 6, 0, "", bgcolor=C_HBG)
+    table.cell(cdrPanel, 0, 1, "Combination", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_left, bgcolor=C_LBG)
+    table.cell(cdrPanel, 1, 1, "L #", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_LBG)
+    table.cell(cdrPanel, 2, 1, "L Win%", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_LBG)
+    table.cell(cdrPanel, 3, 1, "S #", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_LBG)
+    table.cell(cdrPanel, 4, 1, "S Win%", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_LBG)
+    table.cell(cdrPanel, 5, 1, "Total Win%", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_LBG)
+    table.cell(cdrPanel, 6, 1, "Avg Pts", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_LBG)
+    writeSep(cdrPanel, 2, "─── independent ─────────────────────")
+    writeRow(cdrPanel, 3, "Cloud", cLC, cLW, cLS, cSC, cSW, cSS)
+    writeRow(cdrPanel, 4, "RSI", rLC, rLW, rLS, rSC, rSW, rSS)
+    writeRow(cdrPanel, 5, "BB", bLC, bLW, bLS, bSC, bSW, bSS)
+    writeSep(cdrPanel, 6, "─── pairs ───────────────────────────")
+    writeRow(cdrPanel, 7, "Cloud + RSI", crLC, crLW, crLS, crSC, crSW, crSS)
+    writeRow(cdrPanel, 8, "Cloud + BB", cbLC, cbLW, cbLS, cbSC, cbSW, cbSS)
+    writeRow(cdrPanel, 9, "RSI + BB", rbLC, rbLW, rbLS, rbSC, rbSW, rbSS)
+    writeSep(cdrPanel, 10, "─── full confluence ─────────────────")
+    writeRow(cdrPanel, 11, "All Three", aLC, aLW, aLS, aSC, aSW, aSS)
+    writeRow(cdrPanel, 12, "All Three HQ", hLC, hLW, hLS, hSC, hSW, hSS)

@@ -6,8 +6,15 @@ export function registerIndicatorTools(server) {
   server.tool('indicator_set_inputs', 'Change indicator/study input values (e.g., length, source, period)', {
     entity_id: z.string().describe('Entity ID of the study (from chart_get_state)'),
     inputs: z.string().describe('JSON string of input overrides, e.g. \'{"length": 50, "source": "close"}\'. Keys are input IDs, values are the new values.'),
-  }, async ({ entity_id, inputs }) => {
-    try { return jsonResult(await core.setInputs({ entity_id, inputs })); }
+    persist_layout: z.coerce.boolean().optional().describe('After set, trigger chart layout save (default true). Set false to only change in memory.'),
+  }, async ({ entity_id, inputs, persist_layout }) => {
+    try {
+      return jsonResult(await core.setInputs({
+        entity_id,
+        inputs,
+        persist_layout: persist_layout !== false,
+      }));
+    }
     catch (err) { return jsonResult({ success: false, error: err.message }, true); }
   });
 

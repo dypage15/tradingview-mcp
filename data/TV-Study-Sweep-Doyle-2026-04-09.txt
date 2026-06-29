@@ -1,0 +1,129 @@
+================================================================================
+TRADINGVIEW LIVE STUDY SNAPSHOT (not local Pine files)
+================================================================================
+Generated from TradingView Desktop via `tv` CLI (CDP), not from disk copies of
+Doyle or Sweep source. Re-pull anytime: set ADVISOR_STRATEGY_SUBSTRING and run
+`node src/cli/index.js data strategy` / `quant-advisor.mjs`.
+
+Pull timestamp: 2026-04-09 (UTC implied by system)
+
+--------------------------------------------------------------------------------
+1) CHART CONTEXT (from `tv state`)
+--------------------------------------------------------------------------------
+Symbol:     CME_MINI:MNQ1!
+Timeframe:  5 minute
+
+Studies/indicators on chart (names as reported by TV UI):
+  • Doyle S&D (v61.1 - Signal Fix)          ← visual / signal overlay (no API export here)
+  • Sweep Engine v2.0                     (appears more than once in list — duplicate instances)
+  • Sweep Engine v2.1
+  • Sweep Model v2.0 / v2.1
+  • Session levels (extract)
+  • Confluence Engine v3.0 / v4.0
+  • Displacement Engine v5.0
+  • FVG & IFVG ICT [TradingFinder] …
+  • Wick Rejection Candle ID
+  • AYN: Buy-, Sell-, Trend- and SwingSignals …
+  • Sweep Engine v1.0
+
+Note: Doyle is ON THE CHART but TradingView does not expose Doyle’s zone logic
+or trade labels to the same internal strategy metrics API as your Pine strategy.
+Confluence with Doyle must still be judged visually or journaled manually.
+
+--------------------------------------------------------------------------------
+2) STRATEGY TESTER — PINNED TO “Sweep Engine v2.0”
+--------------------------------------------------------------------------------
+Why pin: Many strategies match “Sweep” substring (18 candidates). Reads used:
+  PowerShell: $env:ADVISOR_STRATEGY_SUBSTRING='Sweep Engine v2.0'
+
+Strategy read as: Sweep Engine v2.0
+
+Core metrics (USD, from `tv data strategy` internal_api):
+  Net profit:              5490.36
+  Net profit %:            ~5.49% of test account scale (field netProfitPercent)
+  Profit factor:           2.206
+  Percent profitable:    72.09%
+  Total trades:            43  (closed round-trips; tester view)
+  Winning trades:          31
+  Losing trades:           12
+  Gross profit:            10043.12
+  Gross loss:              4552.76
+  Commission paid:         106.64
+  Avg trade:               127.68
+  Avg win:                 323.97
+  Avg loss:                379.40  (larger than avg win — payoff skew)
+  Ratio avg win / avg loss: ~0.854  (from TV field ratioAvgWinAvgLoss)
+  Largest win trade:       869.52
+  Largest loss trade:      858.48
+  Max contracts held:      2   ← effective size is 2 MNQ in this run (not 1)
+
+Backtest window (epoch in JSON — verify in Strategy Tester UI for exact dates):
+  settings.dateRange.backtest.from / .to present in payload — align to your UI.
+
+--------------------------------------------------------------------------------
+3) TRADE LIST EXPORT (limitation)
+--------------------------------------------------------------------------------
+`tv data trades` returned 86 rows (fills/legs), but fields did not include
+parseable per-trade net PnL for quant-advisor (code TRADE_EXPORT_GAP). So:
+  • Strategy-level metrics above are reliable from TV’s summary object.
+  • Per-trade win rate / expectancy from the export list alone was NOT computed
+    automatically in advisor — use Strategy Tester “List of trades” in app or
+    fix locale/field mapping later.
+
+--------------------------------------------------------------------------------
+4) EQUITY CURVE API
+--------------------------------------------------------------------------------
+`tv data equity` returned 0 points in this pull — equity DD from curve unavailable
+via API this run. Read max drawdown from Strategy Tester UI manually if needed.
+
+--------------------------------------------------------------------------------
+5) FACTUAL OBSERVATIONS (Sweep v2.0 behavior visible in order comments)
+--------------------------------------------------------------------------------
+From exported order rows (sample): exits include xL/xL LIMIT/STOP, xS, “Session flat”,
+and “Close position order”. Factual interpretation:
+  • Session flatten and bracket exits are active in the test — flat exits appear
+    as their own closes (not only TP/SL).
+  • Quantity 2 on entries/exits matches maxContractsHeld = 2 — risk and DD scale
+    with size; any $ DD cap you think in must be for THIS contract count.
+
+--------------------------------------------------------------------------------
+6) DOYLE S&D (v61.1) vs SWEEP — what we can say from THIS TV pull
+--------------------------------------------------------------------------------
+Q: Did we mathematically prove Doyle agreed with every winner?
+A: No — Doyle is not exported as numeric series in this pipeline.
+
+Q: Is Doyle on the chart?
+A: Yes — `tv state` lists “Doyle S&D (v61.1 - Signal Fix)”.
+
+Q: What study step is honest next?
+A: On TV, visually mark bars where Sweep took a trade and note whether price
+   was interacting with a Doyle zone (demand for longs / supply for shorts). Log
+   in a spreadsheet: date, time, side, outcome from Strategy Tester list, Doyle
+   yes/no within X ticks — that turns overlay into data.
+
+--------------------------------------------------------------------------------
+7) MITIGATING DRAWDOWN — grounded in this run’s shape (not new code)
+--------------------------------------------------------------------------------
+  • Payoff: avg loss > avg win with high win rate — streaks of losses still hurt;
+    reducing size after DD or capping daily loss is risk management, not in-script.
+  • Size: maxContractsHeld = 2 doubles exposure vs a 1-lot assumption — align any
+    $2000 DD rule with actual qty in tester.
+  • Many studies on one chart increase load and human confusion; for clean tests,
+    isolate fewer overlays when validating Sweep alone.
+
+--------------------------------------------------------------------------------
+8) REPRO COMMANDS (for your next “re-run study”)
+--------------------------------------------------------------------------------
+  cd C:\Users\dypag\tradingview-mcp
+  $env:ADVISOR_STRATEGY_SUBSTRING='Sweep Engine v2.0'
+  node src/cli/index.js state
+  node src/cli/index.js data strategy
+  node src/cli/index.js data trades -n 200
+  node scripts/quant-advisor.mjs -n 200
+
+Optional: add to `.env` / `.env.local`:
+  ADVISOR_STRATEGY_SUBSTRING=Sweep Engine v2.0
+
+================================================================================
+END
+================================================================================

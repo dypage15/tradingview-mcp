@@ -1,0 +1,48 @@
+{
+  "updatedAt": "2026-04-18T07:01:03.437Z",
+  "sourceMerged": "C:\\Users\\dypag\\tradingview-mcp\\data\\sec_sweep_london_ib_800_MERGED_2026-04-18T06-00-27-757Z.json",
+  "learn": {
+    "best": {
+      "scenarioId": 175,
+      "sweepMode": 1,
+      "sweepInputKey": "in_44",
+      "in_5": 2,
+      "in_25": 2,
+      "in_6": 44,
+      "in_7": 210,
+      "netProfit": 1137.9999999999927,
+      "profitFactor": 1.6425748164878546,
+      "percentProfitable": 0.2830188679245283,
+      "totalTrades": 53,
+      "avgProfitPerTrade": 21.47169811320741,
+      "grossProfit": 2908.9999999999964,
+      "grossLoss": 1771.0000000000036,
+      "strategy_name": "CBC Asia Sweep v4 Daily50 — Sec (Ticks)",
+      "score": 1374.4617523411698
+    },
+    "medianTop20": {
+      "in_5": 4,
+      "in_25": 2,
+      "in_6": 44,
+      "in_7": 200,
+      "sweepMode": 1.5
+    },
+    "avgScoreBySweepMode": {
+      "london_1": 867.629550119992,
+      "ib_2": 867.629550119992
+    },
+    "suggestedNextGrid": {
+      "note": "Narrow arrays around medians; keep 800 factorial shape or switch to finer step on in_7/in_6 only.",
+      "in_7_tpLegTicks_suggest": [
+        180,
+        200,
+        220
+      ],
+      "in_6_stopTicks_suggest": [
+        36,
+        44,
+        52
+      ]
+    }
+  }
+}

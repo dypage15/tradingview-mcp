@@ -1,0 +1,65 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\clreg23_oos_2026-05-22T05-31-07",
+  "method": "sequential_70pct_train_by_trade_order",
+  "spec": {
+    "rsiMode": "Combined",
+    "rsiLen": 6,
+    "confLookback": 3,
+    "cloudSmooth": 3,
+    "minBarsBetween": 0,
+    "minCloudSep": 0,
+    "riskMode": "Points",
+    "tpPoints": 30,
+    "slPoints": 15
+  },
+  "entity_id": "tHzDzY",
+  "symbol": "CME_MINI:MNQ1!",
+  "timeframe": "5",
+  "date_range": {
+    "from": "2026-02-10T17:00:00.000Z",
+    "to": "2026-05-22T05:30:00.000Z",
+    "split": "2026-04-22T01:45:00.000Z",
+    "train_frac": 0.7
+  },
+  "full_window": {
+    "trades": 57,
+    "netProfit": -444.6800000000005,
+    "profitFactor": 0.775373300195995,
+    "percentProfitable": 0.3684210526315789
+  },
+  "train": {
+    "trades": 39,
+    "netProfit": -79.25,
+    "profitFactor": 0.8783109404990403,
+    "percentProfitable": 38.46153846153847,
+    "expectancy": -2.032051282051282
+  },
+  "test": {
+    "trades": 18,
+    "netProfit": -107.75,
+    "profitFactor": 0.6592885375494071,
+    "percentProfitable": 33.33333333333333,
+    "expectancy": -5.986111111111111
+  },
+  "oos_pass": false,
+  "split_detail": {
+    "train": {
+      "trades": 39,
+      "netProfit": -79.25,
+      "profitFactor": 0.8783109404990403,
+      "percentProfitable": 38.46153846153847,
+      "expectancy": -2.032051282051282
+    },
+    "test": {
+      "trades": 18,
+      "netProfit": -107.75,
+      "profitFactor": 0.6592885375494071,
+      "percentProfitable": 33.33333333333333,
+      "expectancy": -5.986111111111111
+    },
+    "cut_index": 39,
+    "total_rounds": 57
+  },
+  "orders_fetched": 114,
+  "round_trips_paired": 57
+}

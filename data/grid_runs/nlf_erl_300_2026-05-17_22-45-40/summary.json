@@ -1,0 +1,3019 @@
+{
+  "generated_at": "2026-05-18T00:04:21.203Z",
+  "runCount": 300,
+  "outDir": "data/grid_runs/nlf_erl_300_2026-05-17_22-45-40",
+  "grid_source_mode": "rewrite",
+  "requested_source_mode": "rewrite",
+  "baseline_inputs_restored_ids": {},
+  "min_trades_per_day_requirement": 1,
+  "best_overall_met_constraint": {
+    "at": "2026-05-17T22:48:27.439Z",
+    "scenarioId": 8,
+    "spec": {
+      "scenarioId": 8,
+      "minBarsBetween": 28,
+      "minScoreCont": 52,
+      "minScoreRev": 50
+    },
+    "grid_source_mode": "rewrite",
+    "netProfit": -3512.8758749999997,
+    "netProfitPercent": -0.035128758749999996,
+    "profitFactor": 0.6474301025616456,
+    "percentProfitable": 0.4818181818181818,
+    "totalTrades": 110,
+    "tradesPerCalendarDay": 1.0542780125794535,
+    "calendar_days_trade_span": 104.33680555555556,
+    "commissionPaid": 2821.3758749999997,
+    "met_trade_per_day_floor": true,
+    "metConstraint": true,
+    "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+    "report_ready": true
+  },
+  "best_that_failed_constraint": {
+    "at": "2026-05-17T22:48:42.905Z",
+    "scenarioId": 9,
+    "spec": {
+      "scenarioId": 9,
+      "minBarsBetween": 40,
+      "minScoreCont": 52,
+      "minScoreRev": 50
+    },
+    "grid_source_mode": "rewrite",
+    "netProfit": -2847.830250000001,
+    "netProfitPercent": -0.028478302500000007,
+    "profitFactor": 0.6821624631388531,
+    "percentProfitable": 0.49504950495049505,
+    "totalTrades": 101,
+    "tradesPerCalendarDay": 0.9680189024593164,
+    "calendar_days_trade_span": 104.33680555555556,
+    "commissionPaid": 2585.8302499999995,
+    "met_trade_per_day_floor": false,
+    "metConstraint": false,
+    "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+    "report_ready": true
+  },
+  "top_feasible": [
+    {
+      "at": "2026-05-17T22:48:27.439Z",
+      "scenarioId": 8,
+      "spec": {
+        "scenarioId": 8,
+        "minBarsBetween": 28,
+        "minScoreCont": 52,
+        "minScoreRev": 50
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0542780125794535,
+      "calendar_days_trade_span": 104.33680555555556,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T22:51:01.861Z",
+      "scenarioId": 18,
+      "spec": {
+        "scenarioId": 18,
+        "minBarsBetween": 28,
+        "minScoreCont": 58,
+        "minScoreRev": 50
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0542429284525792,
+      "calendar_days_trade_span": 104.34027777777777,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T22:53:36.754Z",
+      "scenarioId": 28,
+      "spec": {
+        "scenarioId": 28,
+        "minBarsBetween": 28,
+        "minScoreCont": 64,
+        "minScoreRev": 50
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0542429284525792,
+      "calendar_days_trade_span": 104.34027777777777,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T22:56:11.901Z",
+      "scenarioId": 38,
+      "spec": {
+        "scenarioId": 38,
+        "minBarsBetween": 28,
+        "minScoreCont": 70,
+        "minScoreRev": 50
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0542078466606768,
+      "calendar_days_trade_span": 104.34375,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T22:58:46.976Z",
+      "scenarioId": 48,
+      "spec": {
+        "scenarioId": 48,
+        "minBarsBetween": 28,
+        "minScoreCont": 76,
+        "minScoreRev": 50
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0542078466606768,
+      "calendar_days_trade_span": 104.34375,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:03:57.027Z",
+      "scenarioId": 68,
+      "spec": {
+        "scenarioId": 68,
+        "minBarsBetween": 28,
+        "minScoreCont": 52,
+        "minScoreRev": 56
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.054172767203514,
+      "calendar_days_trade_span": 104.34722222222223,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:06:32.239Z",
+      "scenarioId": 78,
+      "spec": {
+        "scenarioId": 78,
+        "minBarsBetween": 28,
+        "minScoreCont": 58,
+        "minScoreRev": 56
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0541376900808572,
+      "calendar_days_trade_span": 104.35069444444444,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:09:07.710Z",
+      "scenarioId": 88,
+      "spec": {
+        "scenarioId": 88,
+        "minBarsBetween": 28,
+        "minScoreCont": 64,
+        "minScoreRev": 56
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0541376900808572,
+      "calendar_days_trade_span": 104.35069444444444,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:11:43.237Z",
+      "scenarioId": 98,
+      "spec": {
+        "scenarioId": 98,
+        "minBarsBetween": 28,
+        "minScoreCont": 70,
+        "minScoreRev": 56
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0541026152924735,
+      "calendar_days_trade_span": 104.35416666666667,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:14:18.853Z",
+      "scenarioId": 108,
+      "spec": {
+        "scenarioId": 108,
+        "minBarsBetween": 28,
+        "minScoreCont": 76,
+        "minScoreRev": 56
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0541026152924735,
+      "calendar_days_trade_span": 104.35416666666667,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:16:54.303Z",
+      "scenarioId": 118,
+      "spec": {
+        "scenarioId": 118,
+        "minBarsBetween": 28,
+        "minScoreCont": 82,
+        "minScoreRev": 56
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.05406754283813,
+      "calendar_days_trade_span": 104.35763888888889,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:19:29.917Z",
+      "scenarioId": 128,
+      "spec": {
+        "scenarioId": 128,
+        "minBarsBetween": 28,
+        "minScoreCont": 52,
+        "minScoreRev": 62
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.05406754283813,
+      "calendar_days_trade_span": 104.35763888888889,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:22:05.802Z",
+      "scenarioId": 138,
+      "spec": {
+        "scenarioId": 138,
+        "minBarsBetween": 28,
+        "minScoreCont": 58,
+        "minScoreRev": 62
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0540324727175938,
+      "calendar_days_trade_span": 104.36111111111111,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:24:41.815Z",
+      "scenarioId": 148,
+      "spec": {
+        "scenarioId": 148,
+        "minBarsBetween": 28,
+        "minScoreCont": 64,
+        "minScoreRev": 62
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0540324727175938,
+      "calendar_days_trade_span": 104.36111111111111,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:27:17.714Z",
+      "scenarioId": 158,
+      "spec": {
+        "scenarioId": 158,
+        "minBarsBetween": 28,
+        "minScoreCont": 70,
+        "minScoreRev": 62
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -3512.8758749999997,
+      "netProfitPercent": -0.035128758749999996,
+      "profitFactor": 0.6474301025616456,
+      "percentProfitable": 0.4818181818181818,
+      "totalTrades": 110,
+      "tradesPerCalendarDay": 1.0539974049306318,
+      "calendar_days_trade_span": 104.36458333333333,
+      "commissionPaid": 2821.3758749999997,
+      "met_trade_per_day_floor": true,
+      "metConstraint": true,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    }
+  ],
+  "top_raw_profit_ignore_constraint": [
+    {
+      "at": "2026-05-17T22:48:42.905Z",
+      "scenarioId": 9,
+      "spec": {
+        "scenarioId": 9,
+        "minBarsBetween": 40,
+        "minScoreCont": 52,
+        "minScoreRev": 50
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9680189024593164,
+      "calendar_days_trade_span": 104.33680555555556,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T22:51:17.327Z",
+      "scenarioId": 19,
+      "spec": {
+        "scenarioId": 19,
+        "minBarsBetween": 40,
+        "minScoreCont": 58,
+        "minScoreRev": 50
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9679866888519135,
+      "calendar_days_trade_span": 104.34027777777777,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T22:53:52.273Z",
+      "scenarioId": 29,
+      "spec": {
+        "scenarioId": 29,
+        "minBarsBetween": 40,
+        "minScoreCont": 64,
+        "minScoreRev": 50
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9679866888519135,
+      "calendar_days_trade_span": 104.34027777777777,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T22:56:27.380Z",
+      "scenarioId": 39,
+      "spec": {
+        "scenarioId": 39,
+        "minBarsBetween": 40,
+        "minScoreCont": 70,
+        "minScoreRev": 50
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9679544773884396,
+      "calendar_days_trade_span": 104.34375,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T22:59:02.465Z",
+      "scenarioId": 49,
+      "spec": {
+        "scenarioId": 49,
+        "minBarsBetween": 40,
+        "minScoreCont": 76,
+        "minScoreRev": 50
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9679544773884396,
+      "calendar_days_trade_span": 104.34375,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:04:12.529Z",
+      "scenarioId": 69,
+      "spec": {
+        "scenarioId": 69,
+        "minBarsBetween": 40,
+        "minScoreCont": 52,
+        "minScoreRev": 56
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9679222680686809,
+      "calendar_days_trade_span": 104.34722222222223,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:06:47.885Z",
+      "scenarioId": 79,
+      "spec": {
+        "scenarioId": 79,
+        "minBarsBetween": 40,
+        "minScoreCont": 58,
+        "minScoreRev": 56
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9678900608924234,
+      "calendar_days_trade_span": 104.35069444444444,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:09:23.275Z",
+      "scenarioId": 89,
+      "spec": {
+        "scenarioId": 89,
+        "minBarsBetween": 40,
+        "minScoreCont": 64,
+        "minScoreRev": 56
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9678900608924234,
+      "calendar_days_trade_span": 104.35069444444444,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:11:58.778Z",
+      "scenarioId": 99,
+      "spec": {
+        "scenarioId": 99,
+        "minBarsBetween": 40,
+        "minScoreCont": 70,
+        "minScoreRev": 56
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9678578558594529,
+      "calendar_days_trade_span": 104.35416666666667,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:14:34.393Z",
+      "scenarioId": 109,
+      "spec": {
+        "scenarioId": 109,
+        "minBarsBetween": 40,
+        "minScoreCont": 76,
+        "minScoreRev": 56
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9678578558594529,
+      "calendar_days_trade_span": 104.35416666666667,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:19:45.576Z",
+      "scenarioId": 129,
+      "spec": {
+        "scenarioId": 129,
+        "minBarsBetween": 40,
+        "minScoreCont": 52,
+        "minScoreRev": 62
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9678256529695558,
+      "calendar_days_trade_span": 104.35763888888889,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:22:21.467Z",
+      "scenarioId": 139,
+      "spec": {
+        "scenarioId": 139,
+        "minBarsBetween": 40,
+        "minScoreCont": 58,
+        "minScoreRev": 62
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9677934522225179,
+      "calendar_days_trade_span": 104.36111111111111,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:24:57.427Z",
+      "scenarioId": 149,
+      "spec": {
+        "scenarioId": 149,
+        "minBarsBetween": 40,
+        "minScoreCont": 64,
+        "minScoreRev": 62
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9677934522225179,
+      "calendar_days_trade_span": 104.36111111111111,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:27:33.436Z",
+      "scenarioId": 159,
+      "spec": {
+        "scenarioId": 159,
+        "minBarsBetween": 40,
+        "minScoreCont": 70,
+        "minScoreRev": 62
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9677612536181256,
+      "calendar_days_trade_span": 104.36458333333333,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    },
+    {
+      "at": "2026-05-17T23:30:09.565Z",
+      "scenarioId": 169,
+      "spec": {
+        "scenarioId": 169,
+        "minBarsBetween": 40,
+        "minScoreCont": 76,
+        "minScoreRev": 62
+      },
+      "grid_source_mode": "rewrite",
+      "netProfit": -2847.830250000001,
+      "netProfitPercent": -0.028478302500000007,
+      "profitFactor": 0.6821624631388531,
+      "percentProfitable": 0.49504950495049505,
+      "totalTrades": 101,
+      "tradesPerCalendarDay": 0.9677290571561648,
+      "calendar_days_trade_span": 104.36805555555556,
+      "commissionPaid": 2585.8302499999995,
+      "met_trade_per_day_floor": false,
+      "metConstraint": false,
+      "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+      "report_ready": true
+    }
+  ],
+  "notes": [
+    "metConstraint requires ≥1 closed trade per calendar day of Tester trade-span AND numeric netProfit.",
+    "rewrite mode rewrites default input.int() lines per scenario (slow but works when CDP getInputValues is empty).",
+    "Tune MIN_TRADES_PER_DAY env or grid arrays in this script before another pass.",
+    "strategy_snapshot is NOT auto-synced — run npm run nlf:backtest-save for full JSON artifact after picking inputs."
+  ],
+  "compile_ack": {
+    "success": true,
+    "button_clicked": "Pine Save",
+    "has_errors": true,
+    "errors": [
+      {
+        "line": 559,
+        "column": 4,
+        "message": "Strategies without \"calc_on_every_tick = true\" only calculate on confirmed chart bars. In this case, \"barstate.islast\" may not initially return \"true\" on realtime bars, as the last bar is unconfirmed until it closes. If you need to check whether a bar is the latest before it closes, enable \"calc_on_every_tick\" in the \"strategy()\" function.",
+        "severity": 4
+      },
+      {
+        "line": 588,
+        "column": 15,
+        "message": "Strategies without \"calc_on_every_tick = true\" only calculate on confirmed chart bars. In this case, \"barstate.islast\" may not initially return \"true\" on realtime bars, as the last bar is unconfirmed until it closes. If you need to check whether a bar is the latest before it closes, enable \"calc_on_every_tick\" in the \"strategy()\" function.",
+        "severity": 4
+      },
+      {
+        "line": 628,
+        "column": 20,
+        "message": "Strategies without \"calc_on_every_tick = true\" only calculate on confirmed chart bars. In this case, \"barstate.islast\" may not initially return \"true\" on realtime bars, as the last bar is unconfirmed until it closes. If you need to check whether a bar is the latest before it closes, enable \"calc_on_every_tick\" in the \"strategy()\" function.",
+        "severity": 4
+      },
+      {
+        "line": 695,
+        "column": 18,
+        "message": "Strategies without \"calc_on_every_tick = true\" only calculate on confirmed chart bars. In this case, \"barstate.islast\" may not initially return \"true\" on realtime bars, as the last bar is unconfirmed until it closes. If you need to check whether a bar is the latest before it closes, enable \"calc_on_every_tick\" in the \"strategy()\" function.",
+        "severity": 4
+      },
+      {
+        "line": 792,
+        "column": 1,
+        "message": "\"alertcondition()\" has no effect inside strategies.",
+        "severity": 4
+      },
+      {
+        "line": 793,
+        "column": 1,
+        "message": "\"alertcondition()\" has no effect inside strategies.",
+        "severity": 4
+      },
+      {
+        "line": 794,
+        "column": 1,
+        "message": "\"alertcondition()\" has no effect inside strategies.",
+        "severity": 4
+      },
+      {
+        "line": 795,
+        "column": 1,
+        "message": "\"alertcondition()\" has no effect inside strategies.",
+        "severity": 4
+      },
+      {
+        "line": 796,
+        "column": 1,
+        "message": "\"alertcondition()\" has no effect inside strategies.",
+        "severity": 4
+      },
+      {
+        "line": 797,
+        "column": 1,
+        "message": "\"alertcondition()\" has no effect inside strategies.",
+        "severity": 4
+      },
+      {
+        "line": 799,
+        "column": 1,
+        "message": "\"alertcondition()\" has no effect inside strategies.",
+        "severity": 4
+      },
+      {
+        "line": 800,
+        "column": 1,
+        "message": "\"alertcondition()\" has no effect inside strategies.",
+        "severity": 4
+      }
+    ],
+    "study_added": false
+  },
+  "timeline": [
+    {
+      "pine_compile_initial": {
+        "success": true,
+        "button_clicked": "Pine Save",
+        "has_errors": true,
+        "errors": [
+          {
+            "line": 559,
+            "column": 4,
+            "message": "Strategies without \"calc_on_every_tick = true\" only calculate on confirmed chart bars. In this case, \"barstate.islast\" may not initially return \"true\" on realtime bars, as the last bar is unconfirmed until it closes. If you need to check whether a bar is the latest before it closes, enable \"calc_on_every_tick\" in the \"strategy()\" function.",
+            "severity": 4
+          },
+          {
+            "line": 588,
+            "column": 15,
+            "message": "Strategies without \"calc_on_every_tick = true\" only calculate on confirmed chart bars. In this case, \"barstate.islast\" may not initially return \"true\" on realtime bars, as the last bar is unconfirmed until it closes. If you need to check whether a bar is the latest before it closes, enable \"calc_on_every_tick\" in the \"strategy()\" function.",
+            "severity": 4
+          },
+          {
+            "line": 628,
+            "column": 20,
+            "message": "Strategies without \"calc_on_every_tick = true\" only calculate on confirmed chart bars. In this case, \"barstate.islast\" may not initially return \"true\" on realtime bars, as the last bar is unconfirmed until it closes. If you need to check whether a bar is the latest before it closes, enable \"calc_on_every_tick\" in the \"strategy()\" function.",
+            "severity": 4
+          },
+          {
+            "line": 695,
+            "column": 18,
+            "message": "Strategies without \"calc_on_every_tick = true\" only calculate on confirmed chart bars. In this case, \"barstate.islast\" may not initially return \"true\" on realtime bars, as the last bar is unconfirmed until it closes. If you need to check whether a bar is the latest before it closes, enable \"calc_on_every_tick\" in the \"strategy()\" function.",
+            "severity": 4
+          },
+          {
+            "line": 792,
+            "column": 1,
+            "message": "\"alertcondition()\" has no effect inside strategies.",
+            "severity": 4
+          },
+          {
+            "line": 793,
+            "column": 1,
+            "message": "\"alertcondition()\" has no effect inside strategies.",
+            "severity": 4
+          },
+          {
+            "line": 794,
+            "column": 1,
+            "message": "\"alertcondition()\" has no effect inside strategies.",
+            "severity": 4
+          },
+          {
+            "line": 795,
+            "column": 1,
+            "message": "\"alertcondition()\" has no effect inside strategies.",
+            "severity": 4
+          },
+          {
+            "line": 796,
+            "column": 1,
+            "message": "\"alertcondition()\" has no effect inside strategies.",
+            "severity": 4
+          },
+          {
+            "line": 797,
+            "column": 1,
+            "message": "\"alertcondition()\" has no effect inside strategies.",
+            "severity": 4
+          },
+          {
+            "line": 799,
+            "column": 1,
+            "message": "\"alertcondition()\" has no effect inside strategies.",
+            "severity": 4
+          },
+          {
+            "line": 800,
+            "column": 1,
+            "message": "\"alertcondition()\" has no effect inside strategies.",
+            "severity": 4
+          }
+        ],
+        "study_added": false
+      }
+    },
+    {
+      "scenarioId": 0,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": true
+      }
+    },
+    {
+      "scenarioId": 1,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 2,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 3,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 4,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 5,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 6,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 7,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 8,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 9,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 10,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 11,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 12,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 13,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 14,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 15,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 16,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 17,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 18,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 19,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 20,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 21,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 22,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 23,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 24,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 25,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 26,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 27,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 28,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 29,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 30,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 31,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 32,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 33,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 34,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 35,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 36,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 37,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 38,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 39,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 40,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 41,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 42,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 43,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 44,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 45,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 46,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 47,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 48,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 49,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 50,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 51,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 52,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 53,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 54,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 55,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 56,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 57,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 58,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": true
+      }
+    },
+    {
+      "scenarioId": 59,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 60,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 61,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 62,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 63,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 64,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 65,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 66,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 67,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 68,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 69,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 70,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 71,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 72,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 73,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 74,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 75,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 76,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 77,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 78,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 79,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 80,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 81,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 82,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 83,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 84,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 85,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 86,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 87,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 88,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 89,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 90,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 91,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 92,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 93,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 94,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 95,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 96,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 97,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 98,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 99,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 100,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 101,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 102,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 103,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 104,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 105,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 106,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 107,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 108,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 109,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 110,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 111,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 112,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 113,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 114,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 115,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 116,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 117,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 118,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 119,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 120,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 121,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 122,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 123,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 124,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 125,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 126,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 127,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 128,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 129,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 130,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 131,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 132,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 133,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 134,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 135,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 136,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 137,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 138,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 139,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 140,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 141,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 142,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 143,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 144,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 145,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 146,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 147,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 148,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 149,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 150,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 151,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 152,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 153,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 154,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 155,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 156,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 157,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 158,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 159,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 160,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 161,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 162,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 163,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 164,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 165,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 166,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 167,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 168,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 169,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 170,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 171,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 172,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 173,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 174,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 175,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 176,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 177,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 178,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 179,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 180,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 181,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 182,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 183,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 184,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 185,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 186,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 187,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 188,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 189,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 190,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 191,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 192,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 193,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 194,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 195,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 196,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 197,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 198,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 199,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 200,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 201,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 202,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 203,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 204,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 205,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 206,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 207,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 208,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 209,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 210,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 211,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 212,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 213,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 214,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 215,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 216,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 217,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 218,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 219,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 220,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 221,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 222,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 223,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 224,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 225,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 226,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 227,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 228,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 229,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 230,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 231,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 232,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 233,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 234,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 235,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 236,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 237,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 238,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 239,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 240,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 241,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 242,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 243,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 244,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 245,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 246,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 247,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 248,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 249,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 250,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 251,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 252,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 253,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 254,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 255,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 256,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 257,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 258,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 259,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 260,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 261,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 262,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 263,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 264,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 265,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 266,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 267,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 268,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 269,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 270,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 271,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 272,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 273,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 274,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 275,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 276,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 277,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 278,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 279,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 280,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 281,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 282,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 283,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 284,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 285,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 286,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 287,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 288,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 289,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 290,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 291,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 292,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 293,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 294,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 295,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 296,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 297,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 298,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    },
+    {
+      "scenarioId": 299,
+      "pine_rewrite_compile": {
+        "success": true,
+        "has_errors": false
+      }
+    }
+  ]
+}

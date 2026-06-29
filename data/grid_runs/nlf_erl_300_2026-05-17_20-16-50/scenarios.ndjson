@@ -1,0 +1,1 @@
+{"at":"2026-05-17T20:17:57.201Z","scenarioId":0,"spec":{"scenarioId":0,"minBarsBetween":0,"minScoreCont":52,"minScoreRev":50},"grid_source_mode":"rewrite","totalTrades":0,"tradesPerCalendarDay":null,"calendar_days_trade_span":null,"met_trade_per_day_floor":false,"metConstraint":false,"strategy_name":"ERL IRL Engine v2 Strategy [NLF]","report_ready":false}

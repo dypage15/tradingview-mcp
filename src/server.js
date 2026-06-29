@@ -52,7 +52,8 @@ Pine Script development:
 - WARNING: pine_get_source can return 200KB+ for complex scripts — avoid unless editing
 
 Screenshots: capture_screenshot → regions: "full", "chart", "strategy_tester"
-Replay: replay_start → replay_step → replay_trade → replay_status → replay_stop
+Bar replay (chart toolbar): replay_start → replay_step → replay_trade → replay_status → replay_stop
+Strategy Tester: data_get_trades / data_get_strategy_results / data_get_equity READ backtest output only after TradingView finishes calculating. Default strategy pick prefers "Secondary" (shorttitle Sv2 2nd) when both Sweep engines are on chart; set TV_STRATEGY_NAME to override (e.g. Sweep v2). replay_trade does not affect Strategy Tester.
 Batch: batch_run → run action across multiple symbols/timeframes
 Drawing: draw_shape → horizontal_line, trend_line, rectangle, text
 Alerts: alert_create, alert_list, alert_delete

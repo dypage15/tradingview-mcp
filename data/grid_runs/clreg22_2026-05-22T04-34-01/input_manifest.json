@@ -1,0 +1,19 @@
+{
+  "strategy": "Cloud Regime v2.2 — RSI Confluence",
+  "timeframe": "5",
+  "scenario_count": 36,
+  "dimensions": [
+    "rsiMode",
+    "rsiLen",
+    "confLookback",
+    "tpPoints",
+    "slPoints",
+    "cloudSmooth"
+  ],
+  "defaults": {
+    "fast": 9,
+    "slow": 21,
+    "sma": 50,
+    "session": false
+  }
+}

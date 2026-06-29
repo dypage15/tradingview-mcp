@@ -1,0 +1,45 @@
+{
+  "run_id": "2026-05-17_19-56-17",
+  "created_at": "2026-05-17T19:56:52.543Z",
+  "preset": "research_balanced_defaults",
+  "preset_detail": "Baked in strategy_snapshot.pine: minScoreCont/Rev ~72 aligned to panel HIGH band; minBarsBetween 48; NY 09:30–15:30 new entries / 16:00 flat.",
+  "strategy_file_snapshot": "strategy_snapshot.pine",
+  "advisor_substring_used": "ERL",
+  "chart": {
+    "symbol": "CME_MINI:MNQ1!",
+    "resolution": "5"
+  },
+  "pine_compile": {
+    "success": true,
+    "button_clicked": "Pine Save",
+    "has_errors": false,
+    "errors": [],
+    "study_added": false
+  },
+  "pine_errors_terminal": {
+    "success": true,
+    "has_errors": false,
+    "error_count": 0,
+    "errors": []
+  },
+  "strategy": {
+    "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+    "pick_note": null,
+    "candidate_count": 6,
+    "report_ready": true,
+    "kpis": {
+      "netProfitPercent": -0.020603440000000018,
+      "netProfit": -2060.344000000002,
+      "profitFactor": 0.7290213581499995,
+      "percentProfitable": 0.5,
+      "totalTrades": 92,
+      "marginCalls": 0,
+      "commissionPaid": 2361.3440000000014
+    }
+  },
+  "trades_returned": 184,
+  "notes": [
+    "Compare runs by opening data/strategy_runs/*/summary.json",
+    "Tighten Inputs on chart vs defaults baked into strategy_snapshot.pine."
+  ]
+}

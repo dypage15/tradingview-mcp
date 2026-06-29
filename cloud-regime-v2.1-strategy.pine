@@ -1,0 +1,372 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// CLOUD REGIME STRATEGY v2.1
+// EMA Cloud + ChartArt RSI/BB Confluence — MNQ / MGC
+// Next Level Foundry
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// ENTRY LOGIC
+//   flipToBull = cloudBull and not cloudBull[1] — one line, one bar. The flip is
+//   only true on the exact bar the sustained cloud regime first confirms. Bar +1
+//   onward it's false, so there's zero signal queuing. longEntry requires all
+//   three on the flip bar (or within Confluence lookback bars — see input).
+//   Flip still fires on one bar only; RSI/BB may qualify on flip or prior bars.
+//
+// BB PROXIMITY
+//   close <= bbLower + atrBuf with atrBuf = atr(14) * bbBufferMult. Default
+//   buffer is 1.5 ATR — tighten to 0 for hard-touch only, or widen if too few
+//   signals. Scales with volatility across instruments and sessions.
+//
+// TP / SL
+//   Converted to ticks internally (tpPoints / syminfo.mintick). Inputs stay in
+//   price points. Panel shows live R:R as you adjust — useful for rapid sweeps.
+//
+// MISSED FLIP MARKERS
+//   Small faded circles on flip bars that didn't trade. Most important backtest
+//   audit: tells you whether confluence filters good moves or bad ones.
+//
+// PROTECTIVE FLIP EXIT
+//   Long + cloud flips bear → close regardless of TP/SL. Same bar: if short
+//   confluence also fires, short opens. strategy.close runs before strategy.entry.
+//
+// RSI / BB MODES (switchable)
+//   BB  → Proximity (ATR buffer) or Crossover (ChartArt re-cross)
+//   RSI → Exhaustion (30/70) or Momentum (cross 50)
+//
+// LIVE PANEL RSI: calc_on_every_tick=true refreshes the table on each tick;
+// entries/exits still use barstate.isconfirmed (bar close only).
+// RSI uses Wilder RMA (same math as TradingView's built-in RSI indicator).
+// Optional: add RSI(14) in a separate pane to compare visually at length 14.
+// ══════════════════════════════════════════════════════════════════════════════
+
+//@version=6
+strategy("Cloud Regime v2.1 — RSI/BB Confluence",
+     shorttitle          = "ClReg2.1",
+     overlay             = true,
+     pyramiding          = 0,
+     default_qty_type    = strategy.fixed,
+     default_qty_value   = 1,
+     initial_capital     = 10000,
+     commission_type     = strategy.commission.cash_per_contract,
+     commission_value    = 0.62,
+     slippage            = 1,
+     calc_on_every_tick  = true,
+     max_bars_back       = 500)
+
+
+// ─── INPUTS ──────────────────────────────────────────────────────────────────
+
+grp_cloud = "═══ EMA CLOUD ═══"
+grp_bb    = "═══ BOLLINGER BANDS ═══"
+grp_rsi   = "═══ RSI ═══"
+grp_vis   = "═══ CHARTART VISUALS ═══"
+grp_risk  = "═══ RISK MANAGEMENT ═══"
+grp_sess  = "═══ SESSION ═══"
+grp_conf  = "═══ CONFLUENCE ═══"
+
+// Cloud
+fastEmaLen  = input.int(9, "Fast EMA Length", minval=2, group=grp_cloud)
+slowEmaLen  = input.int(21, "Slow EMA Length", minval=2, group=grp_cloud)
+smaLen      = input.int(50, "SMA Baseline", minval=5, group=grp_cloud)
+cloudSmooth = input.int(3, "Cloud Smoothing", minval=1, group=grp_cloud, tooltip="Bars the cloud must hold a single color before the flip is confirmed. Entry only fires on the first bar this count is met.")
+
+// Bollinger Bands
+bbLen        = input.int(20, "BB Length", minval=1, group=grp_bb, tooltip="ChartArt default: 200. Standard default: 20.")
+bbMult       = input.float(2.0, "BB Std Dev Multiplier", minval=0.5, step=0.1, group=grp_bb)
+bbMode       = input.string("Proximity", "BB Entry Trigger", options=["Proximity", "Crossover"], group=grp_bb, tooltip="Proximity: ATR buffer at band. Crossover: re-cross from outside.")
+bbBufferMult = input.float(1.5, "Proximity Buffer (ATR mult)", minval=0.0, step=0.25, group=grp_bb, tooltip="Proximity only. 0 = hard touch. Default 1.5 ATR.")
+bbAtrLen     = input.int(14, "ATR Length for buffer", minval=2, group=grp_bb, tooltip="Proximity only. ATR period for proximity buffer.")
+
+// RSI
+rsiLen        = input.int(14, "RSI Length", minval=2, group=grp_rsi, tooltip="14 matches built-in RSI. ChartArt: use 6.")
+rsiSrc        = input.source(close, "RSI Source", group=grp_rsi)
+rsiMode       = input.string("Exhaustion", "RSI Mode", options=["Exhaustion", "Momentum"], group=grp_rsi, tooltip="Exhaustion: OB/OS levels. Momentum: cross 50.")
+rsiOversold   = input.int(30, "Oversold level", minval=10, maxval=49, group=grp_rsi, tooltip="Exhaustion mode: long needs RSI at or below this on flip bar.")
+rsiOverbought = input.int(70, "Overbought level", minval=51, maxval=90, group=grp_rsi, tooltip="Exhaustion mode: short needs RSI at or above this on flip bar.")
+
+// ChartArt Visuals
+enableBBFill = input.bool(true, "BB Band Fill", group=grp_vis, tooltip="Fill between upper and lower BB.")
+enableBarClr = input.bool(true, "Bar Color (trend events)", group=grp_vis, tooltip="Bar color on BB+RSI trend events.")
+enableBgClr  = input.bool(true, "Background Color", group=grp_vis, tooltip="Background on BB+RSI trend events.")
+
+// Risk Management
+tpPoints = input.float(20.0, "Take Profit (points)", minval=1.0, step=0.5, group=grp_risk, tooltip="Fixed TP in price points.")
+slPoints = input.float(10.0, "Stop Loss (points)", minval=1.0, step=0.5, group=grp_risk, tooltip="Fixed SL in price points.")
+
+// Session
+useSession = input.bool(true, "Enable Session Filter", group=grp_sess)
+sessStart  = input.session("0930-1200", "Trading Window", group=grp_sess, tooltip="No new entries outside window. Open trades use TP/SL.")
+
+confLookback = input.int(3, "Confluence Lookback (bars)", minval=0, maxval=10, group=grp_conf, tooltip="0 = RSI+BB on flip bar only. N = also within N bars before flip. Flip always on entry bar.")
+
+
+// ─── CLOUD ───────────────────────────────────────────────────────────────────
+
+fastEma = ta.ema(close, fastEmaLen)
+slowEma = ta.ema(close, slowEmaLen)
+smaBase = ta.sma(close, smaLen)
+
+rawBull = fastEma > slowEma and slowEma > smaBase
+rawBear = fastEma < slowEma and slowEma < smaBase
+
+bullCount = math.sum(rawBull ? 1 : 0, cloudSmooth)
+bearCount = math.sum(rawBear ? 1 : 0, cloudSmooth)
+
+cloudBull    = bullCount == cloudSmooth
+cloudBear    = bearCount == cloudSmooth
+cloudNeutral = not cloudBull and not cloudBear
+
+// Flip: true only on the exact bar the sustained regime is first confirmed
+flipToBull = cloudBull and not cloudBull[1]
+flipToBear = cloudBear and not cloudBear[1]
+
+
+// ─── BOLLINGER BANDS ─────────────────────────────────────────────────────────
+
+source  = close
+bbBasis = ta.sma(source, bbLen)
+bbDev   = bbMult * ta.stdev(source, bbLen)
+bbUpper = bbBasis + bbDev
+bbLower = bbBasis - bbDev
+
+// Proximity mode (v2.0) — close within ATR buffer of respective band
+atrBuf      = ta.atr(bbAtrLen) * bbBufferMult
+bbProxLong  = close <= bbLower + atrBuf
+bbProxShort = close >= bbUpper - atrBuf
+
+// Crossover mode (ChartArt) — price re-crosses band from outside
+// buyEntry / sellEntry — original ChartArt variable names preserved
+buyEntry  = ta.crossover(source, bbLower)
+sellEntry = ta.crossunder(source, bbUpper)
+
+// Active BB condition driven by mode selection
+bbCondLong  = bbMode == "Proximity" ? bbProxLong  : buyEntry
+bbCondShort = bbMode == "Proximity" ? bbProxShort : sellEntry
+
+
+// ─── RSI (Wilder / built-in TV formula — same as default RSI indicator) ───────
+
+f_rsi_wilder(float src, int len) =>
+    float chg = ta.change(src)
+    float up  = ta.rma(math.max(chg, 0), len)
+    float dn  = ta.rma(-math.min(chg, 0), len)
+    dn == 0 ? 100.0 : up == 0 ? 0.0 : 100.0 - (100.0 / (1.0 + up / dn))
+
+vrsi = f_rsi_wilder(rsiSrc, rsiLen)
+
+// Expose in data window for cross-check vs separate RSI pane
+plot(vrsi, "RSI (panel)", color=color.new(#7E57C2, 100), display=display.data_window)
+
+// Exhaustion mode — RSI at an extreme on the flip bar
+rsiExhLong  = vrsi <= rsiOversold
+rsiExhShort = vrsi >= rsiOverbought
+
+// Momentum mode (ChartArt) — RSI crosses the 50 midline
+rsiMomLong  = ta.crossover(vrsi, 50)
+rsiMomShort = ta.crossunder(vrsi, 50)
+
+// Active RSI condition driven by mode selection
+rsiCondLong  = rsiMode == "Exhaustion" ? rsiExhLong  : rsiMomLong
+rsiCondShort = rsiMode == "Exhaustion" ? rsiExhShort : rsiMomShort
+
+
+// ─── SESSION ─────────────────────────────────────────────────────────────────
+
+inSession = useSession ? not na(time(timeframe.period, sessStart)) : true
+
+
+// ─── CONFLUENCE LOOKBACK ─────────────────────────────────────────────────────
+
+f_recent_true(bool cond, int lb) =>
+    bool ok = cond
+    if lb > 0
+        for i = 1 to lb
+            ok := ok or cond[i]
+    ok
+
+rsiLongOk  = confLookback == 0 ? rsiCondLong  : f_recent_true(rsiCondLong, confLookback)
+bbLongOk   = confLookback == 0 ? bbCondLong   : f_recent_true(bbCondLong, confLookback)
+rsiShortOk = confLookback == 0 ? rsiCondShort : f_recent_true(rsiCondShort, confLookback)
+bbShortOk  = confLookback == 0 ? bbCondShort  : f_recent_true(bbCondShort, confLookback)
+
+
+// ─── ENTRY CONDITIONS ────────────────────────────────────────────────────────
+
+// Flip on this bar; RSI + BB on flip bar or within lookback (no flip queuing)
+longEntry  = flipToBull and rsiLongOk and bbLongOk and inSession
+shortEntry = flipToBear and rsiShortOk and bbShortOk and inSession
+
+
+// ─── RISK PARAMETERS ─────────────────────────────────────────────────────────
+
+tpTicks = tpPoints / syminfo.mintick
+slTicks = slPoints / syminfo.mintick
+
+
+// ─── EXECUTE ENTRIES ─────────────────────────────────────────────────────────
+
+if longEntry and barstate.isconfirmed
+    strategy.entry("Long", strategy.long, comment="Flip+RSI+BB_L")
+    strategy.exit("Long_Exit", "Long", profit=tpTicks, loss=slTicks)
+
+if shortEntry and barstate.isconfirmed
+    strategy.entry("Short", strategy.short, comment="Flip+RSI+BB_S")
+    strategy.exit("Short_Exit", "Short", profit=tpTicks, loss=slTicks)
+
+// Protective flip exit — cloud turns against position regardless of TP/SL
+// Note: strategy.close evaluates before strategy.entry on the same bar,
+// so a flip bar can simultaneously close a long and open a short if all
+// short confluence conditions are met.
+if barstate.isconfirmed and strategy.position_size > 0 and flipToBear
+    strategy.close("Long", comment="FlipExit_L")
+
+if barstate.isconfirmed and strategy.position_size < 0 and flipToBull
+    strategy.close("Short", comment="FlipExit_S")
+
+
+// ─── CLOUD PLOTTING ──────────────────────────────────────────────────────────
+
+p_fast = plot(fastEma, "Fast EMA", color=color.new(color.white, 70), linewidth=1)
+p_slow = plot(slowEma, "Slow EMA", color=color.new(color.white, 80), linewidth=1)
+plot(smaBase, "SMA Baseline", color=color.new(color.yellow, 80), linewidth=1)
+
+cloudColor = cloudBull ? color.new(#06d6a0, 75) : cloudBear ? color.new(#ff3860, 75) : color.new(color.gray, 85)
+fill(p_fast, p_slow, color=cloudColor, title="Cloud Fill")
+
+
+// ─── BB PLOTTING — ChartArt style ────────────────────────────────────────────
+
+// Basis, upper, lower — colors match ChartArt original (aqua basis, silver bands)
+plot(bbBasis, "Bollinger Bands SMA Basis Line", color=color.aqua, linewidth=1)
+p_bbUpper = plot(bbUpper, "Bollinger Bands Upper Line", color=color.silver, linewidth=1)
+p_bbLower = plot(bbLower, "Bollinger Bands Lower Line", color=color.silver, linewidth=1)
+
+// Fill between bands — ChartArt original used a default fill; using subtle silver here
+fill(p_bbUpper, p_bbLower, color=enableBBFill ? color.new(color.silver, 90) : na, title="BB Band Fill")
+
+
+// ─── CHARTART BAR + BACKGROUND COLOR ─────────────────────────────────────────
+
+// Ported from ChartArt v1.1 and adapted to use actual RSI conditions.
+// Original logic: green when price crosses above lower BB and basis rising,
+// red when price crosses below upper BB and basis falling.
+// RSI condition layered on top for directional confirmation.
+
+caLong  = ta.crossover(source, bbLower) and bbBasis > bbBasis[1]
+caShort = ta.crossunder(source, bbUpper) and bbBasis < bbBasis[1]
+
+trendColor   = rsiCondLong and caLong ? color.green : rsiCondShort and caShort ? color.red : na
+trendBgColor = rsiCondLong and caLong ? color.new(color.green, 50) : rsiCondShort and caShort ? color.new(color.red, 50) : na
+
+barcolor(enableBarClr ? trendColor   : na, title="ChartArt Bar Color")
+bgcolor(enableBgClr   ? trendBgColor : na, title="ChartArt Background Color")
+
+
+// ─── ADDITIONAL BACKGROUNDS ──────────────────────────────────────────────────
+
+// Session window — subtle blue tint
+bgcolor(inSession and useSession ? color.new(#3b82f6, 96) : na, title="Session Window")
+
+// Flip bar highlights — useful for auditing how often flips appear
+bgcolor(flipToBull ? color.new(#06d6a0, 88) : na, title="Bull Flip Bar")
+bgcolor(flipToBear ? color.new(#ff3860, 88) : na, title="Bear Flip Bar")
+
+
+// ─── ENTRY MARKERS ───────────────────────────────────────────────────────────
+
+plotshape(longEntry,  "Long Signal",  shape.triangleup,   location.belowbar, color=#06d6a0, size=size.small)
+plotshape(shortEntry, "Short Signal", shape.triangledown, location.abovebar, color=#ff3860, size=size.small)
+
+// Missed flip markers — flip bar where one or more filters failed
+// Watch these in backtesting to audit what confluence is filtering out
+missedL = flipToBull and not longEntry
+missedS = flipToBear and not shortEntry
+plotshape(missedL, "Flip miss — long",  shape.circle, location.belowbar, color=color.new(#06d6a0, 60), size=size.tiny)
+plotshape(missedS, "Flip miss — short", shape.circle, location.abovebar, color=color.new(#ff3860, 60), size=size.tiny)
+
+
+// ─── RSI BOX (bottom-left) — green OS / red OB behind text ───────────────────
+
+bool rsiIsOS = vrsi <= rsiOversold
+bool rsiIsOB = vrsi >= rsiOverbought
+color rsiBoxBg = rsiIsOS ? color.new(color.green, 30) : rsiIsOB ? color.new(color.red, 30) : color.new(#12121e, 10)
+color rsiBoxTxt = color.white
+
+var table rsiBox = table.new(position.bottom_left, 2, 1, border_width=1, border_color=color.new(color.gray, 50), frame_width=1, frame_color=color.new(color.gray, 50))
+
+// ─── INFO PANEL ──────────────────────────────────────────────────────────────
+
+var table panel = table.new(position.top_right, 2, 10, bgcolor=color.new(#0a0a0f, 10), border_color=color.new(#a855f7, 70), border_width=1, frame_color=color.new(#a855f7, 50), frame_width=1)
+
+// barstate.islast — updates every tick on the realtime bar (needs calc_on_every_tick)
+if barstate.islast
+
+    // RSI box — same bgcolor both cells = one solid green/red/neutral block
+    rsiBoxLabel = rsiIsOS ? "RSI  OS" : rsiIsOB ? "RSI  OB" : "RSI"
+    rsiBoxVal   = str.tostring(vrsi, "#.##") + (barstate.isrealtime ? " ●" : "")
+    table.cell(rsiBox, 0, 0, rsiBoxLabel, text_color=rsiBoxTxt, bgcolor=rsiBoxBg, text_size=size.normal, text_halign=text.align_left)
+    table.cell(rsiBox, 1, 0, rsiBoxVal,   text_color=rsiBoxTxt, bgcolor=rsiBoxBg, text_size=size.normal, text_halign=text.align_right)
+
+    // Header
+    table.cell(panel, 0, 0, "CLOUD REGIME",
+         text_color=color.new(#a855f7, 0), text_size=size.small,
+         text_halign=text.align_left, bgcolor=color.new(#12121e, 10))
+    table.cell(panel, 1, 0, "v2.1",
+         text_color=color.new(#8b89a0, 0), text_size=size.small,
+         text_halign=text.align_right, bgcolor=color.new(#12121e, 10))
+
+    // Regime
+    regimeText = cloudBull ? "▲ BULLISH" : cloudBear ? "▼ BEARISH" : "◆ NEUTRAL"
+    regimeClr  = cloudBull ? color.new(#06d6a0, 0) : cloudBear ? color.new(#ff3860, 0) : color.gray
+    table.cell(panel, 0, 1, "Regime",   text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 1, regimeText, text_color=regimeClr,             text_size=size.tiny, text_halign=text.align_right)
+
+    // Flip
+    flipText = flipToBull ? "→ BULL" : flipToBear ? "→ BEAR" : "—"
+    flipClr  = flipToBull ? color.new(#06d6a0, 0) : flipToBear ? color.new(#ff3860, 0) : color.gray
+    table.cell(panel, 0, 2, "Flip (this bar)", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 2, flipText,          text_color=flipClr,               text_size=size.tiny, text_halign=text.align_right)
+
+    // BB mode + status
+    bbModeLabel = bbMode == "Proximity" ? "Prox" : "Cross"
+    bbStatus    = bbCondLong ? "lower zone" : bbCondShort ? "upper zone" : "—"
+    bbClr       = bbCondLong or bbCondShort ? color.new(#f59e0b, 0) : color.gray
+    table.cell(panel, 0, 3, "BB [" + bbModeLabel + "]", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 3, bbStatus,                   text_color=bbClr,                 text_size=size.tiny, text_halign=text.align_right)
+
+    // TP / SL
+    table.cell(panel, 0, 4, "TP / SL (pts)", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 4, str.tostring(tpPoints, "#.#") + " / " + str.tostring(slPoints, "#.#"), text_color=color.new(#e8e6f0, 0), text_size=size.tiny, text_halign=text.align_right)
+
+    // R:R
+    rrRatio = tpPoints / slPoints
+    table.cell(panel, 0, 5, "R:R Ratio", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 5, str.tostring(rrRatio, "#.##") + ":1", text_color=color.new(#e8e6f0, 0), text_size=size.tiny, text_halign=text.align_right)
+
+    // Session
+    sessText = inSession ? "IN SESSION" : "CLOSED"
+    sessClr  = inSession ? color.new(#06d6a0, 0) : color.gray
+    table.cell(panel, 0, 6, "Session", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 6, sessText, text_color=sessClr, text_size=size.tiny, text_halign=text.align_right)
+
+    // Confluence verdict (matches entry logic incl. lookback)
+    longReady  = flipToBull and rsiLongOk and bbLongOk
+    shortReady = flipToBear and rsiShortOk and bbShortOk
+    confText   = longReady ? "▲ LONG" : shortReady ? "▼ SHORT" : "watching"
+    confClr    = longReady ? color.new(#06d6a0, 0) : shortReady ? color.new(#ff3860, 0) : color.gray
+    table.cell(panel, 0, 7, "Confluence", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 7, confText, text_color=confClr, text_size=size.tiny, text_halign=text.align_right)
+
+    // Lookback
+    lbText = confLookback == 0 ? "flip bar only" : str.tostring(confLookback) + " bars"
+    table.cell(panel, 0, 8, "Conf LB", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 8, lbText, text_color=color.new(#e8e6f0, 0), text_size=size.tiny, text_halign=text.align_right)
+
+    // ChartArt visual status
+    caVisText = (enableBBFill or enableBarClr or enableBgClr) ? "active" : "off"
+    table.cell(panel, 0, 9, "ChartArt vis", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 9, caVisText, text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_right)
+
+
+// ─── RSI PANE (optional, add manually) ────────────────────────────────────────
+// Panel RSI now ticks live and matches built-in RSI math at the same length.
+// Add separate RSI(14) with OB 70 / OS 30 only if you want a visual pane.

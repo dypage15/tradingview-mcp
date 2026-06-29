@@ -1,0 +1,5 @@
+{"type":"ok","scenarioId":0,"in_2":1,"in_3":2,"in_4":35,"in_12":0.3,"netProfit":0,"totalTrades":0,"grossProfit":0,"grossLoss":0,"strategy_name":"CBC LIQUIDITY PRO V6","score":0}
+{"type":"ok","scenarioId":1,"in_2":1,"in_3":2,"in_4":35,"in_12":0.5,"netProfit":0,"totalTrades":0,"grossProfit":0,"grossLoss":0,"strategy_name":"CBC LIQUIDITY PRO V6","score":0}
+{"type":"ok","scenarioId":2,"in_2":1,"in_3":2,"in_4":35,"in_12":0.7,"netProfit":0,"totalTrades":0,"grossProfit":0,"grossLoss":0,"strategy_name":"CBC LIQUIDITY PRO V6","score":0}
+{"type":"ok","scenarioId":3,"in_2":1,"in_3":2,"in_4":45,"in_12":0.3,"netProfit":0,"totalTrades":0,"grossProfit":0,"grossLoss":0,"strategy_name":"CBC LIQUIDITY PRO V6","score":0}
+{"type":"ok","scenarioId":4,"in_2":1,"in_3":2,"in_4":45,"in_12":0.5,"netProfit":0,"totalTrades":0,"grossProfit":0,"grossLoss":0,"strategy_name":"CBC LIQUIDITY PRO V6","score":0}

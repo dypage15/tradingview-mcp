@@ -1,0 +1,901 @@
+//@version=6
+// CLOUD REGIME v3.0 — FULL STACK STRATEGY
+// Cloud + MACD + VWAP + ADX + D-RSI (simplified) — MGC / MNQ
+// Next Level Foundry
+// ══════════════════════════════════════════════════════════════════════════════
+// Measured MNQ 5m (~102d): W_L_2 59% / +12.5 pts (N=274); trend tier ~6 trades/102d at defaults.
+// Labeled 1m wick review (250t): W_L_2 +$838 PF~2.56; conf≥2 + skip lunch → PF~1.58 sim.
+// Defaults: capital 100k, dual tier (trend + filtered wick), HTF 5, TP/SL 20/10, lunch block 13–14 ET.
+// ══════════════════════════════════════════════════════════════════════════════
+
+strategy("Cloud Regime v3.0 — Full Stack",
+     shorttitle          = "CR_v3",
+     overlay             = true,
+     pyramiding          = 0,
+     default_qty_type    = strategy.fixed,
+     default_qty_value   = 1,
+     initial_capital     = 100000,
+     commission_type     = strategy.commission.cash_per_contract,
+     commission_value    = 0.62,
+     slippage            = 1,
+     calc_on_every_tick  = false,
+     process_orders_on_close = true,
+     max_bars_back       = 1000,
+     max_labels_count    = 500,
+     max_lines_count     = 100)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INPUTS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+grp_mtf = "═══ MULTI-TIMEFRAME ═══"
+htfTF   = input.timeframe("5", "HTF (Cloud / MACD / ADX)", group=grp_mtf,
+     tooltip="Shared HTF. VWAP and D-RSI stay on chart TF.")
+
+grp_cloud   = "═══ CLOUD ═══"
+fastEmaLen  = input.int(9,     "Fast EMA",            minval=2,    group=grp_cloud)
+slowEmaLen  = input.int(21,    "Slow EMA",            minval=2,    group=grp_cloud)
+smaLen      = input.int(50,    "SMA Baseline",        minval=5,    group=grp_cloud)
+cloudSmooth = input.int(3,     "Cloud Smoothing",     minval=1,    group=grp_cloud)
+cSlopeLen   = input.int(5,     "EMA Slope Lookback",  minval=2,    group=grp_cloud)
+cSteepT     = input.float(0.15,"EMA Steep Threshold", minval=0.01, step=0.01, group=grp_cloud)
+
+grp_macd = "═══ MACD ═══"
+macdFast = input.int(12, "Fast Length",   minval=2, group=grp_macd)
+macdSlow = input.int(26, "Slow Length",   minval=2, group=grp_macd)
+macdSig  = input.int(9,  "Signal Length", minval=2, group=grp_macd)
+
+grp_vwap  = "═══ VWAP ═══"
+proxMult  = input.float(1.0, "Proximity Buffer (ATR×)", minval=0.0, step=0.25, group=grp_vwap,
+     tooltip="Wider buffer = more VWAP-zone entries.")
+proxAtrLn = input.int(14,    "ATR Length",              minval=2,   group=grp_vwap)
+vwapTrigMode = input.string("2-Bar", "VWAP Entry Trigger", group=grp_vwap,
+     options=["Edge", "2-Bar", "Zone"],
+     tooltip="2-Bar = pullback into VWAP (grid winner). Zone = any touch (many trades, lower quality).")
+
+grp_adx   = "═══ ADX ═══"
+adxLen    = input.int(14, "ADX / DI Length", minval=2, group=grp_adx)
+adxSmooth = input.int(14, "ADX Smoothing",   minval=2, group=grp_adx)
+zOptLow   = input.int(18, "Optimal Floor",   minval=10, group=grp_adx)
+zOptHigh  = input.int(35, "Optimal Ceiling", minval=25, group=grp_adx)
+
+grp_drsi  = "═══ D-RSI (Momentum Derivative) ═══"
+useDRSI   = input.bool(true, "Enable D-RSI Filter", group=grp_drsi,
+     tooltip="Adds RSI derivative (simplified D-RSI) as additional momentum confirmation. Disable to trade without it.")
+drsiRSILen= input.int(21,  "RSI Length",        minval=2,  group=grp_drsi)
+drsiWindow= input.int(14,  "D-RSI Smoothing",   minval=3,  group=grp_drsi)
+drsiSigLen= input.int(9,   "Signal Line Length", minval=2,  group=grp_drsi)
+drsiMode  = input.string("Direction Change", "Signal Mode", group=grp_drsi,
+     options=["Direction Change", "Zero-Crossing", "Signal Line Crossing"])
+
+grp_wick   = "═══ BB WICK LABELS ═══"
+showBB     = input.bool(true,  "Plot Bollinger Bands",     group=grp_wick)
+showWicks  = input.bool(true,  "Show BB Wick Labels",      group=grp_wick,
+     tooltip="Labels fire when a candle wicks outside a Bollinger Band and closes back inside.")
+wickBBLen  = input.int(20,     "BB Length",                minval=5,   group=grp_wick)
+wickBBMult = input.float(2.0,  "BB Std Dev",               minval=0.5, step=0.1, group=grp_wick)
+wickRSILen = input.int(14,     "RSI Length (label data)",  minval=2,   group=grp_wick)
+rsiOversold   = input.int(30,  "RSI Oversold",             minval=10, maxval=49, group=grp_wick)
+rsiOverbought = input.int(70,  "RSI Overbought",           minval=51, maxval=90, group=grp_wick)
+minWickConfDisplay = input.int(3, "Min Confluence to Show Label", minval=1, maxval=7, group=grp_wick,
+     tooltip="Hide low-confluence wick labels on chart (research still counts all).")
+
+grp_risk  = "═══ RISK MANAGEMENT ═══"
+tpPoints  = input.float(20.0, "Take Profit (pts)", minval=1.0, step=0.5, group=grp_risk)
+slPoints  = input.float(10.0, "Stop Loss (pts)",   minval=1.0, step=0.5, group=grp_risk)
+
+grp_sess  = "═══ SESSION ═══"
+useSession = input.bool(true,          "Enable Session Filter", group=grp_sess)
+sessStart  = input.session("0930-1600","Trading Window",        group=grp_sess)
+useLunchBlock = input.bool(true, "Block Lunch Chop (13:00–14:00 ET)", group=grp_sess,
+     tooltip="No new entries 13:00–13:59 America/New_York. Labeled review: hour 13 −$120, 33% WR.")
+
+grp_entry = "═══ ENTRIES ═══"
+useTrendTier = input.bool(true,  "Enable Trend Tier", group=grp_entry,
+     tooltip="Cloud + MACD + VWAP + ADX stack.")
+useWickTier  = input.bool(true, "Enable Wick Reversal Tier", group=grp_entry,
+     tooltip="CR3_WL / CR3_WU on clustered BB wicks with labeled-review filters.")
+wickMinConf    = input.int(2, "Wick Entry Min Confluence", minval=1, maxval=7, group=grp_entry,
+     tooltip="2 = W_L_2 bucket. Labeled review: conf=2 = 72% of net profit.")
+wickMaxConfLong  = input.int(4, "Wick Long Max Confluence", minval=1, maxval=7, group=grp_entry,
+     tooltip="Block long wicks above this (conf≥5 + with-cloud = −$255 in review).")
+wickMaxConfShort = input.int(4, "Wick Short Max Confluence", minval=1, maxval=7, group=grp_entry,
+     tooltip="Cap high-conf short wicks (W_U_3+ marginal on 1m).")
+wickRequireOs  = input.bool(false, "Wick Long Requires RSI OS", group=grp_entry,
+     tooltip="OFF = W_L_2 confluence-only (best labeled cell: counter-cloud conf=2).")
+wickRequireOb  = input.bool(true, "Wick Short Requires RSI OB", group=grp_entry,
+     tooltip="ON = W_U_OB quality (58% WR, 8% SL in labeled review).")
+wickBlockTrendStack = input.bool(true, "Block Long Wick Trend Stack", group=grp_entry,
+     tooltip="Skip long wick when conf≥4 AND cloud BULL AND MACD bullish (crowded pullback trap).")
+applyAdxBlockToWick = input.bool(false, "ADX Block on Wick Positions", group=grp_entry,
+     tooltip="OFF = let wick bracket play out; ADX_Block exits were neutral (+$173) on 1m review.")
+wickEntryStyle = input.string("Immediate", "Wick Entry Style", options=["Immediate", "Retest"], group=grp_entry,
+     tooltip="Retest = arm horizontal level when label fires; enter on break + pullback touch (see chart examples).")
+wickRetestBars  = input.int(20, "Retest Window (bars)", minval=3, maxval=100, group=grp_entry,
+     tooltip="Horizontal level stays active this many bars after the wick label.")
+wickRetestTol   = input.float(0.5, "Retest Touch Tolerance (pts)", minval=0.0, step=0.25, group=grp_entry)
+wickRetestLongAnchor  = input.string("Signal High", "Long Retest Level", options=["Signal High", "Signal Close"], group=grp_entry,
+     tooltip="Long: high of wick signal candle → break above → retest from above.")
+wickRetestShortAnchor = input.string("Prior Close", "Short Retest Level", options=["Prior Close", "Signal Close"], group=grp_entry,
+     tooltip="Short: close of bar before wick signal → dip → rally back to level.")
+showRetestLines = input.bool(true, "Draw Retest Levels", group=grp_entry)
+wickRetestSeparateBar = input.bool(true, "Retest on Later Bar", group=grp_entry,
+     tooltip="ON = break/displacement and retest touch must occur on different bars.")
+wickRetestConfirmCandle = input.bool(false, "Retest Confirm Candle", group=grp_entry,
+     tooltip="ON = long retest needs bullish close; short retest needs bearish close.")
+
+grp_tbl   = "═══ TABLE ═══"
+showTable  = input.bool(true, "Show Performance Table", group=grp_tbl)
+
+grp_research = "═══ RESEARCH ═══"
+enableResearch      = input.bool(true, "Enable Research Mode", group=grp_research,
+     tooltip="Forward outcome stats on clustered signals. No look-ahead.")
+outcomeLB           = input.int(10, "Outcome Lookback (bars)", minval=3, maxval=200, group=grp_research)
+clusterBars         = input.int(12, "Event Cluster (bars)", minval=1, maxval=100, group=grp_research,
+     tooltip="Min bars between same-type wick events for independence.")
+winThreshPts        = input.float(0.0, "Win Threshold (pts)", minval=0.0, step=0.5, group=grp_research)
+trackMfeMae         = input.bool(true, "Track MFE / MAE", group=grp_research)
+showResearchTable   = input.bool(true, "Show Research Table", group=grp_research)
+
+adxEntryHigh        = input.int(35, "ADX Entry Ceiling", minval=25, maxval=60, group=grp_research,
+     tooltip="Relaxed ADX upper bound for entries (exit block still uses 45+).")
+
+enforce_adx    = input.bool(true,  "Trend — ADX gate", group=grp_research)
+enforce_drsi   = input.bool(true,  "Trend — D-RSI filter", group=grp_research)
+enforce_slope  = input.bool(true,  "Trend — Cloud slope", group=grp_research)
+enforce_session= input.bool(true,  "Trend — Session filter", group=grp_research)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+fmtPnl(v) =>
+    v >= 0 ? "$" + str.tostring(v, "#.##") : "-$" + str.tostring(math.abs(v), "#.##")
+
+fmtPct(w, t) =>
+    t > 0 ? str.tostring(w / t * 100, "#.#") + "%" : "—"
+
+fmtPF(gp, gl) =>
+    gl > 0 ? str.tostring(gp / gl, "#.##") : "—"
+
+fmtAvg(total, count) =>
+    count > 0 ? fmtPnl(total / count) : "—"
+
+fmtPts(v) =>
+    str.tostring(v, "#.##")
+
+clrPnl(v) =>
+    v > 0 ? color.new(#06d6a0, 0) : v < 0 ? color.new(#ff3860, 0) : color.gray
+
+clrPct(w, t) =>
+    t <= 0 ? color.gray : w / t * 100 >= 55 ? color.new(#06d6a0, 0) : w / t * 100 >= 45 ? color.new(#f59e0b, 0) : color.new(#ff3860, 0)
+
+f_wickBoxClr(bool isLower, float rsi, int osLvl, int obLvl, int conf) =>
+    isLower and rsi <= osLvl ? color.new(#06d6a0, 5) :
+     not isLower and rsi >= obLvl ? color.new(#ff3860, 5) :
+     conf >= 6 ? (isLower ? color.new(#06d6a0, 15) : color.new(#ff3860, 15)) :
+     conf >= 4 ? color.new(#f59e0b, 10) :
+     color.new(#334155, 20)
+
+f_rec(array<int> cnt, array<int> wins, array<float> sPts, array<float> sMfe, array<float> sMae, int idx, float pts, bool win, float mfe, float mae, bool trackMM) =>
+    array.set(cnt, idx, array.get(cnt, idx) + 1)
+    array.set(sPts, idx, array.get(sPts, idx) + pts)
+    if win
+        array.set(wins, idx, array.get(wins, idx) + 1)
+    if trackMM
+        array.set(sMfe, idx, array.get(sMfe, idx) + mfe)
+        array.set(sMae, idx, array.get(sMae, idx) + mae)
+
+f_buildSnapComment(bool isLong, int conf, float rsi, float adx, float mac, float dr, string cld, string vwp, bool osOb, bool isRetest) =>
+    base = isLong ? "CR3_WL" : "CR3_WU"
+    rt = isRetest ? "|rt" : ""
+    ob = osOb ? "O" : ""
+    base + rt + "|c" + str.tostring(conf) + "|r" + str.tostring(rsi, "#.#") + "|a" + str.tostring(adx, "#.#") + "|m" + str.tostring(mac, "#.##") + "|d" + str.tostring(dr, "#.##") + "|" + cld + vwp + ob
+
+C_HBG  = color.new(#12121e, 5)
+C_SBG  = color.new(#0f0f1a, 5)
+C_LBG  = color.new(#1a1a2e, 5)
+C_LCLR = color.new(#8b89a0, 0)
+C_VAL  = color.new(#e8e6f0, 0)
+C_HEAD = color.new(#a855f7, 0)
+C_SCLR = color.new(#a855f7, 30)
+C_RHBG = color.new(#0d1117, 5)
+
+// Research bucket indices
+IDX_WL1  = 0
+IDX_WL2  = 1
+IDX_WL3P = 2
+IDX_WLOS = 3
+IDX_WLCT = 4
+IDX_WU1  = 5
+IDX_WU2  = 6
+IDX_WU3P = 7
+IDX_WUOB = 8
+IDX_WUCT = 9
+IDX_TL   = 10
+IDX_TS   = 11
+IDX_EL     = 12
+IDX_ES     = 13
+IDX_WKL_IMM = 14
+IDX_WKL_RT  = 15
+IDX_WKS_IMM = 16
+IDX_WKS_RT  = 17
+R_BUCKETS = 18
+
+R_LBL = array.from("W_L_1", "W_L_2", "W_L_3+", "W_L_OS", "W_L_CT", "W_U_1", "W_U_2", "W_U_3+", "W_U_OB", "W_U_CT", "T_L", "T_S", "E_L", "E_S", "WK_L_imm", "WK_L_rt", "WK_S_imm", "WK_S_rt")
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CLOUD (MTF)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+f_cloud(fl, sl, sml, sm, spl) =>
+    f    = ta.ema(close, fl)
+    s    = ta.ema(close, sl)
+    b    = ta.sma(close, sml)
+    rb   = f > s and s > b
+    rbe  = f < s and s < b
+    bc   = math.sum(rb  ? 1 : 0, sm) == sm
+    brc  = math.sum(rbe ? 1 : 0, sm) == sm
+    sr   = ta.linreg(f, spl, 0) - ta.linreg(f, spl, 1)
+    atr_ = ta.atr(14)
+    sn   = atr_ > 0 ? sr / atr_ : 0.0
+    [f, s, b, bc, brc, sn]
+
+[htfFast, htfSlow, htfBase, htfBull, htfBear, htfSlopeN] = request.security(
+    syminfo.tickerid, htfTF,
+    f_cloud(fastEmaLen, slowEmaLen, smaLen, cloudSmooth, cSlopeLen),
+    lookahead = barmerge.lookahead_off)
+
+flipToBull = htfBull and not htfBull[1]
+flipToBear = htfBear and not htfBear[1]
+cMildT     = cSteepT * 0.5
+cloudSlopeOk = htfBull ? htfSlopeN >= cMildT : htfBear ? htfSlopeN <= -cMildT : false
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MACD (MTF)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+f_macdHist(fast, slow, sig) =>
+    [_, _, hist] = ta.macd(close, fast, slow, sig)
+    hist
+
+htfHist = request.security(
+    syminfo.tickerid, htfTF,
+    f_macdHist(macdFast, macdSlow, macdSig),
+    lookahead = barmerge.lookahead_off)
+
+macdBullish = htfHist > 0
+macdBearish = htfHist < 0
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VWAP (Chart TF)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+vwapVal    = ta.vwap(hlc3)
+atrBufV    = ta.atr(proxAtrLn) * proxMult
+nearVwap   = math.abs(close - vwapVal) <= atrBufV
+aboveVwap  = close > vwapVal
+belowVwap  = close < vwapVal
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADX (MTF)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+f_adxVal(len, smooth) =>
+    [_, _, ax] = ta.dmi(len, smooth)
+    ax
+
+htfADX = request.security(
+    syminfo.tickerid, htfTF,
+    f_adxVal(adxLen, adxSmooth),
+    lookahead = barmerge.lookahead_off)
+
+adxEntryOk = htfADX >= zOptLow and htfADX <= adxEntryHigh
+adxOptimal = htfADX >= zOptLow and htfADX <= zOptHigh
+adxBlocked = htfADX < 18 or htfADX > 45
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// D-RSI (Chart TF)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+rsiSrc     = ta.rsi(close, drsiRSILen)
+drsi       = ta.linreg(rsiSrc, drsiWindow, 0) - ta.linreg(rsiSrc, drsiWindow, 1)
+drsiSignal = ta.ema(drsi, drsiSigLen)
+
+drsiStateLong  = drsiMode == "Direction Change" ? (drsi > 0 and drsi > drsi[1]) :
+     drsiMode == "Zero-Crossing" ? drsi > 0 :
+     drsi > drsiSignal
+drsiStateShort = drsiMode == "Direction Change" ? (drsi < 0 and drsi < drsi[1]) :
+     drsiMode == "Zero-Crossing" ? drsi < 0 :
+     drsi < drsiSignal
+
+drsiConfirmL = useDRSI ? drsiStateLong  : true
+drsiConfirmS = useDRSI ? drsiStateShort : true
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SESSION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+inSession = useSession ? not na(time(timeframe.period, sessStart)) : true
+sessOk    = enforce_session ? inSession : true
+chHour    = hour(time, "America/New_York")
+lunchOk   = not useLunchBlock or chHour < 13 or chHour >= 14
+entryOk   = sessOk and lunchOk
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// BOLLINGER BANDS + WICK DETECTION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+wickBasis = ta.sma(close, wickBBLen)
+wickDev   = wickBBMult * ta.stdev(close, wickBBLen)
+wickUpper = wickBasis + wickDev
+wickLower = wickBasis - wickDev
+
+upperWick = high > wickUpper and close <= wickUpper
+lowerWick = low  < wickLower and close >= wickLower
+
+wickRSI   = ta.rsi(close, wickRSILen)
+wickOs    = wickRSI <= rsiOversold
+wickOb    = wickRSI >= rsiOverbought
+
+lConf = (wickOs ? 1 : 0) + (adxOptimal ? 1 : 0) + (macdBullish ? 1 : 0) + (drsi > 0 ? 1 : 0) + (htfBull ? 1 : 0) + (aboveVwap ? 1 : 0) + (cloudSlopeOk ? 1 : 0)
+uConf = (wickOb ? 1 : 0) + (adxOptimal ? 1 : 0) + (macdBearish ? 1 : 0) + (drsi < 0 ? 1 : 0) + (htfBear ? 1 : 0) + (belowVwap ? 1 : 0) + (cloudSlopeOk ? 1 : 0)
+
+var int lastClusterLower = na
+var int lastClusterUpper = na
+var int lastClusterTL    = na
+var int lastClusterTS    = na
+
+gapLower = na(lastClusterLower) ? clusterBars : bar_index - lastClusterLower
+gapUpper = na(lastClusterUpper) ? clusterBars : bar_index - lastClusterUpper
+gapTL    = na(lastClusterTL)    ? clusterBars : bar_index - lastClusterTL
+gapTS    = na(lastClusterTS)    ? clusterBars : bar_index - lastClusterTS
+
+clusteredLower = lowerWick and gapLower >= clusterBars
+clusteredUpper = upperWick and gapUpper >= clusterBars
+
+if barstate.isconfirmed and clusteredLower
+    lastClusterLower := bar_index
+if barstate.isconfirmed and clusteredUpper
+    lastClusterUpper := bar_index
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ENTRY CONDITIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+vwapPullback  = nearVwap and not nearVwap[1]
+vwapProx2Bar  = nearVwap and not nearVwap[2]
+vwapZone      = nearVwap
+vwapTrigger   = vwapTrigMode == "Edge" ? vwapPullback : vwapTrigMode == "2-Bar" ? vwapProx2Bar : vwapZone
+
+adxGate   = enforce_adx ? adxEntryOk : true
+drsiGateL = enforce_drsi ? drsiConfirmL : true
+drsiGateS = enforce_drsi ? drsiConfirmS : true
+slopeGate = enforce_slope ? cloudSlopeOk : true
+
+flatBook = strategy.position_size == 0
+
+longSetup = htfBull and macdBullish and slopeGate and vwapTrigger and aboveVwap and adxGate and drsiGateL and entryOk
+shortSetup = htfBear and macdBearish and slopeGate and vwapTrigger and belowVwap and adxGate and drsiGateS and entryOk
+
+clusteredTrendLong  = longSetup and gapTL >= clusterBars
+clusteredTrendShort = shortSetup and gapTS >= clusterBars
+
+if barstate.isconfirmed and clusteredTrendLong
+    lastClusterTL := bar_index
+if barstate.isconfirmed and clusteredTrendShort
+    lastClusterTS := bar_index
+
+trendLongEntry  = flatBook and useTrendTier and longSetup
+trendShortEntry = flatBook and useTrendTier and shortSetup
+
+wickLongConfOk  = lConf >= wickMinConf and lConf <= wickMaxConfLong
+wickShortConfOk = uConf >= wickMinConf and uConf <= wickMaxConfShort
+wickLongTrendOk = not wickBlockTrendStack or not (lConf >= 4 and htfBull and macdBullish)
+
+wickLongSetup  = useWickTier and clusteredLower and wickLongConfOk and wickLongTrendOk and (wickRequireOs ? wickOs : true) and entryOk
+wickShortSetup = useWickTier and clusteredUpper and wickShortConfOk and (wickRequireOb ? wickOb : true) and entryOk
+
+retestTolPx = wickRetestTol
+
+longRetestLvl() =>
+    wickRetestLongAnchor == "Signal High" ? high : close
+
+shortRetestLvl() =>
+    wickRetestShortAnchor == "Prior Close" ? close[1] : close
+
+// Pending wick retest state
+var float pendLLevel   = na
+var int   pendLBar     = na
+var bool  pendLActive  = false
+var bool  pendLBroke   = false
+var int   pendLBrokeBar = na
+var string pendLComment = ""
+var line  lnRetestL    = na
+
+var float pendSLevel   = na
+var int   pendSBar     = na
+var bool  pendSActive  = false
+var bool  pendSDisp    = false
+var int   pendSDispBar = na
+var string pendSComment = ""
+var line  lnRetestS   = na
+
+if barstate.isconfirmed and wickEntryStyle == "Retest" and wickLongSetup
+    lvl = longRetestLvl()
+    pendLLevel := lvl
+    pendLBar := bar_index
+    pendLActive := true
+    pendLBroke := false
+    pendLBrokeBar := na
+    cld = htfBull ? "B" : htfBear ? "R" : "N"
+    vwp = aboveVwap ? "A" : "a"
+    pendLComment := f_buildSnapComment(true, lConf, wickRSI, htfADX, htfHist, drsi, cld, vwp, wickOs, true)
+    if showRetestLines
+        if not na(lnRetestL)
+            line.delete(lnRetestL)
+        lnRetestL := line.new(bar_index, lvl, bar_index + wickRetestBars, lvl, color=color.new(#22d3ee, 30), width=2, style=line.style_solid)
+
+if barstate.isconfirmed and wickEntryStyle == "Retest" and wickShortSetup
+    lvl = shortRetestLvl()
+    pendSLevel := lvl
+    pendSBar := bar_index
+    pendSActive := true
+    pendSDisp := false
+    pendSDispBar := na
+    cld = htfBull ? "B" : htfBear ? "R" : "N"
+    vwp = belowVwap ? "B" : "b"
+    pendSComment := f_buildSnapComment(false, uConf, wickRSI, htfADX, htfHist, drsi, cld, vwp, wickOb, true)
+    if showRetestLines
+        if not na(lnRetestS)
+            line.delete(lnRetestS)
+        lnRetestS := line.new(bar_index, lvl, bar_index + wickRetestBars, lvl, color=color.new(#f472b6, 30), width=2, style=line.style_solid)
+
+if barstate.isconfirmed and pendLActive and not na(lnRetestL)
+    line.set_xy2(lnRetestL, math.min(bar_index, pendLBar + wickRetestBars), pendLLevel)
+
+if barstate.isconfirmed and pendSActive and not na(lnRetestS)
+    line.set_xy2(lnRetestS, math.min(bar_index, pendSBar + wickRetestBars), pendSLevel)
+
+if barstate.isconfirmed and pendLActive and bar_index > pendLBar + wickRetestBars
+    pendLActive := false
+    pendLBroke := false
+    pendLBrokeBar := na
+    if not na(lnRetestL)
+        line.delete(lnRetestL)
+        lnRetestL := na
+
+if barstate.isconfirmed and pendSActive and bar_index > pendSBar + wickRetestBars
+    pendSActive := false
+    pendSDisp := false
+    pendSDispBar := na
+    if not na(lnRetestS)
+        line.delete(lnRetestS)
+        lnRetestS := na
+
+if barstate.isconfirmed and pendLActive and bar_index > pendLBar and high > pendLLevel and not pendLBroke
+    pendLBroke := true
+    pendLBrokeBar := bar_index
+
+if barstate.isconfirmed and pendSActive and bar_index > pendSBar and (close < pendSLevel or low < pendSLevel) and not pendSDisp
+    pendSDisp := true
+    pendSDispBar := bar_index
+
+wickLongImmediate  = flatBook and wickLongSetup and wickEntryStyle == "Immediate"
+wickShortImmediate = flatBook and wickShortSetup and wickEntryStyle == "Immediate"
+
+longRetestBarOk = not wickRetestSeparateBar or (not na(pendLBrokeBar) and bar_index > pendLBrokeBar)
+shortRetestBarOk = not wickRetestSeparateBar or (not na(pendSDispBar) and bar_index > pendSDispBar)
+longRetestConfirmOk = not wickRetestConfirmCandle or close > open
+shortRetestConfirmOk = not wickRetestConfirmCandle or close < open
+
+wickLongRetest = barstate.isconfirmed and pendLActive and bar_index > pendLBar and flatBook and entryOk and pendLBroke and longRetestBarOk and longRetestConfirmOk and low <= pendLLevel + retestTolPx and close >= pendLLevel - retestTolPx
+
+wickShortRetest = barstate.isconfirmed and pendSActive and bar_index > pendSBar and flatBook and entryOk and pendSDisp and shortRetestBarOk and shortRetestConfirmOk and high >= pendSLevel - retestTolPx and close <= pendSLevel + retestTolPx
+
+if barstate.isconfirmed and wickLongRetest
+    pendLActive := false
+    pendLBroke := false
+    pendLBrokeBar := na
+    if not na(lnRetestL)
+        line.delete(lnRetestL)
+        lnRetestL := na
+
+if barstate.isconfirmed and wickShortRetest
+    pendSActive := false
+    pendSDisp := false
+    pendSDispBar := na
+    if not na(lnRetestS)
+        line.delete(lnRetestS)
+        lnRetestS := na
+
+wickLongEntry  = wickLongImmediate or wickLongRetest
+wickShortEntry = wickShortImmediate or wickShortRetest
+
+// Compact pane snapshot for Strategy Tester export (matches BB wick label rows)
+f_wickEntryComment(isLong) =>
+    c = isLong ? lConf : uConf
+    cld = htfBull ? "B" : htfBear ? "R" : "N"
+    vwp = isLong ? (aboveVwap ? "A" : "a") : (belowVwap ? "B" : "b")
+    osOb = isLong ? (wickOs ? "O" : "") : (wickOb ? "O" : "")
+    f_buildSnapComment(isLong, c, wickRSI, htfADX, htfHist, drsi, cld, vwp, isLong ? wickOs : wickOb, false)
+
+longEntry  = trendLongEntry
+shortEntry = trendShortEntry
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EXECUTE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+tpTicks = tpPoints / syminfo.mintick
+slTicks = slPoints / syminfo.mintick
+
+var bool longExitPlaced  = false
+var bool shortExitPlaced = false
+var bool wickLExitPlaced = false
+var bool wickSExitPlaced = false
+
+if barstate.isconfirmed and strategy.position_size == 0
+    longExitPlaced  := false
+    shortExitPlaced := false
+    wickLExitPlaced := false
+    wickSExitPlaced := false
+
+if barstate.isconfirmed and trendLongEntry
+    strategy.entry("Long", strategy.long, qty=1, comment="CR3_L")
+
+if barstate.isconfirmed and trendShortEntry
+    strategy.entry("Short", strategy.short, qty=1, comment="CR3_S")
+
+if barstate.isconfirmed and wickLongEntry and not trendLongEntry
+    strategy.entry("Wick_Long", strategy.long, qty=1, comment=wickLongRetest ? pendLComment : f_wickEntryComment(true))
+
+if barstate.isconfirmed and wickShortEntry and not trendShortEntry
+    strategy.entry("Wick_Short", strategy.short, qty=1, comment=wickShortRetest ? pendSComment : f_wickEntryComment(false))
+
+if barstate.isconfirmed and strategy.position_size > 0 and not longExitPlaced and not wickLExitPlaced
+    eid = strategy.opentrades > 0 ? strategy.opentrades.entry_id(strategy.opentrades - 1) : ""
+    if eid == "Wick_Long"
+        strategy.exit("WL_Exit", "Wick_Long", profit=tpTicks, loss=slTicks)
+        wickLExitPlaced := true
+    else if eid == "Long"
+        strategy.exit("Long_Exit", "Long", profit=tpTicks, loss=slTicks)
+        longExitPlaced := true
+
+if barstate.isconfirmed and strategy.position_size < 0 and not shortExitPlaced and not wickSExitPlaced
+    eid = strategy.opentrades > 0 ? strategy.opentrades.entry_id(strategy.opentrades - 1) : ""
+    if eid == "Wick_Short"
+        strategy.exit("WS_Exit", "Wick_Short", profit=tpTicks, loss=slTicks)
+        wickSExitPlaced := true
+    else if eid == "Short"
+        strategy.exit("Short_Exit", "Short", profit=tpTicks, loss=slTicks)
+        shortExitPlaced := true
+
+if barstate.isconfirmed and strategy.position_size > 0 and flipToBear
+    strategy.close_all(comment="FlipExit")
+
+if barstate.isconfirmed and strategy.position_size < 0 and flipToBull
+    strategy.close_all(comment="FlipExit")
+
+if barstate.isconfirmed and strategy.position_size != 0 and adxBlocked
+    wickOpen = strategy.opentrades > 0 and (strategy.opentrades.entry_id(strategy.opentrades - 1) == "Wick_Long" or strategy.opentrades.entry_id(strategy.opentrades - 1) == "Wick_Short")
+    if applyAdxBlockToWick or not wickOpen
+        strategy.close_all(comment="ADX_Block")
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PERFORMANCE TRACKING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+var int   lTrades = 0
+var int   lWins   = 0
+var float lGP     = 0.0
+var float lGL     = 0.0
+var int   sTrades = 0
+var int   sWins   = 0
+var float sGP     = 0.0
+var float sGL     = 0.0
+var int   streak  = 0
+var int   maxWS   = 0
+var int   maxLS   = 0
+var float bestTrade  = 0.0
+var float worstTrade = 0.0
+
+if strategy.closedtrades > strategy.closedtrades[1]
+    lastIdx = strategy.closedtrades - 1
+    pnl     = strategy.closedtrades.profit(lastIdx)
+    eid     = strategy.closedtrades.entry_id(lastIdx)
+    isLong  = str.contains(eid, "Long")
+
+    if isLong
+        lTrades += 1
+        if pnl > 0
+            lWins += 1
+            lGP   += pnl
+        else if pnl < 0
+            lGL += math.abs(pnl)
+    else
+        sTrades += 1
+        if pnl > 0
+            sWins += 1
+            sGP   += pnl
+        else if pnl < 0
+            sGL += math.abs(pnl)
+
+    bestTrade  := math.max(bestTrade, pnl)
+    worstTrade := math.min(worstTrade, pnl)
+
+    if pnl > 0
+        streak := streak > 0 ? streak + 1 : 1
+        maxWS  := math.max(maxWS, streak)
+    else if pnl < 0
+        streak := streak < 0 ? streak - 1 : -1
+        maxLS  := math.max(maxLS, math.abs(streak))
+    else
+        streak := 0
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RESEARCH — forward outcomes (no look-ahead)
+// Signal at bar t−lb; outcome measured at bar t on confirmed close only.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+var array<int>   rCnt  = array.new_int(R_BUCKETS, 0)
+var array<int>   rWin  = array.new_int(R_BUCKETS, 0)
+var array<float> rPts  = array.new_float(R_BUCKETS, 0.0)
+var array<float> rMfe  = array.new_float(R_BUCKETS, 0.0)
+var array<float> rMae  = array.new_float(R_BUCKETS, 0.0)
+
+lb = outcomeLB
+winSpan = lb + 1
+
+lMfeBar = ta.highest(high, winSpan) - close[lb]
+lMaeBar = close[lb] - ta.lowest(low, winSpan)
+sMfeBar = close[lb] - ta.lowest(low, winSpan)
+sMaeBar = ta.highest(high, winSpan) - close[lb]
+
+if barstate.isconfirmed and enableResearch and bar_index > lb
+    lPts = close - close[lb]
+    sPts = close[lb] - close
+    lWin = lPts > winThreshPts
+    sWin = sPts > winThreshPts
+    lMfe = trackMfeMae ? lMfeBar : 0.0
+    lMae = trackMfeMae ? lMaeBar : 0.0
+    sMfe = trackMfeMae ? sMfeBar : 0.0
+    sMae = trackMfeMae ? sMaeBar : 0.0
+
+    if clusteredLower[lb]
+        c = lConf[lb]
+        if c == 1
+            f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WL1, lPts, lWin, lMfe, lMae, trackMfeMae)
+        else if c == 2
+            f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WL2, lPts, lWin, lMfe, lMae, trackMfeMae)
+        else if c >= 3
+            f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WL3P, lPts, lWin, lMfe, lMae, trackMfeMae)
+        if wickOs[lb]
+            f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WLOS, lPts, lWin, lMfe, lMae, trackMfeMae)
+        if htfBear[lb]
+            f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WLCT, lPts, lWin, lMfe, lMae, trackMfeMae)
+
+    if clusteredUpper[lb]
+        c = uConf[lb]
+        if c == 1
+            f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WU1, sPts, sWin, sMfe, sMae, trackMfeMae)
+        else if c == 2
+            f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WU2, sPts, sWin, sMfe, sMae, trackMfeMae)
+        else if c >= 3
+            f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WU3P, sPts, sWin, sMfe, sMae, trackMfeMae)
+        if wickOb[lb]
+            f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WUOB, sPts, sWin, sMfe, sMae, trackMfeMae)
+        if htfBull[lb]
+            f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WUCT, sPts, sWin, sMfe, sMae, trackMfeMae)
+
+    if clusteredTrendLong[lb]
+        f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_TL, lPts, lWin, lMfe, lMae, trackMfeMae)
+    if clusteredTrendShort[lb]
+        f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_TS, sPts, sWin, sMfe, sMae, trackMfeMae)
+
+    if trendLongEntry[lb]
+        f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_EL, lPts, lWin, lMfe, lMae, trackMfeMae)
+    if trendShortEntry[lb]
+        f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_ES, sPts, sWin, sMfe, sMae, trackMfeMae)
+    if wickLongImmediate[lb]
+        f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WKL_IMM, lPts, lWin, lMfe, lMae, trackMfeMae)
+    if wickLongRetest[lb]
+        f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WKL_RT, lPts, lWin, lMfe, lMae, trackMfeMae)
+    if wickShortImmediate[lb]
+        f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WKS_IMM, sPts, sWin, sMfe, sMae, trackMfeMae)
+    if wickShortRetest[lb]
+        f_rec(rCnt, rWin, rPts, rMfe, rMae, IDX_WKS_RT, sPts, sWin, sMfe, sMae, trackMfeMae)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VISUALS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+p_fast = plot(htfFast, "HTF Fast EMA", color=color.new(color.white, 70), linewidth=1)
+p_slow = plot(htfSlow, "HTF Slow EMA", color=color.new(color.white, 80), linewidth=1)
+plot(htfBase, "HTF SMA Base", color=color.new(color.yellow, 80), linewidth=1)
+
+cloudColor = htfBull ? color.new(#06d6a0, 75) :
+             htfBear ? color.new(#ff3860, 75) :
+             color.new(color.gray, 85)
+fill(p_fast, p_slow, color=cloudColor, title="Cloud Fill")
+
+plot(vwapVal, "VWAP", color=color.new(#f59e0b, 0), linewidth=2)
+
+p_bbU = plot(showBB ? wickUpper : na, "BB Upper", color=color.new(#6366f1, 20), linewidth=1)
+plot(showBB ? wickBasis : na, "BB Basis", color=color.new(#6366f1, 50), linewidth=1, style=plot.style_circles)
+p_bbL = plot(showBB ? wickLower : na, "BB Lower", color=color.new(#6366f1, 20), linewidth=1)
+fill(p_bbU, p_bbL, color=showBB ? color.new(#6366f1, 90) : na, title="BB Fill")
+
+bgcolor(flipToBull and barstate.isconfirmed ? color.new(#06d6a0, 85) : na, title="Bull Flip")
+bgcolor(flipToBear and barstate.isconfirmed ? color.new(#ff3860, 85) : na, title="Bear Flip")
+bgcolor(nearVwap ? color.new(#f59e0b, 93) : na, title="VWAP Zone")
+
+plotshape(trendLongEntry and barstate.isconfirmed,  "Long",  shape.triangleup,   location.belowbar, color=#06d6a0, size=size.small)
+plotshape(trendShortEntry and barstate.isconfirmed, "Short", shape.triangledown, location.abovebar, color=#ff3860, size=size.small)
+plotshape(wickLongImmediate and barstate.isconfirmed and not trendLongEntry,  "Wick Long Imm",  shape.circle, location.belowbar, color=#22d3ee, size=size.tiny)
+plotshape(wickLongRetest and barstate.isconfirmed and not trendLongEntry,     "Wick Long RT",   shape.circle, location.belowbar, color=#06d6a0, size=size.small)
+plotshape(wickShortImmediate and barstate.isconfirmed and not trendShortEntry, "Wick Short Imm", shape.circle, location.abovebar, color=#f472b6, size=size.tiny)
+plotshape(wickShortRetest and barstate.isconfirmed and not trendShortEntry,    "Wick Short RT",  shape.circle, location.abovebar, color=#ff3860, size=size.small)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// BB WICK LABELS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+showLowerLabel = showWicks and (lConf >= minWickConfDisplay or wickOs)
+showUpperLabel = showWicks and (uConf >= minWickConfDisplay or wickOb)
+
+if lowerWick and showLowerLabel and barstate.isconfirmed
+    rsiRow  = "RSI   " + str.tostring(wickRSI,  "#.#")    + (wickOs ? "  OS ✓" : "      ")
+    adxRow  = "ADX   " + str.tostring(htfADX,   "#.#")    + (adxOptimal ? " OPT ✓" : "       ")
+    macdRow = "MACD  " + str.tostring(htfHist,  "#.###")  + (macdBullish ? "  ✓" : "   ")
+    drsiRow = "D-RSI " + str.tostring(drsi,     "#.##")   + (drsi > 0 ? "  ✓" : "   ")
+    cldRow  = "Cloud " + (htfBull ? "BULL" : htfBear ? "BEAR" : "NEU") + (htfBull ? " ✓" : "  ")
+    vwpRow  = "VWAP  " + (aboveVwap ? "above ✓" : "below  ")
+    lTxt    = "▲ LOWER WICK  " + str.tostring(lConf) + "/7\n" + rsiRow + "\n" + adxRow + "\n" + macdRow + "\n" + drsiRow + "\n" + cldRow + "\n" + vwpRow
+    label.new(bar_index, low, text=lTxt, style=label.style_label_up, color=f_wickBoxClr(true, wickRSI, rsiOversold, rsiOverbought, lConf), textcolor=color.white, size=size.small)
+
+if upperWick and showUpperLabel and barstate.isconfirmed
+    rsiRow  = "RSI   " + str.tostring(wickRSI,  "#.#")    + (wickOb ? "  OB ✓" : "      ")
+    adxRow  = "ADX   " + str.tostring(htfADX,   "#.#")    + (adxOptimal ? " OPT ✓" : "       ")
+    macdRow = "MACD  " + str.tostring(htfHist,  "#.###")  + (macdBearish ? "  ✓" : "   ")
+    drsiRow = "D-RSI " + str.tostring(drsi,     "#.##")   + (drsi < 0 ? "  ✓" : "   ")
+    cldRow  = "Cloud " + (htfBull ? "BULL" : htfBear ? "BEAR" : "NEU") + (htfBear ? " ✓" : "  ")
+    vwpRow  = "VWAP  " + (belowVwap ? "below ✓" : "above  ")
+    uTxt    = "▼ UPPER WICK  " + str.tostring(uConf) + "/7\n" + rsiRow + "\n" + adxRow + "\n" + macdRow + "\n" + drsiRow + "\n" + cldRow + "\n" + vwpRow
+    label.new(bar_index, high, text=uTxt, style=label.style_label_down, color=f_wickBoxClr(false, wickRSI, rsiOversold, rsiOverbought, uConf), textcolor=color.white, size=size.small)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RESEARCH TABLE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+var table researchPanel = table.new(position.bottom_left, 6, 21,
+     bgcolor = color.new(#0a0a0f, 5), border_color = color.new(#22d3ee, 60),
+     border_width = 1, frame_color = color.new(#22d3ee, 40), frame_width = 2)
+
+if barstate.islast and enableResearch and showResearchTable
+    rt = researchPanel
+    table.cell(rt, 0, 0, "CR3 RESEARCH lb=" + str.tostring(outcomeLB), text_color=color.new(#22d3ee, 0), text_size=size.tiny, text_halign=text.align_left, bgcolor=C_RHBG)
+    table.cell(rt, 1, 0, "N", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_RHBG)
+    table.cell(rt, 2, 0, "Win%", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_RHBG)
+    table.cell(rt, 3, 0, "AvgPts", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_RHBG)
+    table.cell(rt, 4, 0, "AvgMFE", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_RHBG)
+    table.cell(rt, 5, 0, "AvgMAE", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_RHBG)
+
+    for i = 0 to R_BUCKETS - 1
+        row = i + 1
+        n   = array.get(rCnt, i)
+        w   = array.get(rWin, i)
+        sp  = array.get(rPts, i)
+        smf = array.get(rMfe, i)
+        sma = array.get(rMae, i)
+        table.cell(rt, 0, row, array.get(R_LBL, i), text_color=C_VAL, text_size=size.tiny, text_halign=text.align_left)
+        table.cell(rt, 1, row, str.tostring(n), text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center)
+        table.cell(rt, 2, row, fmtPct(w, n), text_color=clrPct(w, n), text_size=size.tiny, text_halign=text.align_center)
+        table.cell(rt, 3, row, n > 0 ? fmtPts(sp / n) : "—", text_color=n > 0 and sp / n > 0 ? color.new(#06d6a0, 0) : color.new(#ff3860, 0), text_size=size.tiny, text_halign=text.align_center)
+        table.cell(rt, 4, row, n > 0 and trackMfeMae ? fmtPts(smf / n) : "—", text_color=C_VAL, text_size=size.tiny, text_halign=text.align_center)
+        table.cell(rt, 5, row, n > 0 and trackMfeMae ? fmtPts(sma / n) : "—", text_color=C_VAL, text_size=size.tiny, text_halign=text.align_center)
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PERFORMANCE TABLE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+var table perfPanel = table.new(position.top_right, 4, 16,
+     bgcolor = color.new(#0a0a0f, 5), border_color = color.new(#a855f7, 60),
+     border_width = 1, frame_color = color.new(#a855f7, 40), frame_width = 2)
+
+if barstate.islast and showTable
+    t = perfPanel
+    allT  = strategy.closedtrades
+    allW  = strategy.wintrades
+    allL  = strategy.losstrades
+    allGP = strategy.grossprofit
+    allGL = math.abs(strategy.grossloss)
+    allNP = strategy.netprofit
+    lLosses = lTrades - lWins
+    sLosses = sTrades - sWins
+
+    table.cell(t, 0, 0, "CLOUD REGIME v3.0", text_color=C_HEAD, text_size=size.small, text_halign=text.align_left, bgcolor=C_HBG)
+    table.cell(t, 1, 0, "All", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_HBG)
+    table.cell(t, 2, 0, "Long", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_HBG)
+    table.cell(t, 3, 0, "Short", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_HBG)
+
+    table.cell(t, 0, 1, "Trades", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 1, str.tostring(allT), text_color=C_VAL, text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 2, 1, str.tostring(lTrades), text_color=C_VAL, text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 3, 1, str.tostring(sTrades), text_color=C_VAL, text_size=size.tiny, text_halign=text.align_center)
+
+    table.cell(t, 0, 2, "Win rate", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 2, fmtPct(allW, allT), text_color=clrPct(allW, allT), text_size=size.small, text_halign=text.align_center)
+    table.cell(t, 2, 2, fmtPct(lWins, lTrades), text_color=clrPct(lWins, lTrades), text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 3, 2, fmtPct(sWins, sTrades), text_color=clrPct(sWins, sTrades), text_size=size.tiny, text_halign=text.align_center)
+
+    table.cell(t, 0, 3, "Profit factor", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 3, fmtPF(allGP, allGL), text_color=C_VAL, text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 2, 3, fmtPF(lGP, lGL), text_color=C_VAL, text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 3, 3, fmtPF(sGP, sGL), text_color=C_VAL, text_size=size.tiny, text_halign=text.align_center)
+
+    table.cell(t, 0, 4, "Avg win", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 4, fmtAvg(allGP, allW), text_color=color.new(#06d6a0, 0), text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 2, 4, fmtAvg(lGP, lWins), text_color=color.new(#06d6a0, 0), text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 3, 4, fmtAvg(sGP, sWins), text_color=color.new(#06d6a0, 0), text_size=size.tiny, text_halign=text.align_center)
+
+    table.cell(t, 0, 5, "Avg loss", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 5, fmtAvg(-allGL, allL), text_color=color.new(#ff3860, 0), text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 2, 5, fmtAvg(-lGL, lLosses), text_color=color.new(#ff3860, 0), text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 3, 5, fmtAvg(-sGL, sLosses), text_color=color.new(#ff3860, 0), text_size=size.tiny, text_halign=text.align_center)
+
+    table.cell(t, 0, 6, "Net PnL", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 6, fmtPnl(allNP), text_color=clrPnl(allNP), text_size=size.small, text_halign=text.align_center)
+    table.cell(t, 2, 6, fmtPnl(lGP - lGL), text_color=clrPnl(lGP - lGL), text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 3, 6, fmtPnl(sGP - sGL), text_color=clrPnl(sGP - sGL), text_size=size.tiny, text_halign=text.align_center)
+
+    table.cell(t, 0, 7, "Max drawdown", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 7, fmtPnl(strategy.max_drawdown), text_color=color.new(#ff3860, 0), text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 2, 7, "best: " + fmtPnl(bestTrade), text_color=color.new(#06d6a0, 0), text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 3, 7, "worst: " + fmtPnl(worstTrade), text_color=color.new(#ff3860, 0), text_size=size.tiny, text_halign=text.align_center)
+
+    rrRatio = slPoints > 0 ? tpPoints / slPoints : 0
+    table.cell(t, 0, 8, "Streaks / R:R", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 8, "W:" + str.tostring(maxWS) + " L:" + str.tostring(maxLS), text_color=C_VAL, text_size=size.tiny, text_halign=text.align_center)
+    table.cell(t, 2, 8, "R:R " + str.tostring(rrRatio, "#.#") + ":1", text_color=C_VAL, text_size=size.tiny, text_halign=text.align_center)
+    streakText = streak > 0 ? "W" + str.tostring(streak) : streak < 0 ? "L" + str.tostring(math.abs(streak)) : "—"
+    streakClr  = streak > 0 ? color.new(#06d6a0, 0) : streak < 0 ? color.new(#ff3860, 0) : color.gray
+    table.cell(t, 3, 8, "now: " + streakText, text_color=streakClr, text_size=size.tiny, text_halign=text.align_center)
+
+    table.cell(t, 0, 9, "── recent trades ──────────", text_color=C_SCLR, text_size=size.tiny, text_halign=text.align_left, bgcolor=C_SBG)
+    table.cell(t, 1, 9, "PnL", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_SBG)
+    table.cell(t, 2, 9, "Dir", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_SBG)
+    table.cell(t, 3, 9, "Bars", text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_center, bgcolor=C_SBG)
+
+    recentN = math.min(6, allT)
+    if recentN > 0
+        for i = 0 to recentN - 1
+            idx   = allT - 1 - i
+            row   = 10 + i
+            rPnl  = strategy.closedtrades.profit(idx)
+            rDir  = strategy.closedtrades.entry_id(idx)
+            rEntry = strategy.closedtrades.entry_bar_index(idx)
+            rExit  = strategy.closedtrades.exit_bar_index(idx)
+            rBars  = rExit - rEntry
+            table.cell(t, 0, row, "#" + str.tostring(idx + 1), text_color=C_LCLR, text_size=size.tiny, text_halign=text.align_left)
+            table.cell(t, 1, row, fmtPnl(rPnl), text_color=clrPnl(rPnl), text_size=size.tiny, text_halign=text.align_center)
+            dirClr = str.contains(rDir, "Long") ? color.new(#06d6a0, 0) : color.new(#ff3860, 0)
+            table.cell(t, 2, row, str.contains(rDir, "Long") ? "L" : "S", text_color=dirClr, text_size=size.tiny, text_halign=text.align_center)
+            table.cell(t, 3, row, str.tostring(rBars), text_color=C_VAL, text_size=size.tiny, text_halign=text.align_center)

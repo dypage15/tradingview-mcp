@@ -1,0 +1,397 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\cr3_trade_review_2026-05-30T00-00-54",
+  "timestamp": "2026-05-30T00:00:54.266Z",
+  "symbol": "CME_MINI:MNQ1!",
+  "timeframe": "1",
+  "entity_id": "sMhEyg",
+  "inputs": {
+    "htfTF": "30",
+    "fastEmaLen": 9,
+    "slowEmaLen": 21,
+    "smaLen": 50,
+    "cloudSmooth": 3,
+    "cSlopeLen": 5,
+    "cSteepT": 0.15,
+    "macdFast": 12,
+    "macdSlow": 26,
+    "macdSig": 9,
+    "proxMult": 1,
+    "proxAtrLn": 14,
+    "vwapTrigMode": "2-Bar",
+    "adxLen": 14,
+    "adxSmooth": 14,
+    "zOptLow": 18,
+    "zOptHigh": 35,
+    "useDRSI": true,
+    "drsiRSILen": 21,
+    "drsiWindow": 14,
+    "drsiSigLen": 9,
+    "drsiMode": "Direction Change",
+    "showBB": true,
+    "showWicks": true,
+    "wickBBLen": 20,
+    "wickBBMult": 2,
+    "wickRSILen": 14,
+    "rsiOversold": 30,
+    "rsiOverbought": 70,
+    "minWickConfDisplay": 3,
+    "tpPoints": 40,
+    "slPoints": 20,
+    "useSession": true,
+    "sessStart": "0930-1600",
+    "useTrendTier": false,
+    "useWickTier": true,
+    "wickMinConf": 1,
+    "wickRequireOs": false,
+    "wickRequireOb": false,
+    "showTable": true,
+    "enableResearch": true,
+    "outcomeLB": 100,
+    "clusterBars": 10,
+    "winThreshPts": 0,
+    "trackMfeMae": true,
+    "showResearchTable": true,
+    "adxEntryHigh": 35,
+    "enforce_adx": true,
+    "enforce_drsi": true,
+    "enforce_slope": true,
+    "enforce_session": true
+  },
+  "strategy_tester": {
+    "currency": "USD",
+    "settings": {
+      "dateRange": {
+        "backtest": {
+          "from": 1778450400000,
+          "to": 1780088340000
+        },
+        "trade": {
+          "from": 1778509920000,
+          "to": 1780088340000
+        }
+      }
+    },
+    "firstTradeIndex": 0,
+    "avgBarsInLossTrade": 8.77536231884058,
+    "avgBarsInTrade": 9.68,
+    "avgBarsInWinTrade": 10.794642857142858,
+    "avgLosTrade": 36.15666667,
+    "avgLosTradePercent": 0.0006126807944483192,
+    "avgTrade": 8.458,
+    "avgTradePercent": 0.00014495813406497786,
+    "avgWinTrade": 63.42964286,
+    "avgWinTradePercent": 0.001078477528126004,
+    "commissionPaid": 310.0000000000011,
+    "grossLoss": 4989.619999999983,
+    "grossLossPercent": 0.004989619999999983,
+    "grossLossWC": 4821,
+    "grossProfit": 7104.120000000015,
+    "grossProfitPercent": 0.007104120000000015,
+    "grossProfitWC": 7245.5,
+    "largestLosTrade": 60.739999999999995,
+    "largestLosTradePercent": 0.001045041932,
+    "largestWinTrade": 270.76,
+    "largestWinTradePercent": 0.00458292908,
+    "marginCalls": 0,
+    "maxContractsHeld": 1,
+    "netProfit": 2114.5000000000327,
+    "netProfitPercent": 0.0021145000000000326,
+    "numberOfLosingTrades": 138,
+    "numberOfWiningTrades": 112,
+    "percentProfitable": 0.448,
+    "profitFactor": 1.4237797667958763,
+    "ratioAvgWinAvgLoss": 1.7543000697193418,
+    "totalOpenTrades": 0,
+    "totalTrades": 250
+  },
+  "research": {
+    "parsed": true,
+    "outcomeLB": 100,
+    "buckets": [
+      {
+        "signal": "W_L_1",
+        "n": 118,
+        "winPct": 62.7,
+        "avgPts": 2.58,
+        "avgMfe": 70.61,
+        "avgMae": 80.81
+      },
+      {
+        "signal": "W_L_2",
+        "n": 197,
+        "winPct": 61.9,
+        "avgPts": 26.07,
+        "avgMfe": 86.78,
+        "avgMae": 66.87
+      },
+      {
+        "signal": "W_L_3+",
+        "n": 323,
+        "winPct": 50.8,
+        "avgPts": -4.42,
+        "avgMfe": 59.09,
+        "avgMae": 71.57
+      },
+      {
+        "signal": "W_L_OS",
+        "n": 43,
+        "winPct": 60.5,
+        "avgPts": 6.22,
+        "avgMfe": 81.53,
+        "avgMae": 74.57
+      },
+      {
+        "signal": "W_L_CT",
+        "n": 170,
+        "winPct": 55.9,
+        "avgPts": 11.06,
+        "avgMfe": 88.49,
+        "avgMae": 80.83
+      },
+      {
+        "signal": "W_U_1",
+        "n": 103,
+        "winPct": 46.6,
+        "avgPts": -3.58,
+        "avgMfe": 58.35,
+        "avgMae": 59.95
+      },
+      {
+        "signal": "W_U_2",
+        "n": 244,
+        "winPct": 44.7,
+        "avgPts": -2.35,
+        "avgMfe": 61.34,
+        "avgMae": 57.98
+      },
+      {
+        "signal": "W_U_3+",
+        "n": 260,
+        "winPct": 47.3,
+        "avgPts": -8.57,
+        "avgMfe": 65.31,
+        "avgMae": 69.76
+      },
+      {
+        "signal": "W_U_OB",
+        "n": 57,
+        "winPct": 40.4,
+        "avgPts": -3.33,
+        "avgMfe": 73.89,
+        "avgMae": 65.68
+      },
+      {
+        "signal": "W_U_CT",
+        "n": 332,
+        "winPct": 47.6,
+        "avgPts": -2.34,
+        "avgMfe": 52.44,
+        "avgMae": 50.57
+      },
+      {
+        "signal": "T_L",
+        "n": 2,
+        "winPct": 100,
+        "avgPts": 38.38,
+        "avgMfe": 63.25,
+        "avgMae": 87
+      },
+      {
+        "signal": "T_S",
+        "n": 1,
+        "winPct": 0,
+        "avgPts": -88.75,
+        "avgMfe": 12.25,
+        "avgMae": 91.5
+      },
+      {
+        "signal": "E_L",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      },
+      {
+        "signal": "E_S",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      },
+      {
+        "signal": "WK_L",
+        "n": 141,
+        "winPct": 61,
+        "avgPts": 32.02,
+        "avgMfe": 91.41,
+        "avgMae": 74.83
+      },
+      {
+        "signal": "WK_S",
+        "n": 102,
+        "winPct": 42.2,
+        "avgPts": -15.5,
+        "avgMfe": 79.37,
+        "avgMae": 84.97
+      }
+    ],
+    "wickRows": [
+      {
+        "signal": "W_L_1",
+        "n": 118,
+        "winPct": 62.7,
+        "avgPts": 2.58,
+        "avgMfe": 70.61,
+        "avgMae": 80.81
+      },
+      {
+        "signal": "W_L_2",
+        "n": 197,
+        "winPct": 61.9,
+        "avgPts": 26.07,
+        "avgMfe": 86.78,
+        "avgMae": 66.87
+      },
+      {
+        "signal": "W_L_3+",
+        "n": 323,
+        "winPct": 50.8,
+        "avgPts": -4.42,
+        "avgMfe": 59.09,
+        "avgMae": 71.57
+      },
+      {
+        "signal": "W_L_OS",
+        "n": 43,
+        "winPct": 60.5,
+        "avgPts": 6.22,
+        "avgMfe": 81.53,
+        "avgMae": 74.57
+      },
+      {
+        "signal": "W_L_CT",
+        "n": 170,
+        "winPct": 55.9,
+        "avgPts": 11.06,
+        "avgMfe": 88.49,
+        "avgMae": 80.83
+      },
+      {
+        "signal": "W_U_1",
+        "n": 103,
+        "winPct": 46.6,
+        "avgPts": -3.58,
+        "avgMfe": 58.35,
+        "avgMae": 59.95
+      },
+      {
+        "signal": "W_U_2",
+        "n": 244,
+        "winPct": 44.7,
+        "avgPts": -2.35,
+        "avgMfe": 61.34,
+        "avgMae": 57.98
+      },
+      {
+        "signal": "W_U_3+",
+        "n": 260,
+        "winPct": 47.3,
+        "avgPts": -8.57,
+        "avgMfe": 65.31,
+        "avgMae": 69.76
+      },
+      {
+        "signal": "W_U_OB",
+        "n": 57,
+        "winPct": 40.4,
+        "avgPts": -3.33,
+        "avgMfe": 73.89,
+        "avgMae": 65.68
+      },
+      {
+        "signal": "W_U_CT",
+        "n": 332,
+        "winPct": 47.6,
+        "avgPts": -2.34,
+        "avgMfe": 52.44,
+        "avgMae": 50.57
+      }
+    ],
+    "trendRows": [
+      {
+        "signal": "T_L",
+        "n": 2,
+        "winPct": 100,
+        "avgPts": 38.38,
+        "avgMfe": 63.25,
+        "avgMae": 87
+      },
+      {
+        "signal": "T_S",
+        "n": 1,
+        "winPct": 0,
+        "avgPts": -88.75,
+        "avgMfe": 12.25,
+        "avgMae": 91.5
+      }
+    ],
+    "entryRows": [
+      {
+        "signal": "E_L",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      },
+      {
+        "signal": "E_S",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      }
+    ],
+    "wickEntryRows": [
+      {
+        "signal": "WK_L",
+        "n": 141,
+        "winPct": 61,
+        "avgPts": 32.02,
+        "avgMfe": 91.41,
+        "avgMae": 74.83
+      },
+      {
+        "signal": "WK_S",
+        "n": 102,
+        "winPct": 42.2,
+        "avgPts": -15.5,
+        "avgMfe": 79.37,
+        "avgMae": 84.97
+      }
+    ],
+    "bestByWin": {
+      "signal": "W_L_1",
+      "n": 118,
+      "winPct": 62.7,
+      "avgPts": 2.58,
+      "avgMfe": 70.61,
+      "avgMae": 80.81
+    },
+    "bestByPts": {
+      "signal": "WK_L",
+      "n": 141,
+      "winPct": 61,
+      "avgPts": 32.02,
+      "avgMfe": 91.41,
+      "avgMae": 74.83
+    },
+    "studyName": "Cloud Regime v3.0 — Full Stack",
+    "row_count": 16
+  },
+  "report_trade_count": 250,
+  "order_pair_count": 250
+}

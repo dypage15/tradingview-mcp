@@ -85,10 +85,18 @@ export function registerUiTools(server) {
     catch (err) { return jsonResult({ success: false, error: err.message }, true); }
   });
 
-  server.tool('ui_evaluate', 'Execute JavaScript code in the TradingView page context for advanced automation', {
-    expression: z.string().describe('JavaScript expression to evaluate in the page context. Wrap in IIFE for complex logic.'),
-  }, async ({ expression }) => {
-    try { return jsonResult(await core.uiEvaluate({ expression })); }
+  server.tool('strategy_tester_click_update_report', 'If Strategy Tester shows an "Update report" / Refresh report banner after input or chart changes, click it so metrics refresh. Safe no-op when absent.', {
+    max_attempts: z.coerce.number().optional().describe('Max click passes (default 4)'),
+    pause_ms: z.coerce.number().optional().describe('Wait between passes in ms (default 450)'),
+  }, async ({ max_attempts, pause_ms }) => {
+    try {
+      return jsonResult(
+        await core.strategyTesterClickUpdateReportIfPresent({
+          max_attempts: max_attempts ?? undefined,
+          pause_ms: pause_ms ?? undefined,
+        })
+      );
+    }
     catch (err) { return jsonResult({ success: false, error: err.message }, true); }
   });
 }

@@ -1,0 +1,63 @@
+{
+  "entry_comments": {
+    "CR3_WL": 144,
+    "CR3_WU": 106
+  },
+  "exit_comments": {
+    "WL_Exit": 112,
+    "WS_Exit": 74,
+    "ADX_Block": 64
+  },
+  "paired_sample": [
+    {
+      "side": "Long",
+      "entryId": "Wick_Long",
+      "entryComment": "CR3_WL",
+      "exitComment": "WL_Exit",
+      "entryPrice": 29282.25,
+      "exitPrice": 29322.25,
+      "pts": 40,
+      "exitType": "LIMIT"
+    },
+    {
+      "side": "Long",
+      "entryId": "Wick_Long",
+      "entryComment": "CR3_WL",
+      "exitComment": "WL_Exit",
+      "entryPrice": 29378.5,
+      "exitPrice": 29418.5,
+      "pts": 40,
+      "exitType": "LIMIT"
+    },
+    {
+      "side": "Short",
+      "entryId": "Wick_Short",
+      "entryComment": "CR3_WU",
+      "exitComment": "WS_Exit",
+      "entryPrice": 29434,
+      "exitPrice": 29454.25,
+      "pts": -20.25,
+      "exitType": "STOP"
+    },
+    {
+      "side": "Long",
+      "entryId": "Wick_Long",
+      "entryComment": "CR3_WL",
+      "exitComment": "WL_Exit",
+      "entryPrice": 29459.25,
+      "exitPrice": 29439,
+      "pts": -20.25,
+      "exitType": "STOP"
+    },
+    {
+      "side": "Short",
+      "entryId": "Wick_Short",
+      "entryComment": "CR3_WU",
+      "exitComment": "WS_Exit",
+      "entryPrice": 29425.75,
+      "exitPrice": 29385.75,
+      "pts": 40,
+      "exitType": "LIMIT"
+    }
+  ]
+}

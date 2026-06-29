@@ -1,9 +1,28 @@
 /**
  * Core health/discovery/launch logic.
  */
-import { getClient, getTargetInfo, evaluate } from '../connection.js';
-import { existsSync } from 'fs';
-import { execSync, spawn } from 'child_process';
+import { getClient, getTargetInfo, evaluate, CDP_HOST } from '../connection.js';
+import { existsSync, readdirSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import { execSync, execFileSync, spawn } from 'child_process';
+
+/** MSIX / Store layout: %ProgramFiles%\WindowsApps\TradingView*\TradingView.exe */
+function resolveTradingViewExeWindowsApps() {
+  const pf = process.env.PROGRAMFILES;
+  if (!pf) return null;
+  const wa = join(pf, 'WindowsApps');
+  if (!existsSync(wa)) return null;
+  try {
+    const ents = readdirSync(wa, { withFileTypes: true });
+    for (const d of ents) {
+      if (!d.isDirectory() || !/tradingview/i.test(d.name)) continue;
+      const candidate = join(wa, d.name, 'TradingView.exe');
+      if (existsSync(candidate)) return candidate;
+    }
+  } catch { /* ignore */ }
+  return null;
+}
 
 export async function healthCheck() {
   await getClient();
@@ -160,7 +179,12 @@ export async function uiState() {
 }
 
 export async function launch({ port, kill_existing } = {}) {
-  const cdpPort = port || 9222;
+  const defaultFromEnv = (() => {
+    const raw = process.env.TRADINGVIEW_CDP_PORT || '9222';
+    const p = Number.parseInt(String(raw), 10);
+    return p > 0 && p <= 65535 ? p : 9222;
+  })();
+  const cdpPort = typeof port === 'number' && port > 0 ? port : defaultFromEnv;
   const killFirst = kill_existing !== false;
   const platform = process.platform;
 
@@ -170,10 +194,14 @@ export async function launch({ port, kill_existing } = {}) {
       `${process.env.HOME}/Applications/TradingView.app/Contents/MacOS/TradingView`,
     ],
     win32: [
+      process.env.TRADINGVIEW_EXECUTABLE?.trim(),
       `${process.env.LOCALAPPDATA}\\TradingView\\TradingView.exe`,
+      `${process.env.LOCALAPPDATA}\\Microsoft\\WindowsApps\\TradingView.exe`,
+      `${process.env.LOCALAPPDATA}\\Programs\\TradingView\\TradingView.exe`,
+      `${process.env.LOCALAPPDATA}\\Programs\\TradingView Desktop\\TradingView.exe`,
       `${process.env.PROGRAMFILES}\\TradingView\\TradingView.exe`,
       `${process.env['PROGRAMFILES(X86)']}\\TradingView\\TradingView.exe`,
-    ],
+    ].filter(Boolean),
     linux: [
       '/opt/TradingView/tradingview',
       '/opt/TradingView/TradingView',
@@ -207,6 +235,63 @@ export async function launch({ port, kill_existing } = {}) {
     } catch { /* ignore */ }
   }
 
+  if (!tvPath && platform === 'win32') {
+    tvPath = resolveTradingViewExeWindowsApps();
+  }
+
+  /** Windows MSIX / Microsoft Store: scripts/launch_tv_debug_msix.ps1 (InstallLocation exe or COM AUMID). */
+  if (!tvPath && platform === 'win32') {
+    const msixScript = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'scripts', 'launch_tv_debug_msix.ps1');
+    if (existsSync(msixScript)) {
+      try {
+        const psArgs = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', msixScript, '-Port', String(cdpPort)];
+        if (!killFirst) psArgs.push('-NoKill');
+        execFileSync('powershell.exe', psArgs, { timeout: 120000, stdio: 'pipe', encoding: 'utf-8', windowsHide: true });
+      } catch (e) {
+        throw new Error(
+          `TradingView not found on Windows (classic paths empty). MSIX launcher failed: ${e.message}. ` +
+          `Set TRADINGVIEW_EXECUTABLE to TradingView.exe, or run: powershell -ExecutionPolicy Bypass -File "${msixScript}" -Port ${cdpPort}`,
+        );
+      }
+      for (let i = 0; i < 30; i++) {
+        await new Promise(r => setTimeout(r, 1000));
+        try {
+          const http = await import('http');
+          const ready = await new Promise((resolve) => {
+            http.get(`http://${CDP_HOST}:${cdpPort}/json/version`, (res) => {
+              let data = '';
+              res.on('data', (chunk) => data += chunk);
+              res.on('end', () => resolve(data));
+            }).on('error', () => resolve(null));
+          });
+          if (ready) {
+            const info = JSON.parse(ready);
+            return {
+              success: true,
+              platform,
+              binary: 'msix-launcher',
+              pid: null,
+              cdp_port: cdpPort,
+              cdp_url: `http://${CDP_HOST}:${cdpPort}`,
+              browser: info.Browser,
+              user_agent: info['User-Agent'],
+              note: 'Launched via scripts/launch_tv_debug_msix.ps1 (no classic TradingView.exe path found).',
+            };
+          }
+        } catch { /* retry */ }
+      }
+      return {
+        success: true,
+        platform,
+        binary: 'msix-launcher',
+        pid: null,
+        cdp_port: cdpPort,
+        cdp_ready: false,
+        warning: 'MSIX launcher finished but CDP not responding yet. It may still be loading. Try tv_health_check in a few seconds.',
+      };
+    }
+  }
+
   if (!tvPath) {
     throw new Error(`TradingView not found on ${platform}. Searched: ${candidates.join(', ')}. Launch manually with: /path/to/TradingView --remote-debugging-port=${cdpPort}`);
   }
@@ -227,7 +312,7 @@ export async function launch({ port, kill_existing } = {}) {
     try {
       const http = await import('http');
       const ready = await new Promise((resolve) => {
-        http.get(`http://localhost:${cdpPort}/json/version`, (res) => {
+        http.get(`http://${CDP_HOST}:${cdpPort}/json/version`, (res) => {
           let data = '';
           res.on('data', (chunk) => data += chunk);
           res.on('end', () => resolve(data));
@@ -237,7 +322,7 @@ export async function launch({ port, kill_existing } = {}) {
         const info = JSON.parse(ready);
         return {
           success: true, platform, binary: tvPath, pid: child.pid,
-          cdp_port: cdpPort, cdp_url: `http://localhost:${cdpPort}`,
+          cdp_port: cdpPort, cdp_url: `http://${CDP_HOST}:${cdpPort}`,
           browser: info.Browser, user_agent: info['User-Agent'],
         };
       }

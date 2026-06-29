@@ -49,8 +49,27 @@ export async function openPanel({ panel, action }) {
           else { if (typeof bwb.showWidget === 'function') bwb.showWidget(widgetName); }
           performed = 'opened';
         } else if (action === 'close' || (action === 'toggle' && isOpen)) {
-          if (typeof bwb.hideWidget === 'function') bwb.hideWidget(widgetName);
-          performed = 'closed';
+          if (typeof bwb.hideWidget === 'function') {
+            bwb.hideWidget(widgetName);
+            performed = 'closed';
+          } else {
+            var bottomClose = document.querySelector('[class*="layout__area--bottom"]');
+            var closedViaDom = false;
+            if (bottomClose) {
+              var closeBtns = bottomClose.querySelectorAll('button[data-name="close"], button[aria-label="Close"]');
+              for (var ci = 0; ci < closeBtns.length; ci++) {
+                if (closeBtns[ci].offsetParent !== null) { closeBtns[ci].click(); closedViaDom = true; break; }
+              }
+              if (!closedViaDom) {
+                var tabs = bottomClose.querySelectorAll('[role="tab"]');
+                for (var ti = 0; ti < tabs.length; ti++) {
+                  var tx = (tabs[ti].textContent || '').trim().toLowerCase();
+                  if (tx === 'chart' || tx.indexOf('chart') === 0) { tabs[ti].click(); closedViaDom = true; break; }
+                }
+              }
+            }
+            performed = closedViaDom ? 'closed' : 'close_unavailable';
+          }
         }
         return { was_open: isOpen, performed: performed };
       })()
@@ -290,4 +309,70 @@ export async function findElement({ query, strategy }) {
 export async function uiEvaluate({ expression }) {
   const result = await evaluate(expression);
   return { success: true, result };
+}
+
+/**
+ * When strategy inputs or the chart changes, Strategy Tester often shows an
+ * "Update report" style control; metrics stay stale until it is acknowledged.
+ * Scopes search to the backtesting / bottom panel when possible.
+ */
+export async function strategyTesterClickUpdateReportIfPresent(opts = {}) {
+  if (process.env.TV_SKIP_UPDATE_REPORT_CLICK === '1') {
+    return { success: true, skipped: true, clicks: 0 };
+  }
+  const maxAttempts = Number(opts.max_attempts ?? 4);
+  const pauseMs = Number(opts.pause_ms ?? 450);
+
+  let clicks = 0;
+  let lastText = null;
+  for (let a = 0; a < maxAttempts; a++) {
+    const hit = await evaluate(`
+      (function() {
+        function textMatchesBanner(tlow) {
+          return tlow.indexOf('update report') !== -1
+            || tlow.indexOf('refresh report') !== -1
+            || tlow.indexOf('reload report') !== -1;
+        }
+        function scanRoot(root) {
+          if (!root) return null;
+          var cand = root.querySelectorAll(
+            'button, [role="button"], a, span[role="button"], div[class*="button"]'
+          );
+          for (var i = 0; i < cand.length; i++) {
+            var el = cand[i];
+            if (!el || el.offsetParent === null || el.disabled) continue;
+            var text = String(el.innerText || el.textContent || '')
+              .replace(/[ \\n\\r\\t]+/g, ' ')
+              .trim();
+            if (!text || text.length > 140) continue;
+            var tlow = text.toLowerCase().replace(/[ \\n\\r\\t]+/g, ' ');
+            if (textMatchesBanner(tlow)) {
+              try {
+                el.click();
+              } catch (e) {}
+              return { did_click: true, text: text };
+            }
+          }
+          return null;
+        }
+        var hit = scanRoot(document.querySelector('[data-name="backtesting"]'));
+        if (!hit && document.querySelector('[class*="strategyReport"]')) {
+          hit = scanRoot(document.querySelector('[class*="strategyReport"]').closest('[class*="layout__area"]') || document.querySelector('[class*="strategyReport"]'));
+        }
+        if (!hit) {
+          hit = scanRoot(document.querySelector('[class*="layout__area--bottom"]'));
+        }
+        if (!hit) {
+          hit = scanRoot(document.body);
+        }
+        if (!hit) return { did_click: false };
+        return hit;
+      })()
+    `);
+    if (!hit || !hit.did_click) break;
+    clicks += 1;
+    lastText = hit.text ?? null;
+    await new Promise((r) => setTimeout(r, pauseMs));
+  }
+  return { success: true, clicks, last_clicked_text: lastText };
 }

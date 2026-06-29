@@ -1,0 +1,510 @@
+{
+  "success": true,
+  "trade_count": 50,
+  "source": "internal_api",
+  "trades": [
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25934,
+      "q": 1,
+      "tm": 0,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25967.75,
+      "q": 1,
+      "tm": 1,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 26062,
+      "q": 1,
+      "tm": 2,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 26109.25,
+      "q": 1,
+      "tm": 3,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25967.25,
+      "q": 1,
+      "tm": 4,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25937.25,
+      "q": 1,
+      "tm": 5,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25454.5,
+      "q": 1,
+      "tm": 6,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25323.25,
+      "q": 1,
+      "tm": 7,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24918.75,
+      "q": 1,
+      "tm": 8,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24857.5,
+      "q": 1,
+      "tm": 9,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25017,
+      "q": 1,
+      "tm": 10,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "Session end flat",
+      "e": false,
+      "id": "Close position order",
+      "p": 24787.5,
+      "q": 1,
+      "tm": 11,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25073.5,
+      "q": 1,
+      "tm": 12,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25176.75,
+      "q": 1,
+      "tm": 13,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25366.5,
+      "q": 1,
+      "tm": 14,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25411.75,
+      "q": 1,
+      "tm": 15,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25560.25,
+      "q": 1,
+      "tm": 16,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25466.75,
+      "q": 1,
+      "tm": 17,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25450.75,
+      "q": 1,
+      "tm": 18,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25362.5,
+      "q": 1,
+      "tm": 19,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25465.75,
+      "q": 1,
+      "tm": 20,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25444.5,
+      "q": 1,
+      "tm": 21,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25135.75,
+      "q": 1,
+      "tm": 22,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25053.75,
+      "q": 1,
+      "tm": 23,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24967.75,
+      "q": 1,
+      "tm": 24,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25120.25,
+      "q": 1,
+      "tm": 25,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25039,
+      "q": 1,
+      "tm": 26,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25002.5,
+      "q": 1,
+      "tm": 27,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 24888,
+      "q": 1,
+      "tm": 28,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24948.5,
+      "q": 1,
+      "tm": 29,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 24974,
+      "q": 1,
+      "tm": 30,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 24874.75,
+      "q": 1,
+      "tm": 31,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25237.25,
+      "q": 1,
+      "tm": 32,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25290.25,
+      "q": 1,
+      "tm": 33,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25058,
+      "q": 1,
+      "tm": 34,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 24978,
+      "q": 1,
+      "tm": 35,
+      "tp": "LIMIT"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25064.75,
+      "q": 1,
+      "tm": 36,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25200.75,
+      "q": 1,
+      "tm": 37,
+      "tp": "LIMIT"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25096.25,
+      "q": 1,
+      "tm": 38,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25168.25,
+      "q": 1,
+      "tm": 39,
+      "tp": "STOP"
+    },
+    {
+      "b": true,
+      "c": "L",
+      "e": true,
+      "id": "L",
+      "p": 25127,
+      "q": 1,
+      "tm": 40,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "XL",
+      "e": false,
+      "id": "XL",
+      "p": 25041,
+      "q": 1,
+      "tm": 41,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25214,
+      "q": 1,
+      "tm": 42,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25255.5,
+      "q": 1,
+      "tm": 43,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25132,
+      "q": 1,
+      "tm": 44,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25240.5,
+      "q": 1,
+      "tm": 45,
+      "tp": "STOP"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25277.75,
+      "q": 1,
+      "tm": 46,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "Session end flat",
+      "e": false,
+      "id": "Close position order",
+      "p": 25298.75,
+      "q": 1,
+      "tm": 47,
+      "tp": "MARKET"
+    },
+    {
+      "b": false,
+      "c": "S",
+      "e": true,
+      "id": "S",
+      "p": 25095.25,
+      "q": 1,
+      "tm": 48,
+      "tp": "MARKET"
+    },
+    {
+      "b": true,
+      "c": "XS",
+      "e": false,
+      "id": "XS",
+      "p": 25076.75,
+      "q": 1,
+      "tm": 49,
+      "tp": "LIMIT"
+    }
+  ],
+  "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+  "pick_note": null,
+  "candidate_count": 6
+}

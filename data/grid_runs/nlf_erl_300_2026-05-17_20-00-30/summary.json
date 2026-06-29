@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-05-17T20:01:21.445Z",
+  "runCount": 4,
+  "outDir": "data/grid_runs/nlf_erl_300_2026-05-17_20-00-30",
+  "baseline_inputs_restored_ids": {
+    "in_22": 48,
+    "in_25": 72,
+    "in_26": 72
+  },
+  "min_trades_per_day_requirement": 1,
+  "best_overall_met_constraint": null,
+  "best_that_failed_constraint": null,
+  "top_feasible": [],
+  "top_raw_profit_ignore_constraint": [],
+  "notes": [
+    "metConstraint requires ≥1 closed trade per calendar day of Tester trade-span AND numeric netProfit.",
+    "Tune MIN_TRADES_PER_DAY env or grid arrays in this script before another pass.",
+    "strategy_snapshot is NOT auto-synced — run npm run nlf:backtest-save for full JSON artifact after picking inputs."
+  ],
+  "compile_ack": {
+    "success": true,
+    "button_clicked": "Pine Save",
+    "has_errors": false,
+    "errors": [],
+    "study_added": false
+  },
+  "timeline": [
+    {
+      "pine_compile": {
+        "success": true,
+        "button_clicked": "Pine Save",
+        "has_errors": false,
+        "errors": [],
+        "study_added": false
+      }
+    }
+  ]
+}

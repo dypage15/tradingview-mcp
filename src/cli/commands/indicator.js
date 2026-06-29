@@ -36,14 +36,19 @@ register('indicator', {
       },
     }],
     ['set', {
-      description: 'Change indicator input values',
+      description: 'Change indicator input values (persists to chart layout save when possible)',
       options: {
         inputs: { type: 'string', short: 'i', description: 'JSON input overrides, e.g. \'{"length": 50}\'' },
+        'no-persist': { type: 'boolean', description: 'Skip auto-save of chart layout after changing inputs' },
       },
       handler: (opts, positionals) => {
         if (!positionals[0]) throw new Error('Entity ID required. Usage: tv indicator set eFu1Ot -i \'{"in_3": 20}\'');
         if (!opts.inputs) throw new Error('Inputs required. Usage: tv indicator set eFu1Ot -i \'{"in_3": 20}\'');
-        return indCore.setInputs({ entity_id: positionals[0], inputs: opts.inputs });
+        return indCore.setInputs({
+          entity_id: positionals[0],
+          inputs: opts.inputs,
+          persist_layout: opts['no-persist'] !== true,
+        });
       },
     }],
     ['get', {

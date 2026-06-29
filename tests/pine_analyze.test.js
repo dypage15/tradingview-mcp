@@ -7,6 +7,7 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { markersLookLikeStalePineParse } from '../src/core/pine.js';
 
 // Extracted analyze function matching the tool's logic
 function analyze(source) {
@@ -319,5 +320,17 @@ this_function_does_not_exist()`;
 
     // Empty source returns 400 — that's correct behavior
     assert.ok(response.status === 400 || response.status === 200, `Unexpected status: ${response.status}`);
+  });
+});
+
+describe('markersLookLikeStalePineParse', () => {
+  it('flags stale parse-ish Monaco wording', () => {
+    assert.equal(markersLookLikeStalePineParse([{ message: 'Cannot parse Pine Script.' }]), true);
+    assert.equal(markersLookLikeStalePineParse([{ message: "Couldn't parse compilation result" }]), true);
+  });
+
+  it('ignores unrelated markers', () => {
+    assert.equal(markersLookLikeStalePineParse([{ message: 'Undeclared identifier "x"' }]), false);
+    assert.equal(markersLookLikeStalePineParse([]), false);
   });
 });

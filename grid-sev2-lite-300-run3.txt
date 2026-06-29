@@ -1,0 +1,1946 @@
+[sev2-grid-300] preflight: 5m chart → Strategy Tester → Pine sync → settle...
+{
+  "success": true,
+  "timeframe": "5",
+  "chart_ready": true
+}
+{
+  "success": true,
+  "panel": "pine-editor",
+  "action": "open",
+  "was_open": true,
+  "performed": "opened"
+}
+{
+  "success": true,
+  "panel": "strategy-tester",
+  "action": "open",
+  "was_open": false,
+  "performed": "opened"
+}
+{
+  "success": true,
+  "lines_set": 325
+}
+{
+  "success": true,
+  "button_clicked": "Pine Save",
+  "has_errors": false,
+  "errors": [],
+  "study_added": false
+}
+[sev2-grid-300] 300 runs | objective=balanced | delayMs=7000 | TV_STRATEGY_NAME=SEv2 Strat | GRID_LOW_LOAD=0
+[grid] CDP OK — CME_MINI:MNQ1! @ 5
+Auto-selected Pine strategy: qx8R0T — Sweep Engine v2.0 Strategy
+[default] combinations (capped at 300): 300, objective=balanced delayMs=7000 safeMode=true lowLoadMerge=false
+{"mode":"cartesian","scenario":"default","n":1,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":2,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":3,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":4,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":5,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":6,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":7,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":8,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":9,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":10,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":11,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":12,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":13,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":14,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":15,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":16,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":17,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":18,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":19,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":20,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":21,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":22,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":23,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":24,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":25,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":26,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":27,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":28,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":29,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":30,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":31,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":32,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":33,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":34,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":35,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":36,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":37,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":38,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":39,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":40,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":41,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":42,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":43,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":44,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":45,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":46,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":47,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":48,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":49,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":50,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":51,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":52,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":53,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":54,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":55,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":56,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":57,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":58,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":59,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":60,"score":0,"key":"balanced","overrides":{"in_2":3.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":61,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":62,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":63,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":64,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":65,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":66,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":67,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":68,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":69,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":70,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":71,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":72,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":73,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":74,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":75,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":76,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":77,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":78,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":79,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":80,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":81,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":82,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":83,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":84,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":85,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":86,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":87,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":88,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":89,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":90,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":91,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":92,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":93,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":94,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":95,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":96,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":97,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":98,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":99,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":100,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":101,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":102,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":103,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":104,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":105,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":106,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":107,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":108,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":109,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":110,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":111,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":112,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":113,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":114,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":115,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":116,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":117,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":118,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":119,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":120,"score":0,"key":"balanced","overrides":{"in_2":4,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":121,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":122,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":123,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":124,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":125,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":126,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":127,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":128,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":129,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":130,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":131,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":132,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":133,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":134,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":135,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":136,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":137,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":138,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":139,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":140,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":141,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":142,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":143,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":144,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":145,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":146,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":147,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":148,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":149,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":150,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":151,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":152,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":153,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":154,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":155,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":156,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":157,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":158,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":159,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":160,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":161,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":162,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":163,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":164,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":165,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":166,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":167,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":168,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":169,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":170,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":171,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":172,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":173,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":174,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":175,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":176,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":177,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":178,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":179,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":180,"score":0,"key":"balanced","overrides":{"in_2":4.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":181,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":182,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":183,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":184,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":185,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":186,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":187,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":188,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":189,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":190,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":191,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":192,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":193,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":194,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":195,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":196,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":197,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":198,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":199,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":200,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":201,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":202,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":203,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":204,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":205,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":206,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":207,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":208,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":209,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":210,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":211,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":212,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":213,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":214,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":215,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":216,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":217,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":218,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":219,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":220,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":221,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":8,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":222,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":8,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":223,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":224,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":225,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":12,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":226,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":12,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":227,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":228,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":229,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":230,"score":0,"key":"balanced","overrides":{"in_2":5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":2},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+{"mode":"cartesian","scenario":"default","n":231,"score":-28.500537355399267,"key":"balanced","overrides":{"in_2":5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":0},"raw_hint":null,"dd_pct":null,"dd_usd_est":null}
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":3.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":4.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":4,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":8,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":0}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (1/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (2/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+[tv] indicator set failed (3/3): Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+indicator set failed after retries Command failed: C:\Program Files\nodejs\node.exe C:\Users\dypag\tradingview-mcp\src\cli\index.js indicator set qx8R0T -i {"in_2":5.5,"in_3":5.5,"in_4":12,"in_20":0.1,"in_21":2}
+{
+  "success": false,
+  "error": "JS evaluation error: Error: There is no such study\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/1619.d6135c520dedeef7ea19.js:58:1303)\n    at <anonymous>:4:25\n    at <anonymous>:32:7"
+}
+
+
+=== BEST [default] (by balanced) ===
+{
+  "score": 0,
+  "objective": "balanced",
+  "key": "balanced",
+  "inputs": {
+    "in_2": 3.5,
+    "in_3": 3.5,
+    "in_4": 4,
+    "in_20": 0,
+    "in_21": 0
+  },
+  "metrics": {
+    "netProfit": 0,
+    "netProfitPercent": 0,
+    "totalTrades": 0,
+    "grossProfit": 0,
+    "grossLoss": 0,
+    "commissionPaid": 0
+  },
+  "entity_id": "qx8R0T",
+  "scenario": "default"
+}

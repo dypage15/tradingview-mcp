@@ -1,0 +1,486 @@
+{
+  "schema_version": 1,
+  "evaluator": "evaluate-clreg22-grid",
+  "generated_at": "2026-05-21T06:44:45.865Z",
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\clreg22_2026-05-21T06-35-31",
+  "measurement_contract": {
+    "primary_objective": "expectancy (netProfit / totalTrades) with profitFactor >= 1.75 gate",
+    "secondary": [
+      "netProfit",
+      "profitFactor",
+      "maxDrawdown (manual from TV)",
+      "tradesPerDay"
+    ],
+    "not_sufficient_alone": [
+      "winRate > 50% without positive expectancy"
+    ],
+    "oos_required": "Hold out last 30% of calendar days before live",
+    "data_needed_from_strategy": [
+      "totalTrades, netProfit, profitFactor, percentProfitable",
+      "avgTrade (expectancy), avgWinTrade, avgLosTrade, ratioAvgWinAvgLoss",
+      "grossProfit, grossLoss, trade date span (calendarDays)",
+      "Per-trade export: entry time, exit reason, PnL pts (for Sharpe/Ulcer)",
+      "Signal counts: flips, missed flips, RSI mode (from on-chart table)"
+    ]
+  },
+  "distributions": {
+    "n": 36,
+    "win_rate_pct": {
+      "mean": 0,
+      "min": 0,
+      "max": 0
+    },
+    "profit_factor": {
+      "mean": 0
+    },
+    "net_profit": {
+      "mean": 0
+    },
+    "expectancy": {
+      "mean": null
+    }
+  },
+  "feasible": [],
+  "best_by_pf": [
+    {
+      "scenarioId": 0,
+      "spec": {
+        "rsiMode": "Trend",
+        "rsiLen": 6,
+        "confLookback": 0,
+        "tpPoints": 15,
+        "slPoints": 8,
+        "cloudSmooth": 2
+      },
+      "error": null,
+      "strategy_name": "Cloud Regime v2.2 — RSI Confluence",
+      "report_ready": true,
+      "totalTrades": 0,
+      "percentProfitable": 0,
+      "profitFactor": 0,
+      "netProfit": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "avgTrade": null,
+      "expectancy": null,
+      "avgWinTrade": null,
+      "avgLosTrade": null,
+      "ratioWinLoss": null,
+      "calendarDays": null,
+      "tradesPerDay": null,
+      "metConstraint": false,
+      "score": null
+    },
+    {
+      "scenarioId": 1,
+      "spec": {
+        "rsiMode": "Trend",
+        "rsiLen": 6,
+        "confLookback": 0,
+        "tpPoints": 15,
+        "slPoints": 8,
+        "cloudSmooth": 3
+      },
+      "error": null,
+      "strategy_name": "Cloud Regime v2.2 — RSI Confluence",
+      "report_ready": true,
+      "totalTrades": 0,
+      "percentProfitable": 0,
+      "profitFactor": 0,
+      "netProfit": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "avgTrade": null,
+      "expectancy": null,
+      "avgWinTrade": null,
+      "avgLosTrade": null,
+      "ratioWinLoss": null,
+      "calendarDays": null,
+      "tradesPerDay": null,
+      "metConstraint": false,
+      "score": null
+    },
+    {
+      "scenarioId": 2,
+      "spec": {
+        "rsiMode": "Trend",
+        "rsiLen": 6,
+        "confLookback": 0,
+        "tpPoints": 20,
+        "slPoints": 10,
+        "cloudSmooth": 2
+      },
+      "error": null,
+      "strategy_name": "Cloud Regime v2.2 — RSI Confluence",
+      "report_ready": true,
+      "totalTrades": 0,
+      "percentProfitable": 0,
+      "profitFactor": 0,
+      "netProfit": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "avgTrade": null,
+      "expectancy": null,
+      "avgWinTrade": null,
+      "avgLosTrade": null,
+      "ratioWinLoss": null,
+      "calendarDays": null,
+      "tradesPerDay": null,
+      "metConstraint": false,
+      "score": null
+    },
+    {
+      "scenarioId": 3,
+      "spec": {
+        "rsiMode": "Trend",
+        "rsiLen": 6,
+        "confLookback": 0,
+        "tpPoints": 20,
+        "slPoints": 10,
+        "cloudSmooth": 3
+      },
+      "error": null,
+      "strategy_name": "Cloud Regime v2.2 — RSI Confluence",
+      "report_ready": true,
+      "totalTrades": 0,
+      "percentProfitable": 0,
+      "profitFactor": 0,
+      "netProfit": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "avgTrade": null,
+      "expectancy": null,
+      "avgWinTrade": null,
+      "avgLosTrade": null,
+      "ratioWinLoss": null,
+      "calendarDays": null,
+      "tradesPerDay": null,
+      "metConstraint": false,
+      "score": null
+    },
+    {
+      "scenarioId": 4,
+      "spec": {
+        "rsiMode": "Trend",
+        "rsiLen": 6,
+        "confLookback": 0,
+        "tpPoints": 25,
+        "slPoints": 12,
+        "cloudSmooth": 2
+      },
+      "error": null,
+      "strategy_name": "Cloud Regime v2.2 — RSI Confluence",
+      "report_ready": true,
+      "totalTrades": 0,
+      "percentProfitable": 0,
+      "profitFactor": 0,
+      "netProfit": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "avgTrade": null,
+      "expectancy": null,
+      "avgWinTrade": null,
+      "avgLosTrade": null,
+      "ratioWinLoss": null,
+      "calendarDays": null,
+      "tradesPerDay": null,
+      "metConstraint": false,
+      "score": null
+    }
+  ],
+  "best_by_wr": [
+    {
+      "scenarioId": 0,
+      "spec": {
+        "rsiMode": "Trend",
+        "rsiLen": 6,
+        "confLookback": 0,
+        "tpPoints": 15,
+        "slPoints": 8,
+        "cloudSmooth": 2
+      },
+      "error": null,
+      "strategy_name": "Cloud Regime v2.2 — RSI Confluence",
+      "report_ready": true,
+      "totalTrades": 0,
+      "percentProfitable": 0,
+      "profitFactor": 0,
+      "netProfit": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "avgTrade": null,
+      "expectancy": null,
+      "avgWinTrade": null,
+      "avgLosTrade": null,
+      "ratioWinLoss": null,
+      "calendarDays": null,
+      "tradesPerDay": null,
+      "metConstraint": false,
+      "score": null
+    },
+    {
+      "scenarioId": 1,
+      "spec": {
+        "rsiMode": "Trend",
+        "rsiLen": 6,
+        "confLookback": 0,
+        "tpPoints": 15,
+        "slPoints": 8,
+        "cloudSmooth": 3
+      },
+      "error": null,
+      "strategy_name": "Cloud Regime v2.2 — RSI Confluence",
+      "report_ready": true,
+      "totalTrades": 0,
+      "percentProfitable": 0,
+      "profitFactor": 0,
+      "netProfit": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "avgTrade": null,
+      "expectancy": null,
+      "avgWinTrade": null,
+      "avgLosTrade": null,
+      "ratioWinLoss": null,
+      "calendarDays": null,
+      "tradesPerDay": null,
+      "metConstraint": false,
+      "score": null
+    },
+    {
+      "scenarioId": 2,
+      "spec": {
+        "rsiMode": "Trend",
+        "rsiLen": 6,
+        "confLookback": 0,
+        "tpPoints": 20,
+        "slPoints": 10,
+        "cloudSmooth": 2
+      },
+      "error": null,
+      "strategy_name": "Cloud Regime v2.2 — RSI Confluence",
+      "report_ready": true,
+      "totalTrades": 0,
+      "percentProfitable": 0,
+      "profitFactor": 0,
+      "netProfit": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "avgTrade": null,
+      "expectancy": null,
+      "avgWinTrade": null,
+      "avgLosTrade": null,
+      "ratioWinLoss": null,
+      "calendarDays": null,
+      "tradesPerDay": null,
+      "metConstraint": false,
+      "score": null
+    },
+    {
+      "scenarioId": 3,
+      "spec": {
+        "rsiMode": "Trend",
+        "rsiLen": 6,
+        "confLookback": 0,
+        "tpPoints": 20,
+        "slPoints": 10,
+        "cloudSmooth": 3
+      },
+      "error": null,
+      "strategy_name": "Cloud Regime v2.2 — RSI Confluence",
+      "report_ready": true,
+      "totalTrades": 0,
+      "percentProfitable": 0,
+      "profitFactor": 0,
+      "netProfit": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "avgTrade": null,
+      "expectancy": null,
+      "avgWinTrade": null,
+      "avgLosTrade": null,
+      "ratioWinLoss": null,
+      "calendarDays": null,
+      "tradesPerDay": null,
+      "metConstraint": false,
+      "score": null
+    },
+    {
+      "scenarioId": 4,
+      "spec": {
+        "rsiMode": "Trend",
+        "rsiLen": 6,
+        "confLookback": 0,
+        "tpPoints": 25,
+        "slPoints": 12,
+        "cloudSmooth": 2
+      },
+      "error": null,
+      "strategy_name": "Cloud Regime v2.2 — RSI Confluence",
+      "report_ready": true,
+      "totalTrades": 0,
+      "percentProfitable": 0,
+      "profitFactor": 0,
+      "netProfit": 0,
+      "grossProfit": 0,
+      "grossLoss": 0,
+      "avgTrade": null,
+      "expectancy": null,
+      "avgWinTrade": null,
+      "avgLosTrade": null,
+      "ratioWinLoss": null,
+      "calendarDays": null,
+      "tradesPerDay": null,
+      "metConstraint": false,
+      "score": null
+    }
+  ],
+  "best_by_expectancy": [],
+  "marginal": {
+    "rsiMode": {
+      "Trend": {
+        "n": 36,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      }
+    },
+    "rsiLen": {
+      "6": {
+        "n": 24,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      },
+      "14": {
+        "n": 12,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      }
+    },
+    "confLookback": {
+      "0": {
+        "n": 16,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      },
+      "3": {
+        "n": 12,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      },
+      "6": {
+        "n": 8,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      }
+    },
+    "tpPoints": {
+      "15": {
+        "n": 10,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      },
+      "20": {
+        "n": 10,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      },
+      "25": {
+        "n": 8,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      },
+      "30": {
+        "n": 8,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      }
+    },
+    "slPoints": {
+      "8": {
+        "n": 10,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      },
+      "10": {
+        "n": 10,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      },
+      "12": {
+        "n": 8,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      },
+      "15": {
+        "n": 8,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      }
+    },
+    "cloudSmooth": {
+      "2": {
+        "n": 18,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      },
+      "3": {
+        "n": 18,
+        "avg_wr": 0,
+        "avg_pf": 0,
+        "avg_net": 0,
+        "avg_exp": null,
+        "feasible": 0
+      }
+    }
+  },
+  "conclusion": {
+    "can_claim_profitable_yet": false,
+    "wr_above_50_alone_proves_edge": false,
+    "recommendation": "No grid cell met PF>=1, net>0, expectancy>0, min trades — do not optimize for WR alone; widen Trend/Combined RSI or fix execution before live."
+  }
+}

@@ -65,9 +65,14 @@ register('stream', {
       options: {
         filter: { type: 'string', short: 'f', description: 'Filter by study name' },
         interval: { type: 'string', short: 'i', description: 'Poll interval in ms (default 2000)' },
+        force: { type: 'boolean', short: 'F', description: 'Emit every interval even if table text unchanged' },
       },
       handler: async (opts) => {
-        await core.streamTables({ interval: opts.interval ? Number(opts.interval) : undefined, filter: opts.filter });
+        await core.streamTables({
+          interval: opts.interval ? Number(opts.interval) : undefined,
+          filter: opts.filter,
+          dedupe: !opts.force,
+        });
         process.exit(0);
       },
     }],

@@ -1,0 +1,85 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// Liquidity Sweep Reversal Smart
+// ══════════════════════════════════════════════════════════════════════════════
+// Identifies liquidity sweeps and subsequent reversals.
+// A sweep occurs when price breaks above prior highs (sell-side liquidity) or
+// below prior lows (buy-side liquidity). A reversal is confirmed when price
+// closes against the sweep direction.
+//
+// @author Vamp (JS) — Pine port
+// @version 1.0.0
+// @license MIT
+// ══════════════════════════════════════════════════════════════════════════════
+
+//@version=6
+indicator("Liquidity Sweep Reversal Smart", shorttitle="LSR Smart", overlay=true, max_labels_count=500)
+
+
+// ─── INPUTS ──────────────────────────────────────────────────────────────────
+
+grpDetect = "Detection"
+lookbackBars = input.int(20, "Lookback Bars", minval=5, maxval=100, step=5, group=grpDetect,
+     tooltip="Number of prior bars used to find the liquidity pool high/low (excluding current bar).")
+
+grpVisual = "Visuals"
+showBull     = input.bool(true, "Show Bullish Reversals", group=grpVisual)
+showBear     = input.bool(true, "Show Bearish Reversals", group=grpVisual)
+arrowSizeIn  = input.string("Small", "Arrow Size", options=["Tiny", "Small", "Normal", "Large", "Huge"], group=grpVisual)
+bullColor    = input.color(color.lime, "Bull Color", group=grpVisual)
+bearColor    = input.color(color.red, "Bear Color", group=grpVisual)
+
+ready = bar_index >= lookbackBars + 1
+
+
+// ─── LIQUIDITY POOLS (exclude current bar) ───────────────────────────────────
+
+priorHigh = ta.highest(high[1], lookbackBars)
+priorLow  = ta.lowest(low[1], lookbackBars)
+
+
+// ─── SWEEP STATE ─────────────────────────────────────────────────────────────
+
+var bool sweptHigh = false
+var bool sweptLow  = false
+
+if ready
+    if high > priorHigh
+        sweptHigh := true
+    if low < priorLow
+        sweptLow := true
+
+
+// ─── REVERSAL DETECTION ──────────────────────────────────────────────────────
+
+bearReversal = ready and sweptHigh and close < open
+bullReversal = ready and sweptLow  and close > open
+
+if bearReversal
+    sweptHigh := false
+if bullReversal
+    sweptLow := false
+
+
+// ─── PLOTS ───────────────────────────────────────────────────────────────────
+// plotshape size must be a compile-time constant — one call per size tier
+
+bearSig = showBear and bearReversal
+bullSig = showBull and bullReversal
+
+plotshape(bearSig and arrowSizeIn == "Tiny",   "Bear Tiny",   style=shape.triangledown, location=location.abovebar, color=bearColor, size=size.tiny)
+plotshape(bearSig and arrowSizeIn == "Small",  "Bear Small",  style=shape.triangledown, location=location.abovebar, color=bearColor, size=size.small)
+plotshape(bearSig and arrowSizeIn == "Normal", "Bear Normal", style=shape.triangledown, location=location.abovebar, color=bearColor, size=size.normal)
+plotshape(bearSig and arrowSizeIn == "Large",  "Bear Large",  style=shape.triangledown, location=location.abovebar, color=bearColor, size=size.large)
+plotshape(bearSig and arrowSizeIn == "Huge",   "Bear Huge",   style=shape.triangledown, location=location.abovebar, color=bearColor, size=size.huge)
+
+plotshape(bullSig and arrowSizeIn == "Tiny",   "Bull Tiny",   style=shape.triangleup, location=location.belowbar, color=bullColor, size=size.tiny)
+plotshape(bullSig and arrowSizeIn == "Small",  "Bull Small",  style=shape.triangleup, location=location.belowbar, color=bullColor, size=size.small)
+plotshape(bullSig and arrowSizeIn == "Normal", "Bull Normal", style=shape.triangleup, location=location.belowbar, color=bullColor, size=size.normal)
+plotshape(bullSig and arrowSizeIn == "Large",  "Bull Large",  style=shape.triangleup, location=location.belowbar, color=bullColor, size=size.large)
+plotshape(bullSig and arrowSizeIn == "Huge",   "Bull Huge",   style=shape.triangleup, location=location.belowbar, color=bullColor, size=size.huge)
+
+
+// ─── ALERTS ──────────────────────────────────────────────────────────────────
+
+alertcondition(bearReversal, "Bearish LSR", "Liquidity sweep above prior high + bearish reversal")
+alertcondition(bullReversal, "Bullish LSR", "Liquidity sweep below prior low + bullish reversal")

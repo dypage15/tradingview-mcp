@@ -1,0 +1,246 @@
+//@version=6
+// Sweep Engine v2.0 — lightweight STRATEGY (optional dashboard table). Full features + predictive mode: sweep-engine-v2-export.pine.
+//
+// MAX WIN RATE IN TRADINGVIEW:
+//   1) Add this strategy to the chart (5m). Strategy Tester → ⚙ → Optimization.
+//   2) Optimization metric: "Percent profitable" / "Winning trades %" (wording varies by locale).
+//   3) Optional minimum trades: enable "Filter results" if available so 2-trade / 100% WR sets are rejected.
+//   4) Or run: npm run winrate-grid — see scripts/winrate-grid.mjs (requires TradingView + tv CLI).
+//
+// Note: Pushing win % often lowers total profit or trade count; validate out-of-sample.
+strategy("Sweep Engine v2.0 Strategy", shorttitle="SEv2 Strat", overlay=true, max_lines_count=120, max_labels_count=40,
+     initial_capital=100000, default_qty_type=strategy.fixed, default_qty_value=1, pyramiding=0,
+     commission_type=strategy.commission.cash_per_contract, commission_value=0.62,
+     slippage=2, process_orders_on_close=true, calc_on_every_tick=false,
+     margin_long=0, margin_short=0)
+
+// ═══════════════════════════════════════════════════════════════
+// INPUTS — all numeric or 0/1 so Strategy Tester genetic search can sweep them
+// ═══════════════════════════════════════════════════════════════
+i_atrLen     = input.int(14,     "ATR Length",                   group="Signal", minval=5, maxval=30, step=1)
+i_slMult     = input.float(4.5,  "Stop Loss (x ATR)",           group="Signal", minval=1.0, maxval=10.0, step=0.25)
+i_tpMult     = input.float(4.0,  "Take Profit (x ATR)",         group="Signal", minval=1.25, maxval=14.0, step=0.25)
+i_cooldown   = input.int(8,      "Cooldown (bars)",              group="Signal", minval=1, maxval=30, step=1)
+i_minConf    = input.int(0,      "Min confluence score (0–3)",   group="Signal", minval=0, maxval=3, step=1,
+     tooltip="0 = sweep-only (recommended). Higher = fewer trades; many sweeps score 0 confluence.")
+
+i_blockLongEmaBear = input.int(1, "Block longs when EMAs bearish (0/1)", group="Signal", minval=0, maxval=1,
+     tooltip="1 = no longs when fast EMA < slow EMA or close ≤ slow EMA (matches Sweep v2 chart EMA gate; use 0 for legacy behavior).")
+i_emaFast    = input.int(9,      "Fast EMA (long gate)",          group="Signal", minval=2, maxval=50, step=1)
+i_emaSlow    = input.int(21,     "Slow EMA (long gate)",          group="Signal", minval=5, maxval=100, step=1)
+
+i_minAtr     = input.float(0.0,  "Min ATR filter (0 = off)",     group="Signal", minval=0.0, maxval=100.0, step=0.25,
+     tooltip="Skip entries when ATR below this (reduces chop; may raise win %).")
+
+// 0 = off, 1 = on (for optimization sweeps)
+i_useIB      = input.int(1,      "Trade IB sweeps (0/1)",        group="Session Sweeps", minval=0, maxval=1)
+i_useLondon  = input.int(1,      "Trade London sweeps (0/1)",      group="Session Sweeps", minval=0, maxval=1)
+i_useAsia    = input.int(1,      "Trade Asia sweeps (0/1)",        group="Session Sweeps", minval=0, maxval=1)
+i_useLon50   = input.int(0,      "Require London 50 bias (0/1)", group="Session Sweeps", minval=0, maxval=1)
+
+i_roundIntvl = input.int(100,    "Round number interval",        group="Confluence", minval=50, maxval=500, step=50)
+i_confProx   = input.float(1.5,  "Confluence proximity (x ATR)", group="Confluence", minval=0.25, maxval=5.0, step=0.25)
+
+i_flatHr     = input.int(15,     "Flatten — hour (Chicago)",     group="Session Exit", minval=12, maxval=17, step=1,
+     tooltip="Close & block new entries after this time (CT) until next session day.")
+i_flatMn     = input.int(0,      "Flatten — minute (Chicago)",   group="Session Exit", minval=0, maxval=55, step=5)
+
+i_plotSig    = input.int(1,      "Plot entry markers (0/1)",     group="Display", minval=0, maxval=1)
+i_showDashTable = input.int(1,   "Show dashboard table (0/1)",   group="Display", minval=0, maxval=1,
+     tooltip="On-chart stats table. Set 0 if chart load is an issue.")
+
+// ═══════════════════════════════════════════════════════════════
+// TIME + SESSION (CT)
+// ═══════════════════════════════════════════════════════════════
+hr = hour(time, "America/Chicago")
+mn = minute(time, "America/Chicago")
+atr = ta.atr(i_atrLen)
+newDay = ta.change(time("D")) != 0
+var int lastSig = 0
+var int tradesToday = 0
+
+isAsia     = hr >= 18 or hr < 1
+isLondon   = hr >= 1 and hr < 4
+isIB       = (hr == 8 and mn >= 30) or (hr == 9 and mn < 30)
+isPostIB   = (hr == 9 and mn >= 30) or (hr >= 10 and hr < 15)
+isNY_AM_KZ = (hr == 7 and mn >= 30) or hr == 8 or (hr == 9 and mn < 30)
+isSB_AM    = hr == 9 or (hr == 10 and mn == 0)
+isLonClose = hr == 9 or (hr == 10 and mn < 30)
+isKillzone = isNY_AM_KZ or isSB_AM or isLonClose
+sweepLngAsiaTimeOK = isKillzone or isPostIB
+
+pastFlat = (hr > i_flatHr) or (hr == i_flatHr and mn >= i_flatMn)
+
+// ═══════════════════════════════════════════════════════════════
+// SESSION LEVELS
+// ═══════════════════════════════════════════════════════════════
+var float ibH=na, var float ibL=na, var float ib50=na, var bool ibOK=false
+var float lonH=na, var float lonL=na, var float lon50=na, var bool lonOK=false
+var float asiaH=na, var float asiaL=na, var bool asiaOK=false
+
+if newDay
+    ibH:=na,ibL:=na,ib50:=na,ibOK:=false,lonH:=na,lonL:=na,lon50:=na,lonOK:=false,asiaH:=na,asiaL:=na,asiaOK:=false
+    tradesToday := 0
+
+if isIB
+    ibH:=na(ibH)?high:math.max(ibH,high), ibL:=na(ibL)?low:math.min(ibL,low), ib50:=(ibH+ibL)/2
+if isIB[1] and not isIB
+    ibOK:=true
+
+if isLondon
+    lonH:=na(lonH)?high:math.max(lonH,high), lonL:=na(lonL)?low:math.min(lonL,low), lon50:=(lonH+lonL)/2
+if isLondon[1] and not isLondon
+    lonOK:=true
+
+if isAsia
+    asiaH:=na(asiaH)?high:math.max(asiaH,high), asiaL:=na(asiaL)?low:math.min(asiaL,low)
+if isAsia[1] and not isAsia
+    asiaOK:=true
+
+// ═══════════════════════════════════════════════════════════════
+// VWAP
+// ═══════════════════════════════════════════════════════════════
+var float cPV=0., var float cVol=0.
+if newDay
+    cPV:=0., cVol:=0.
+tp_=(high+low+close)/3
+cPV+=tp_*volume, cVol+=volume
+vwap=cVol>0?cPV/cVol:close
+
+rndAbove = math.ceil(close / i_roundIntvl) * i_roundIntvl
+rndBelow = math.floor(close / i_roundIntvl) * i_roundIntvl
+nearRound = math.min(math.abs(close - rndAbove), math.abs(close - rndBelow)) < atr * i_confProx
+
+// ═══════════════════════════════════════════════════════════════
+// SWEEPS + CONFLUENCE
+// ═══════════════════════════════════════════════════════════════
+useLon50 = i_useLon50 == 1
+lon50Bull = not useLon50 or (lonOK and close > lon50)
+lon50Bear = not useLon50 or (lonOK and close < lon50)
+
+sweepIBlo  = ibOK and isPostIB and (low < ibL) and (close > ibL) and lon50Bull
+sweepIBhi  = ibOK and isPostIB and (high > ibH) and (close < ibH) and lon50Bear
+sweepLonLo = lonOK and sweepLngAsiaTimeOK and (low < lonL) and (close > lonL) and lon50Bull
+sweepLonHi = lonOK and sweepLngAsiaTimeOK and (high > lonH) and (close < lonH) and lon50Bear
+sweepAsLo  = asiaOK and sweepLngAsiaTimeOK and (low < asiaL) and (close > asiaL) and lon50Bull
+sweepAsHi  = asiaOK and sweepLngAsiaTimeOK and (high > asiaH) and (close < asiaH) and lon50Bear
+
+bullSweep = (i_useIB == 1 and sweepIBlo) or (i_useAsia == 1 and sweepAsLo) or (i_useLondon == 1 and sweepLonLo)
+bearSweep = (i_useIB == 1 and sweepIBhi) or (i_useAsia == 1 and sweepAsHi) or (i_useLondon == 1 and sweepLonHi)
+
+nearVWAP = math.abs(close - vwap) < atr * i_confProx
+lon50Aligned_bull = lonOK and close > lon50
+lon50Aligned_bear = lonOK and close < lon50
+
+confBull = (nearRound ? 1 : 0) + (nearVWAP ? 1 : 0) + (lon50Aligned_bull ? 1 : 0)
+confBear = (nearRound ? 1 : 0) + (nearVWAP ? 1 : 0) + (lon50Aligned_bear ? 1 : 0)
+
+volOK = i_minAtr <= 0 or atr >= i_minAtr
+
+emaF = ta.ema(close, i_emaFast)
+emaS = ta.ema(close, i_emaSlow)
+longEmaOK = i_blockLongEmaBear == 0 or (emaF > emaS and close > emaS)
+
+// ═══════════════════════════════════════════════════════════════
+// SIGNALS
+// ═══════════════════════════════════════════════════════════════
+cdOK = bar_index - lastSig > i_cooldown
+
+canEnter = not pastFlat and strategy.position_size == 0
+
+longSig  = volOK and bullSweep and cdOK and canEnter and confBull >= i_minConf and longEmaOK
+shortSig = volOK and bearSweep and cdOK and canEnter and confBear >= i_minConf
+
+if longSig or shortSig
+    lastSig := bar_index
+    tradesToday += 1
+
+// ═══════════════════════════════════════════════════════════════
+// POSITIONS
+// ═══════════════════════════════════════════════════════════════
+var float holdSL = na
+var float holdTP = na
+
+flatBar = pastFlat
+
+if flatBar and strategy.position_size != 0
+    strategy.close_all(comment="Session flat")
+
+if longSig
+    holdSL := close - atr * i_slMult
+    holdTP := close + atr * i_tpMult
+    strategy.entry("Long", strategy.long)
+    strategy.exit("xL", "Long", stop=holdSL, limit=holdTP)
+
+if shortSig
+    holdSL := close + atr * i_slMult
+    holdTP := close - atr * i_tpMult
+    strategy.entry("Short", strategy.short)
+    strategy.exit("xS", "Short", stop=holdSL, limit=holdTP)
+
+justClosed = strategy.position_size == 0 and nz(strategy.position_size[1], 0) != 0
+if flatBar or justClosed
+    holdSL := na
+    holdTP := na
+
+// ═══════════════════════════════════════════════════════════════
+// PLOTS
+// ═══════════════════════════════════════════════════════════════
+plot(i_plotSig == 1 and longSig ? low : na, "Long", color=color.new(color.lime, 0), style=plot.style_circles, linewidth=3)
+plot(i_plotSig == 1 and shortSig ? high : na, "Short", color=color.new(color.red, 0), style=plot.style_circles, linewidth=3)
+bgcolor(pastFlat ? color.new(color.gray, 92) : na, title="After flatten (no new trades)")
+
+// ═══════════════════════════════════════════════════════════════
+// DASHBOARD TABLE (lite — reactive only)
+// ═══════════════════════════════════════════════════════════════
+var table tabDash = na
+tcHead = color.new(#58a6ff, 0)
+tcLab = color.new(#8b949e, 0)
+tcVal = color.new(#e6edf3, 0)
+tcBg = color.new(#0d1117, 8)
+tcBr = color.new(#30363d, 25)
+cRd = color.new(color.red, 0)
+
+if barstate.islast
+    if i_showDashTable == 0
+        if not na(tabDash)
+            table.delete(tabDash)
+            tabDash := na
+    else
+        if na(tabDash)
+            tabDash := table.new(position.top_right, 2, 13, border_width=1, frame_color=tcBr, border_color=tcBr, bgcolor=tcBg)
+        table.clear(tabDash, 0, 0, 1, 12)
+        fr = timeframe.period
+        posStr = strategy.position_size > 0 ? "Long" : strategy.position_size < 0 ? "Short" : "Flat"
+        bs = bar_index - lastSig
+        coolStr = bs > i_cooldown ? "Ready" : str.tostring(i_cooldown + 1 - bs) + " bars"
+        wrStr = strategy.closedtrades > 0 ? str.tostring((strategy.wintrades / strategy.closedtrades) * 100, "#.##") + "%" : "—"
+        sessStr = (ibOK ? "IB " : "") + (lonOK ? "Lon " : "") + (asiaOK ? "Asia" : "")
+        sessStr := sessStr == "" ? "—" : sessStr
+
+        table.cell(tabDash, 0, 0, "SEv2 Lite", text_color=tcHead, bgcolor=color.new(#161b22, 0), text_size=size.small)
+        table.cell(tabDash, 1, 0, fr, text_color=tcHead, bgcolor=color.new(#161b22, 0), text_size=size.small)
+        table.cell(tabDash, 0, 1, "Symbol", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 1, syminfo.ticker, text_color=tcVal, text_size=size.tiny)
+        table.cell(tabDash, 0, 2, "ATR", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 2, str.tostring(atr, format.mintick), text_color=tcVal, text_size=size.tiny)
+        table.cell(tabDash, 0, 3, "Net profit", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 3, str.tostring(strategy.netprofit, format.mintick), text_color=tcVal, text_size=size.tiny)
+        table.cell(tabDash, 0, 4, "Open P&L", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 4, str.tostring(strategy.openprofit, format.mintick), text_color=tcVal, text_size=size.tiny)
+        table.cell(tabDash, 0, 5, "Closed / W%", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 5, str.tostring(strategy.closedtrades) + " · " + wrStr, text_color=tcVal, text_size=size.tiny)
+        table.cell(tabDash, 0, 6, "Position", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 6, posStr, text_color=tcVal, text_size=size.tiny)
+        table.cell(tabDash, 0, 7, "Cooldown", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 7, coolStr, text_color=tcVal, text_size=size.tiny)
+        table.cell(tabDash, 0, 8, "Min conf ≥", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 8, str.tostring(i_minConf), text_color=tcVal, text_size=size.tiny)
+        table.cell(tabDash, 0, 9, "Sessions OK", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 9, sessStr, text_color=tcVal, text_size=size.tiny)
+        table.cell(tabDash, 0, 10, "Trades today", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 10, str.tostring(tradesToday), text_color=tcVal, text_size=size.tiny)
+        table.cell(tabDash, 0, 11, "Flatten CT", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 11, str.tostring(i_flatHr) + ":" + (i_flatMn < 10 ? "0" : "") + str.tostring(i_flatMn), text_color=tcVal, text_size=size.tiny)
+        table.cell(tabDash, 0, 12, "After flat", text_color=tcLab, text_size=size.tiny)
+        table.cell(tabDash, 1, 12, pastFlat ? "Yes" : "No", text_color=pastFlat ? cRd : tcVal, text_size=size.tiny)

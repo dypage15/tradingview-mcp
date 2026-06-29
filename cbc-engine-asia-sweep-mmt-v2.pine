@@ -1,0 +1,625 @@
+//@version=6
+strategy("CBC Engine + Asia Sweep [MMT v2]", overlay=true,
+     initial_capital=250000, default_qty_type=strategy.fixed, default_qty_value=1,
+     commission_type=strategy.commission.cash_per_contract, commission_value=1.25,
+     slippage=1, pyramiding=0, calc_on_every_tick=false, process_orders_on_close=true,
+     margin_long=0, margin_short=0,
+     max_lines_count=500, max_labels_count=200, max_boxes_count=50)
+
+// Inputs
+grp1 = "CBC Settings"
+strongFlipOnly  = input.bool(false, "Strong Flips Only", group=grp1)
+showAllFlips    = input.bool(true, "Show ALL Flip Arrows (context)", group=grp1)
+requireTrend    = input.bool(false, "Require EMA/VWAP Trend Confirmation", group=grp1)
+requireHTFAlign = input.bool(false, "Require HTF Bias Alignment", group=grp1)
+allowHTFBounce  = input.bool(true, "Allow HTF EMA Bounce Overrides", group=grp1)
+closeOnFlip     = input.bool(true, "Close on opposite CBC flip", group=grp1)
+
+grp2 = "Timeframe"
+htfRes = input.timeframe("10", "Higher Timeframe (Bias)", group=grp2)
+h1Res  = input.timeframe("60", "1H Level Timeframe", group=grp2)
+
+grpAsia = "Asia Session Range"
+showAsiaRange    = input.bool(true, "Show Asia Range Box", group=grpAsia)
+asiaStart        = input.int(19, "Asia Start Hour (ET)", group=grpAsia, minval=0, maxval=23)
+asiaEnd          = input.int(0, "Asia End Hour (ET)", group=grpAsia, minval=0, maxval=23)
+showMidnightOpen = input.bool(true, "Show Midnight Open Line", group=grpAsia)
+asiaBoxColor     = input.color(color.new(color.purple, 85), "Asia Range Box Color", group=grpAsia)
+midnightColor    = input.color(color.new(color.yellow, 30), "Midnight Open Color", group=grpAsia)
+asiaExtend       = input.int(100, "Extend Asia Levels (bars)", group=grpAsia, minval=10, maxval=500)
+
+grpSessLvls = "Session Liquidity Levels"
+useAsiaLevels    = input.bool(true, "Use Asia H/L", group=grpSessLvls)
+useLondonLevels  = input.bool(true, "Use London H/L", group=grpSessLvls)
+useIBLevels      = input.bool(true, "Use IB H/L", group=grpSessLvls)
+useCBDRLevels    = input.bool(true, "Use CBDR H/L", group=grpSessLvls)
+usePDHLLevels    = input.bool(true, "Use Prev Day H/L", group=grpSessLvls)
+useMidnightLevel = input.bool(true, "Use Midnight Open", group=grpSessLvls)
+ldnStart_h       = input.int(3, "London Start Hour (ET)", group=grpSessLvls, minval=0, maxval=23)
+ldnEnd_h         = input.int(12, "London End Hour (ET)", group=grpSessLvls, minval=0, maxval=23)
+ibStart_h        = input.int(9, "IB Start Hour (ET)", group=grpSessLvls, minval=0, maxval=23)
+ibStart_m        = input.int(30, "IB Start Minute", group=grpSessLvls, minval=0, maxval=59)
+ibEnd_h          = input.int(10, "IB End Hour (ET)", group=grpSessLvls, minval=0, maxval=23)
+ibEnd_m          = input.int(30, "IB End Minute", group=grpSessLvls, minval=0, maxval=59)
+cbdrStart_h      = input.int(14, "CBDR Start Hour (ET)", group=grpSessLvls, minval=0, maxval=23)
+cbdrEnd_h        = input.int(20, "CBDR End Hour (ET)", group=grpSessLvls, minval=0, maxval=23)
+
+grpSweep = "Sweep Detection"
+sweepThreshold   = input.float(0.5, "Sweep Threshold (points beyond level)", group=grpSweep, minval=0.1, step=0.1)
+sweepLookback    = input.int(2, "Sweep-to-Flip Delay (max bars)", group=grpSweep, minval=0, maxval=5)
+minConfluence    = input.int(1, "Min Confluence Score for Signal", group=grpSweep, minval=1, maxval=5)
+
+grpLevels = "1H Liquidity Levels"
+show1HLevels     = input.bool(true, "Show 1H Swing Levels", group=grpLevels)
+h1SwingLookback  = input.int(5, "1H Swing Lookback (bars)", group=grpLevels, minval=2, maxval=20)
+h1LevelColor_H   = input.color(color.new(color.red, 40), "1H Swing High Color", group=grpLevels)
+h1LevelColor_L   = input.color(color.new(color.lime, 40), "1H Swing Low Color", group=grpLevels)
+
+grpATR = "ATR Volatility Gate"
+useATRGate       = input.bool(false, "Enable ATR Minimum Filter", group=grpATR)
+atrLen           = input.int(14, "ATR Length", group=grpATR)
+atrMinThreshold  = input.float(0.30, "Min ATR Value (points)", group=grpATR, step=0.05)
+
+grpQuality = "Range Quality Filter"
+useRangeQuality  = input.bool(false, "Enable Asia Range Quality Filter", group=grpQuality)
+maxRangePct      = input.float(40.0, "Max Range % of Daily ATR", group=grpQuality, minval=10, maxval=100)
+
+grp3 = "EMA / VWAP"
+showFastEMA      = input.bool(false, "", group=grp3, inline="ema1")
+emaFastLen       = input.int(9, "Fast EMA", group=grp3, inline="ema1")
+showPullbackEMA  = input.bool(true, "", group=grp3, inline="ema2")
+emaPullbackLen   = input.int(13, "Pullback EMA", group=grp3, inline="ema2")
+showSlowEMA      = input.bool(false, "", group=grp3, inline="ema3")
+emaSlowLen       = input.int(21, "Slow EMA", group=grp3, inline="ema3")
+showVWAP         = input.bool(true, "Show VWAP", group=grp3)
+show_cloud_fill  = input.bool(true, "Show EMA Cloud Fill", group=grp3)
+
+grp4 = "Session Filter"
+useSession   = input.bool(false, "Enable Session Filter", group=grp4)
+sessionStart = input.session("0930-1600", "Trading Session", group=grp4)
+
+grp5 = "Visuals & Dashboard"
+showDshbrd   = input.bool(true, "Show Dashboard", group=grp5)
+showLabels   = input.bool(true, "Show Signal Labels", group=grp5)
+showSL       = input.bool(true, "Show Stop Loss Levels", group=grp5)
+slLookback   = input.int(2, "Stop Loss Lookback (candles)", group=grp5, minval=1, maxval=20)
+showBias     = input.bool(true, "Show HTF Bias Background", group=grp5)
+showTargets  = input.bool(true, "Show Draw-on-Liquidity Targets", group=grp5)
+bullColor    = input.color(color.new(color.lime, 80), "Bullish Background", group=grp5)
+bearColor    = input.color(color.new(color.red, 85), "Bearish Background", group=grp5)
+neutralColor = input.color(color.new(color.gray, 90), "Neutral Background", group=grp5)
+ema1_color   = input.color(color.purple, "Fast EMA Color", group=grp5)
+ema2_color   = input.color(color.new(color.orange, 65), "Pullback EMA Color", group=grp5)
+ema3_color   = input.color(color.white, "Slow EMA Color", group=grp5)
+vwap_color   = input.color(color.new(#a5d6a7, 0), "VWAP Color", group=grp5)
+
+grpRisk = "Risk / Orders"
+tpMode      = input.string("DOL Target", "TP Mode", options=["DOL Target", "ATR Multiple", "Fixed Points"], group=grpRisk)
+tpATRMult   = input.float(2.0, "TP ATR Mult", group=grpRisk, minval=0.5, step=0.5)
+tpFixedPts  = input.float(5.0, "TP Fixed Pts", group=grpRisk, minval=1, step=0.5)
+slMode      = input.string("Candle Lookback", "SL Mode", options=["Candle Lookback", "ATR Multiple", "Fixed Points"], group=grpRisk)
+slATRMult   = input.float(1.5, "SL ATR Mult", group=grpRisk, minval=0.5, step=0.5)
+slFixedPts  = input.float(3.0, "SL Fixed Pts", group=grpRisk, minval=0.5, step=0.5)
+signalCooldown = input.int(10, "Cooldown (bars)", group=grpRisk, minval=0, maxval=50)
+useKillzones = input.bool(true, "KZ-Only Signals", group=grpRisk)
+onePerKZ = input.bool(true, "One Per KZ", group=grpRisk)
+forceExecFallback = input.bool(true, "Force execution fallback on raw CBC flips", group=grpRisk,
+     tooltip="If full confluence path produces no orders, execute on raw CBC flips (still respects cooldown/session).")
+forceTestTrades = input.bool(false, "Emergency test trades (guarantee execution)", group=grpRisk,
+     tooltip="Places periodic alternating long/short entries to guarantee Strategy Tester activity while debugging.")
+forceTestEveryBars = input.int(50, "Emergency test trade interval (bars)", group=grpRisk, minval=10, maxval=500)
+asiaKZ_s  = input.int(19, "Asia KZ Start", group=grpRisk)
+asiaKZ_e  = input.int(21, "Asia KZ End", group=grpRisk)
+ldnKZ_s   = input.int(2,  "London KZ Start", group=grpRisk)
+ldnKZ_e   = input.int(5,  "London KZ End", group=grpRisk)
+nyKZ_s    = input.int(8,  "NY KZ Start", group=grpRisk)
+nyKZ_e    = input.int(11, "NY KZ End", group=grpRisk)
+
+inSession = not useSession or (time(timeframe.period, sessionStart) != 0)
+
+emaFast     = ta.ema(close, emaFastLen)
+emaPullback = ta.ema(close, emaPullbackLen)
+emaSlow     = ta.ema(close, emaSlowLen)
+vwapVal     = ta.vwap(hlc3)
+atrVal      = ta.atr(atrLen)
+dailyATR    = request.security(syminfo.tickerid, "D", ta.atr(14)[1], lookahead=barmerge.lookahead_off)
+
+cbcBullishState(src_close, src_high_prev, src_low_prev) =>
+    var int state = 0
+    if src_close > src_high_prev
+        state := 1
+    else if src_close < src_low_prev
+        state := -1
+    state
+
+cbcState = cbcBullishState(close, high[1], low[1])
+cbcBullFlip = cbcState == 1 and cbcState[1] != 1
+cbcBearFlip = cbcState == -1 and cbcState[1] != -1
+longStrongFlip  = (low < low[1]) and cbcBullFlip
+shortStrongFlip = (high > high[1]) and cbcBearFlip
+
+htfEmaFastExpr = ta.ema(close, emaFastLen)
+htfEmaSlowExpr = ta.ema(close, emaSlowLen)
+[htfClose, htfHighPrev, htfLowPrev, htfEmaFast, htfEmaSlow] = request.security(syminfo.tickerid, htfRes,
+     [close[1], high[2], low[2], htfEmaFastExpr[1], htfEmaSlowExpr[1]], lookahead=barmerge.lookahead_off)
+
+var int htfState = 0
+if htfClose > htfHighPrev
+    htfState := 1
+else if htfClose < htfLowPrev
+    htfState := -1
+htfBullish = htfState == 1
+htfBearish = htfState == -1
+htfEmaBullish = htfEmaFast > htfEmaSlow
+htfEmaBearish = htfEmaFast < htfEmaSlow
+htfBandUpper  = math.max(htfEmaFast, htfEmaSlow)
+htfBandLower  = math.min(htfEmaFast, htfEmaSlow)
+touchedHTFBand = (low <= htfBandUpper and high >= htfBandLower) or (low[1] <= htfBandUpper and high[1] >= htfBandLower)
+longBounceValid  = allowHTFBounce and htfEmaBullish and touchedHTFBand
+shortBounceValid = allowHTFBounce and htfEmaBearish and touchedHTFBand
+
+trendBullish = emaSlow > vwapVal
+trendBearish = emaSlow < vwapVal
+
+barHour = hour(time, "America/New_York")
+barMin  = minute(time, "America/New_York")
+barTimeET = barHour * 60 + barMin
+isAsiaBar = false
+if asiaEnd == 0
+    isAsiaBar := barHour >= asiaStart
+else if asiaEnd > asiaStart
+    isAsiaBar := barHour >= asiaStart and barHour < asiaEnd
+else
+    isAsiaBar := barHour >= asiaStart or barHour < asiaEnd
+
+inLondonSession = ldnEnd_h > ldnStart_h ? (barHour >= ldnStart_h and barHour < ldnEnd_h) : (barHour >= ldnStart_h or barHour < ldnEnd_h)
+ibStartMin = ibStart_h * 60 + ibStart_m
+ibEndMin = ibEnd_h * 60 + ibEnd_m
+inIBSession = ibEndMin > ibStartMin ? (barTimeET >= ibStartMin and barTimeET < ibEndMin) : (barTimeET >= ibStartMin or barTimeET < ibEndMin)
+inCBDRSession = cbdrEnd_h > cbdrStart_h ? (barHour >= cbdrStart_h and barHour < cbdrEnd_h) : (barHour >= cbdrStart_h or barHour < cbdrEnd_h)
+
+var float asiaHigh = na
+var float asiaLow = na
+var float asiaHighFinal = na
+var float asiaLowFinal = na
+var float midnightOpen = na
+var bool asiaActive = false
+var bool asiaComplete = false
+var float londonHigh = na
+var float londonLow = na
+var float londonHighFinal = na
+var float londonLowFinal = na
+var bool londonActive = false
+var bool londonComplete = false
+var float ibHigh = na
+var float ibLow = na
+var float ibHighFinal = na
+var float ibLowFinal = na
+var bool ibActive = false
+var bool ibComplete = false
+var float cbdrHigh = na
+var float cbdrLow = na
+var float cbdrHighFinal = na
+var float cbdrLowFinal = na
+var bool cbdrActive = false
+var bool cbdrComplete = false
+newAsiaSession = isAsiaBar and not isAsiaBar[1]
+asiaJustEnded  = not isAsiaBar and isAsiaBar[1]
+newLondonSession = inLondonSession and not inLondonSession[1]
+londonJustEnded = not inLondonSession and inLondonSession[1]
+newIBSession = inIBSession and not inIBSession[1]
+ibJustEnded = not inIBSession and inIBSession[1]
+newCBDRSession = inCBDRSession and not inCBDRSession[1]
+cbdrJustEnded = not inCBDRSession and inCBDRSession[1]
+if newAsiaSession
+    asiaHigh := high
+    asiaLow := low
+    asiaActive := true
+    asiaComplete := false
+if isAsiaBar and asiaActive
+    asiaHigh := math.max(asiaHigh, high)
+    asiaLow  := math.min(asiaLow, low)
+if asiaJustEnded and asiaActive
+    asiaHighFinal := asiaHigh
+    asiaLowFinal := asiaLow
+    asiaActive := false
+    asiaComplete := true
+if newLondonSession
+    londonHigh := high
+    londonLow := low
+    londonActive := true
+    londonComplete := false
+if inLondonSession and londonActive
+    londonHigh := math.max(londonHigh, high)
+    londonLow := math.min(londonLow, low)
+if londonJustEnded and londonActive
+    londonHighFinal := londonHigh
+    londonLowFinal := londonLow
+    londonActive := false
+    londonComplete := true
+if newIBSession
+    ibHigh := high
+    ibLow := low
+    ibActive := true
+    ibComplete := false
+if inIBSession and ibActive
+    ibHigh := math.max(ibHigh, high)
+    ibLow := math.min(ibLow, low)
+if ibJustEnded and ibActive
+    ibHighFinal := ibHigh
+    ibLowFinal := ibLow
+    ibActive := false
+    ibComplete := true
+if newCBDRSession
+    cbdrHigh := high
+    cbdrLow := low
+    cbdrActive := true
+    cbdrComplete := false
+if inCBDRSession and cbdrActive
+    cbdrHigh := math.max(cbdrHigh, high)
+    cbdrLow := math.min(cbdrLow, low)
+if cbdrJustEnded and cbdrActive
+    cbdrHighFinal := cbdrHigh
+    cbdrLowFinal := cbdrLow
+    cbdrActive := false
+    cbdrComplete := true
+isMidnightBar = barHour == 0 and barMin < (timeframe.in_seconds() / 60)
+if isMidnightBar
+    midnightOpen := open
+pdh = request.security(syminfo.tickerid, "D", high[1], lookahead=barmerge.lookahead_off)
+pdl = request.security(syminfo.tickerid, "D", low[1], lookahead=barmerge.lookahead_off)
+
+asiaRange = asiaHighFinal - asiaLowFinal
+rangeIsClean = true
+if useRangeQuality and not na(dailyATR) and not na(asiaRange) and dailyATR > 0
+    rangePct = (asiaRange / dailyATR) * 100
+    rangeIsClean := rangePct <= maxRangePct
+
+[h1High, h1Low, h1High1, h1Low1, h1High2, h1Low2] = request.security(syminfo.tickerid, h1Res,
+     [high[1], low[1], high[2], low[2], high[3], low[3]], lookahead=barmerge.lookahead_off)
+h1SwingHigh = h1High1 > h1High and h1High1 > h1High2 ? h1High1 : na
+h1SwingLow  = h1Low1 < h1Low and h1Low1 < h1Low2 ? h1Low1 : na
+var float swH1 = na
+var float swH2 = na
+var float swL1 = na
+var float swL2 = na
+if not na(h1SwingHigh)
+    swH2 := swH1
+    swH1 := h1SwingHigh
+if not na(h1SwingLow)
+    swL2 := swL1
+    swL1 := h1SwingLow
+
+sweptAsiaHigh = false
+sweptAsiaLow  = false
+if asiaComplete and not na(asiaHighFinal) and not na(asiaLowFinal)
+    for i = 0 to sweepLookback
+        if high[i] > asiaHighFinal + sweepThreshold and close[i] <= asiaHighFinal
+            sweptAsiaHigh := true
+        if low[i] < asiaLowFinal - sweepThreshold and close[i] >= asiaLowFinal
+            sweptAsiaLow := true
+sweptH1High = false
+sweptH1Low  = false
+if not na(swH1)
+    for i = 0 to sweepLookback
+        if high[i] > swH1 + sweepThreshold and close[i] <= swH1
+            sweptH1High := true
+if not na(swL1)
+    for i = 0 to sweepLookback
+        if low[i] < swL1 - sweepThreshold and close[i] >= swL1
+            sweptH1Low := true
+sweptMidnightHigh = false
+sweptMidnightLow  = false
+if not na(midnightOpen)
+    for i = 0 to sweepLookback
+        if high[i] > midnightOpen + sweepThreshold and close[i] <= midnightOpen
+            sweptMidnightHigh := true
+        if low[i] < midnightOpen - sweepThreshold and close[i] >= midnightOpen
+            sweptMidnightLow := true
+
+sweptLondonHigh = false
+sweptLondonLow = false
+if londonComplete and not na(londonHighFinal) and not na(londonLowFinal)
+    for i = 0 to sweepLookback
+        if high[i] > londonHighFinal + sweepThreshold and close[i] <= londonHighFinal
+            sweptLondonHigh := true
+        if low[i] < londonLowFinal - sweepThreshold and close[i] >= londonLowFinal
+            sweptLondonLow := true
+sweptIBHigh = false
+sweptIBLow = false
+if ibComplete and not na(ibHighFinal) and not na(ibLowFinal)
+    for i = 0 to sweepLookback
+        if high[i] > ibHighFinal + sweepThreshold and close[i] <= ibHighFinal
+            sweptIBHigh := true
+        if low[i] < ibLowFinal - sweepThreshold and close[i] >= ibLowFinal
+            sweptIBLow := true
+sweptCBDRHigh = false
+sweptCBDRLow = false
+if cbdrComplete and not na(cbdrHighFinal) and not na(cbdrLowFinal)
+    for i = 0 to sweepLookback
+        if high[i] > cbdrHighFinal + sweepThreshold and close[i] <= cbdrHighFinal
+            sweptCBDRHigh := true
+        if low[i] < cbdrLowFinal - sweepThreshold and close[i] >= cbdrLowFinal
+            sweptCBDRLow := true
+sweptPDH = false
+sweptPDL = false
+if not na(pdh) and not na(pdl)
+    for i = 0 to sweepLookback
+        if high[i] > pdh + sweepThreshold and close[i] <= pdh
+            sweptPDH := true
+        if low[i] < pdl - sweepThreshold and close[i] >= pdl
+            sweptPDL := true
+
+anySweepBull = (useAsiaLevels and sweptAsiaLow) or (useLondonLevels and sweptLondonLow) or (useIBLevels and sweptIBLow) or (useCBDRLevels and sweptCBDRLow) or (usePDHLLevels and sweptPDL) or (show1HLevels and sweptH1Low) or (useMidnightLevel and sweptMidnightLow)
+anySweepBear = (useAsiaLevels and sweptAsiaHigh) or (useLondonLevels and sweptLondonHigh) or (useIBLevels and sweptIBHigh) or (useCBDRLevels and sweptCBDRHigh) or (usePDHLLevels and sweptPDH) or (show1HLevels and sweptH1High) or (useMidnightLevel and sweptMidnightHigh)
+
+// Running sweep trigger counters (bull = swept lows, bear = swept highs).
+var int cAsiaBull = 0
+var int cAsiaBear = 0
+var int cLondonBull = 0
+var int cLondonBear = 0
+var int cIBBull = 0
+var int cIBBear = 0
+var int cCBDRBull = 0
+var int cCBDRBear = 0
+var int cPDLBull = 0
+var int cPDHBear = 0
+var int cH1Bull = 0
+var int cH1Bear = 0
+var int cMidnightBull = 0
+var int cMidnightBear = 0
+
+asiaBullHit = useAsiaLevels and sweptAsiaLow and not sweptAsiaLow[1]
+asiaBearHit = useAsiaLevels and sweptAsiaHigh and not sweptAsiaHigh[1]
+londonBullHit = useLondonLevels and sweptLondonLow and not sweptLondonLow[1]
+londonBearHit = useLondonLevels and sweptLondonHigh and not sweptLondonHigh[1]
+ibBullHit = useIBLevels and sweptIBLow and not sweptIBLow[1]
+ibBearHit = useIBLevels and sweptIBHigh and not sweptIBHigh[1]
+cbdrBullHit = useCBDRLevels and sweptCBDRLow and not sweptCBDRLow[1]
+cbdrBearHit = useCBDRLevels and sweptCBDRHigh and not sweptCBDRHigh[1]
+pdlBullHit = usePDHLLevels and sweptPDL and not sweptPDL[1]
+pdhBearHit = usePDHLLevels and sweptPDH and not sweptPDH[1]
+h1BullHit = show1HLevels and sweptH1Low and not sweptH1Low[1]
+h1BearHit = show1HLevels and sweptH1High and not sweptH1High[1]
+midBullHit = useMidnightLevel and sweptMidnightLow and not sweptMidnightLow[1]
+midBearHit = useMidnightLevel and sweptMidnightHigh and not sweptMidnightHigh[1]
+
+if asiaBullHit
+    cAsiaBull += 1
+if asiaBearHit
+    cAsiaBear += 1
+if londonBullHit
+    cLondonBull += 1
+if londonBearHit
+    cLondonBear += 1
+if ibBullHit
+    cIBBull += 1
+if ibBearHit
+    cIBBear += 1
+if cbdrBullHit
+    cCBDRBull += 1
+if cbdrBearHit
+    cCBDRBear += 1
+if pdlBullHit
+    cPDLBull += 1
+if pdhBearHit
+    cPDHBear += 1
+if h1BullHit
+    cH1Bull += 1
+if h1BearHit
+    cH1Bear += 1
+if midBullHit
+    cMidnightBull += 1
+if midBearHit
+    cMidnightBear += 1
+
+totalBullSweeps = cAsiaBull + cLondonBull + cIBBull + cCBDRBull + cPDLBull + cH1Bull + cMidnightBull
+totalBearSweeps = cAsiaBear + cLondonBear + cIBBear + cCBDRBear + cPDHBear + cH1Bear + cMidnightBear
+atrPass = not useATRGate or (atrVal >= atrMinThreshold)
+
+longFlipRaw = strongFlipOnly ? longStrongFlip : cbcBullFlip
+longConfluence = (longStrongFlip ? 1 : 0) + (anySweepBull ? 1 : 0) + (htfBullish ? 1 : 0) + (trendBullish ? 1 : 0) + ((not htfBullish and longBounceValid) ? 1 : 0)
+longTrend = requireTrend ? trendBullish : true
+longHTF   = requireHTFAlign ? htfBullish : true
+longMainSignal   = longFlipRaw and longTrend and longHTF and inSession and atrPass
+longBounceSignal = longFlipRaw and longTrend and not htfBullish and longBounceValid and inSession and atrPass
+longSweepSignal  = longFlipRaw and anySweepBull and longTrend and inSession and atrPass and rangeIsClean
+longSignal = longMainSignal or longBounceSignal or longSweepSignal
+
+shortFlipRaw = strongFlipOnly ? shortStrongFlip : cbcBearFlip
+shortConfluence = (shortStrongFlip ? 1 : 0) + (anySweepBear ? 1 : 0) + (htfBearish ? 1 : 0) + (trendBearish ? 1 : 0) + ((not htfBearish and shortBounceValid) ? 1 : 0)
+shortTrend = requireTrend ? trendBearish : true
+shortHTF   = requireHTFAlign ? htfBearish : true
+shortMainSignal   = shortFlipRaw and shortTrend and shortHTF and inSession and atrPass
+shortBounceSignal = shortFlipRaw and shortTrend and not htfBearish and shortBounceValid and inSession and atrPass
+shortSweepSignal  = shortFlipRaw and anySweepBear and shortTrend and inSession and atrPass and rangeIsClean
+shortSignal = shortMainSignal or shortBounceSignal or shortSweepSignal
+
+longFiltered  = longSignal and longConfluence >= minConfluence
+shortFiltered = shortSignal and shortConfluence >= minConfluence
+weakLong  = showAllFlips and cbcBullFlip and not longFiltered
+weakShort = showAllFlips and cbcBearFlip and not shortFiltered
+
+inAsiaKZ   = asiaKZ_e > asiaKZ_s ? (barHour >= asiaKZ_s and barHour < asiaKZ_e) : (barHour >= asiaKZ_s or barHour < asiaKZ_e)
+inLondonKZ = barHour >= ldnKZ_s and barHour < ldnKZ_e
+inNYKZ     = barHour >= nyKZ_s and barHour < nyKZ_e
+inAnyKZ    = inAsiaKZ or inLondonKZ or inNYKZ
+var bool tradedThisKZ = false
+if not inAnyKZ
+    tradedThisKZ := false
+cooldownOK = na(strategy.opentrades.entry_bar_index(strategy.opentrades - 1)) or bar_index - strategy.opentrades.entry_bar_index(strategy.opentrades - 1) > signalCooldown
+kzOK = not useKillzones or inAnyKZ
+onePerKzOK = not onePerKZ or not tradedThisKZ
+canEnter = kzOK and onePerKzOK and cooldownOK
+
+slLowestLow   = ta.lowest(low, slLookback)
+slHighestHigh = ta.highest(high, slLookback)
+
+longSL = slMode == "Candle Lookback" ? slLowestLow : slMode == "ATR Multiple" ? close - atrVal * slATRMult : close - slFixedPts
+shortSL = slMode == "Candle Lookback" ? slHighestHigh : slMode == "ATR Multiple" ? close + atrVal * slATRMult : close + slFixedPts
+
+longTP = tpMode == "ATR Multiple" ? close + atrVal * tpATRMult : tpMode == "Fixed Points" ? close + tpFixedPts : na
+shortTP = tpMode == "ATR Multiple" ? close - atrVal * tpATRMult : tpMode == "Fixed Points" ? close - tpFixedPts : na
+if tpMode == "DOL Target"
+    float longTPDol = na
+    if useAsiaLevels and asiaComplete and not na(asiaHighFinal) and asiaHighFinal > close
+        longTPDol := na(longTPDol) ? asiaHighFinal : math.min(longTPDol, asiaHighFinal)
+    if useLondonLevels and londonComplete and not na(londonHighFinal) and londonHighFinal > close
+        longTPDol := na(longTPDol) ? londonHighFinal : math.min(longTPDol, londonHighFinal)
+    if useIBLevels and ibComplete and not na(ibHighFinal) and ibHighFinal > close
+        longTPDol := na(longTPDol) ? ibHighFinal : math.min(longTPDol, ibHighFinal)
+    if useCBDRLevels and cbdrComplete and not na(cbdrHighFinal) and cbdrHighFinal > close
+        longTPDol := na(longTPDol) ? cbdrHighFinal : math.min(longTPDol, cbdrHighFinal)
+    if usePDHLLevels and not na(pdh) and pdh > close
+        longTPDol := na(longTPDol) ? pdh : math.min(longTPDol, pdh)
+    if show1HLevels and not na(swH1) and swH1 > close
+        longTPDol := na(longTPDol) ? swH1 : math.min(longTPDol, swH1)
+    if show1HLevels and not na(swH2) and swH2 > close
+        longTPDol := na(longTPDol) ? swH2 : math.min(longTPDol, swH2)
+    if useMidnightLevel and not na(midnightOpen) and midnightOpen > close
+        longTPDol := na(longTPDol) ? midnightOpen : math.min(longTPDol, midnightOpen)
+    longTP := longTPDol
+
+    float shortTPDol = na
+    if useAsiaLevels and asiaComplete and not na(asiaLowFinal) and asiaLowFinal < close
+        shortTPDol := na(shortTPDol) ? asiaLowFinal : math.max(shortTPDol, asiaLowFinal)
+    if useLondonLevels and londonComplete and not na(londonLowFinal) and londonLowFinal < close
+        shortTPDol := na(shortTPDol) ? londonLowFinal : math.max(shortTPDol, londonLowFinal)
+    if useIBLevels and ibComplete and not na(ibLowFinal) and ibLowFinal < close
+        shortTPDol := na(shortTPDol) ? ibLowFinal : math.max(shortTPDol, ibLowFinal)
+    if useCBDRLevels and cbdrComplete and not na(cbdrLowFinal) and cbdrLowFinal < close
+        shortTPDol := na(shortTPDol) ? cbdrLowFinal : math.max(shortTPDol, cbdrLowFinal)
+    if usePDHLLevels and not na(pdl) and pdl < close
+        shortTPDol := na(shortTPDol) ? pdl : math.max(shortTPDol, pdl)
+    if show1HLevels and not na(swL1) and swL1 < close
+        shortTPDol := na(shortTPDol) ? swL1 : math.max(shortTPDol, swL1)
+    if show1HLevels and not na(swL2) and swL2 < close
+        shortTPDol := na(shortTPDol) ? swL2 : math.max(shortTPDol, swL2)
+    if useMidnightLevel and not na(midnightOpen) and midnightOpen < close
+        shortTPDol := na(shortTPDol) ? midnightOpen : math.max(shortTPDol, midnightOpen)
+    shortTP := shortTPDol
+
+if closeOnFlip and strategy.position_size > 0 and cbcBearFlip
+    strategy.close("Long", comment="Opp flip")
+if closeOnFlip and strategy.position_size < 0 and cbcBullFlip
+    strategy.close("Short", comment="Opp flip")
+
+longExec = longFiltered or (forceExecFallback and longFlipRaw and inSession and atrPass)
+shortExec = shortFiltered or (forceExecFallback and shortFlipRaw and inSession and atrPass)
+forceLong = forceTestTrades and (bar_index % forceTestEveryBars == 0)
+forceShort = forceTestTrades and (bar_index % forceTestEveryBars == int(forceTestEveryBars / 2))
+longExec := longExec or forceLong
+shortExec := shortExec or forceShort
+// If killzones are enabled, require the flip bar itself to be inside a KZ.
+if useKillzones
+    longExec := longExec and longFlipRaw and inAnyKZ
+    shortExec := shortExec and shortFlipRaw and inAnyKZ
+
+if longExec and canEnter and strategy.position_size <= 0
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long-Exit", from_entry="Long", stop=longSL, limit=longTP)
+    if onePerKZ and inAnyKZ
+        tradedThisKZ := true
+if shortExec and canEnter and strategy.position_size >= 0
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short-Exit", from_entry="Short", stop=shortSL, limit=shortTP)
+    if onePerKZ and inAnyKZ
+        tradedThisKZ := true
+
+bgCol = showBias ? (htfBullish ? bullColor : htfBearish ? bearColor : neutralColor) : na
+bgcolor(bgCol, title="HTF Bias BG")
+
+plot(showFastEMA ? emaFast : na, color=ema1_color, linewidth=1, title="Fast EMA")
+plot(showPullbackEMA ? emaPullback : na, color=ema2_color, linewidth=1, title="Pullback EMA")
+plot(showSlowEMA ? emaSlow : na, color=ema3_color, linewidth=2, title="Slow EMA")
+ema1p = plot(emaFast, color=color.new(color.white, 100), title="EMA1 Cloud")
+ema2p = plot(emaPullback, color=color.new(color.white, 100), title="EMA2 Cloud")
+ema3p = plot(emaSlow, color=color.new(color.white, 100), title="EMA3 Cloud")
+fill(ema1p, ema2p, color=show_cloud_fill ? (emaFast >= emaPullback ? color.new(color.green, 80) : color.new(color.red, 80)) : na, title="Fast Cloud")
+fill(ema2p, ema3p, color=show_cloud_fill ? (emaPullback >= emaSlow ? color.new(color.green, 80) : color.new(color.red, 80)) : na, title="Slow Cloud")
+plot(showVWAP ? vwapVal : na, color=vwap_color, linewidth=2, title="VWAP")
+
+plot(showTargets and strategy.position_size != 0 and not na(longTP) and strategy.position_size > 0 ? longTP : na, color=color.new(color.aqua, 20), style=plot.style_linebr, linewidth=2, title="Long DOL Target")
+plot(showTargets and strategy.position_size != 0 and not na(shortTP) and strategy.position_size < 0 ? shortTP : na, color=color.new(color.aqua, 20), style=plot.style_linebr, linewidth=2, title="Short DOL Target")
+plot(showMidnightOpen and not na(midnightOpen) ? midnightOpen : na, color=midnightColor, style=plot.style_cross, linewidth=1, title="Midnight Open")
+plot(show1HLevels and not na(swH1) ? swH1 : na, color=h1LevelColor_H, style=plot.style_cross, linewidth=1, title="1H Swing High 1")
+plot(show1HLevels and not na(swL1) ? swL1 : na, color=h1LevelColor_L, style=plot.style_cross, linewidth=1, title="1H Swing Low 1")
+plot(show1HLevels and not na(swH2) ? swH2 : na, color=color.new(h1LevelColor_H, 60), style=plot.style_cross, linewidth=1, title="1H Swing High 2")
+plot(show1HLevels and not na(swL2) ? swL2 : na, color=color.new(h1LevelColor_L, 60), style=plot.style_cross, linewidth=1, title="1H Swing Low 2")
+plot(showAsiaRange and asiaComplete and not na(asiaHighFinal) ? asiaHighFinal : na, color=color.new(color.purple, 30), style=plot.style_linebr, linewidth=2, title="Asia High")
+plot(showAsiaRange and asiaComplete and not na(asiaLowFinal) ? asiaLowFinal : na, color=color.new(color.purple, 30), style=plot.style_linebr, linewidth=2, title="Asia Low")
+plot(useLondonLevels and londonComplete and not na(londonHighFinal) ? londonHighFinal : na, color=color.new(color.blue, 45), style=plot.style_linebr, linewidth=1, title="London High")
+plot(useLondonLevels and londonComplete and not na(londonLowFinal) ? londonLowFinal : na, color=color.new(color.blue, 45), style=plot.style_linebr, linewidth=1, title="London Low")
+plot(useIBLevels and ibComplete and not na(ibHighFinal) ? ibHighFinal : na, color=color.new(color.orange, 35), style=plot.style_linebr, linewidth=1, title="IB High")
+plot(useIBLevels and ibComplete and not na(ibLowFinal) ? ibLowFinal : na, color=color.new(color.orange, 35), style=plot.style_linebr, linewidth=1, title="IB Low")
+plot(useCBDRLevels and cbdrComplete and not na(cbdrHighFinal) ? cbdrHighFinal : na, color=color.new(color.fuchsia, 45), style=plot.style_linebr, linewidth=1, title="CBDR High")
+plot(useCBDRLevels and cbdrComplete and not na(cbdrLowFinal) ? cbdrLowFinal : na, color=color.new(color.fuchsia, 45), style=plot.style_linebr, linewidth=1, title="CBDR Low")
+plot(usePDHLLevels and not na(pdh) ? pdh : na, color=color.new(color.white, 55), style=plot.style_linebr, linewidth=1, title="Prev Day High")
+plot(usePDHLLevels and not na(pdl) ? pdl : na, color=color.new(color.white, 55), style=plot.style_linebr, linewidth=1, title="Prev Day Low")
+
+plotshape(weakLong or (not showLabels and longFiltered), style=shape.triangleup, location=location.belowbar, color=color.new(color.lime, 60), size=size.tiny, title="Weak Bull Flip")
+plotshape(weakShort or (not showLabels and shortFiltered), style=shape.triangledown, location=location.abovebar, color=color.new(color.red, 60), size=size.tiny, title="Weak Bear Flip")
+
+if showLabels and longFiltered
+    label.new(bar_index, low * 0.9995, text="LONG\nSL: " + str.tostring(math.round(longSL, 2)) + "\nC:" + str.tostring(longConfluence), color=color.new(color.lime, 20), textcolor=color.white, style=label.style_label_up, size=size.small)
+if showLabels and shortFiltered
+    label.new(bar_index, high * 1.0005, text="SHORT\nSL: " + str.tostring(math.round(shortSL, 2)) + "\nC:" + str.tostring(shortConfluence), color=color.new(color.red, 20), textcolor=color.white, style=label.style_label_down, size=size.small)
+
+var box asiaBox = na
+if showAsiaRange and newAsiaSession
+    asiaBox := box.new(bar_index, high, bar_index, low, border_color=color.new(color.purple, 50), bgcolor=asiaBoxColor, border_width=1)
+if showAsiaRange and isAsiaBar and not na(asiaBox)
+    box.set_right(asiaBox, bar_index)
+    box.set_top(asiaBox, asiaHigh)
+    box.set_bottom(asiaBox, asiaLow)
+
+tfToLabel(string tf) =>
+    tf == "D" ? "Daily" : tf == "W" ? "Weekly" : str.tonumber(tf) >= 60 and str.tonumber(tf) % 60 == 0 ? str.tostring(int(str.tonumber(tf) / 60)) + "H" : tf + "m"
+fmtSweepCounts(int bullCount, int bearCount) =>
+    "L:" + str.tostring(bullCount) + " H:" + str.tostring(bearCount)
+
+var table infoTable = table.new(position.top_right, 2, 16, border_color=color.gray, border_width=1, frame_color=color.gray, frame_width=1)
+dashFrame = barstate.islastconfirmedhistory or (barstate.islast and barstate.isconfirmed)
+if dashFrame and showDshbrd
+    var string tfLabel = tfToLabel(timeframe.period)
+    var string HTFLabel = tfToLabel(htfRes)
+    table.cell(infoTable, 0, 0, "CBC+Sweep MMTv2", bgcolor=color.new(color.navy, 10), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 0, "Status", bgcolor=color.new(color.navy, 10), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 1, HTFLabel + " Bias", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 1, htfBullish ? "BULL" : htfBearish ? "BEAR" : "NEUT", bgcolor=htfBullish ? color.new(color.lime, 60) : htfBearish ? color.new(color.red, 60) : color.new(color.gray, 60), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 2, tfLabel + " CBC", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 2, cbcState == 1 ? "BULL" : cbcState == -1 ? "BEAR" : "NEUT", bgcolor=cbcState == 1 ? color.new(color.lime, 60) : cbcState == -1 ? color.new(color.red, 60) : color.new(color.gray, 60), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 3, "Trend", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 3, trendBullish ? "BULL" : trendBearish ? "BEAR" : "MIX", bgcolor=trendBullish ? color.new(color.lime, 60) : trendBearish ? color.new(color.red, 60) : color.new(color.gray, 60), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 4, "Asia", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 4, asiaActive ? "FORMING" : asiaComplete ? "SET" : "WAIT", bgcolor=asiaActive ? color.new(color.yellow, 60) : asiaComplete ? color.new(color.purple, 60) : color.new(color.gray, 60), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 5, "Sweep", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 5, (anySweepBull or anySweepBear) ? "ACTIVE" : "NONE", bgcolor=(anySweepBull or anySweepBear) ? color.new(color.orange, 40) : color.new(color.gray, 60), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 6, "Confluence", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 6, strategy.position_size > 0 ? str.tostring(longConfluence) : strategy.position_size < 0 ? str.tostring(shortConfluence) : "-", bgcolor=color.new(color.gray, 70), text_color=color.yellow, text_size=size.small)
+    table.cell(infoTable, 0, 7, "Position", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 7, strategy.position_size > 0 ? "LONG" : strategy.position_size < 0 ? "SHORT" : "FLAT", bgcolor=strategy.position_size > 0 ? color.new(color.lime, 50) : strategy.position_size < 0 ? color.new(color.red, 50) : color.new(color.gray, 70), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 8, "Sweeps Tot", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 8, fmtSweepCounts(totalBullSweeps, totalBearSweeps), bgcolor=color.new(color.orange, 70), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 9, "Asia", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 9, fmtSweepCounts(cAsiaBull, cAsiaBear), bgcolor=color.new(color.purple, 70), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 10, "London", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 10, fmtSweepCounts(cLondonBull, cLondonBear), bgcolor=color.new(color.blue, 70), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 11, "IB", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 11, fmtSweepCounts(cIBBull, cIBBear), bgcolor=color.new(color.orange, 70), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 12, "CBDR", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 12, fmtSweepCounts(cCBDRBull, cCBDRBear), bgcolor=color.new(color.fuchsia, 70), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 13, "PDL/PDH", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 13, "L:" + str.tostring(cPDLBull) + " H:" + str.tostring(cPDHBear), bgcolor=color.new(color.white, 85), text_color=color.black, text_size=size.small)
+    table.cell(infoTable, 0, 14, "1H", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 14, fmtSweepCounts(cH1Bull, cH1Bear), bgcolor=color.new(color.teal, 70), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 0, 15, "Midnight", bgcolor=color.new(color.gray, 80), text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 15, fmtSweepCounts(cMidnightBull, cMidnightBear), bgcolor=color.new(color.yellow, 70), text_color=color.black, text_size=size.small)
+
+alertcondition(longFiltered, "CBC Long Signal", "CBC BUY - {{ticker}} {{interval}}")
+alertcondition(shortFiltered, "CBC Short Signal", "CBC SELL - {{ticker}} {{interval}}")
+alertcondition(longSweepSignal, "Sweep Flip Long", "SWEEP FLIP BUY - {{ticker}} {{interval}}")
+alertcondition(shortSweepSignal, "Sweep Flip Short", "SWEEP FLIP SELL - {{ticker}} {{interval}}")
+alertcondition(longFiltered or shortFiltered, "CBC Any Signal", "CBC Signal - {{ticker}} {{interval}}")
+alertcondition(newAsiaSession, "Asia Session Start", "Asia Range forming - {{ticker}}")
+alertcondition(asiaJustEnded, "Asia Session End", "Asia Range SET - {{ticker}}")

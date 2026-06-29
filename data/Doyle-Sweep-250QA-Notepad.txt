@@ -1,0 +1,777 @@
+================================================================================
+250 QUESTION / ANSWER NOTEPAD
+Doyle S&D (v61.1 - Signal Fix)  +  Sweep Engine v2.0 (Sweep v2 family)
+================================================================================
+
+PROVENANCE — READ FIRST
+- TradingView Strategy Tester metrics were read via tv CLI (internal_api) for Sweep Engine v2.0 on CME_MINI:MNQ1! @ 5m.
+- Chart study list (tv state) includes "Doyle S&D (v61.1 - Signal Fix)" and multiple Sweep-related studies.
+- Doyle zone geometry and signals are NOT available as numeric series through this CLI — answers about Doyle "at trade X" require visual/manual logging unless you export otherwise.
+- Sweep mechanics answers reference sweep-engine-v2-export.pine in this repo (read-only; script not modified).
+- Per-trade PnL rows from tv data trades were not parseable by quant-advisor (TRADE_EXPORT_GAP) — Q&As avoid fabricating which tickets won/lost individually.
+
+KEY METRICS — THIS TV SAMPLE (used wherever Q asks for "our run")
+  Net profit $5490.36  |  PF 2.2059  |  Win rate 72.09%
+  Trades 43 (31 W / 12 L)  |  Avg trade $127.68
+  Avg win $323.97  |  Avg loss $379.40  |  avgWin/avgLoss ratio 0.8539
+  Largest win $869.52  |  Largest loss $858.48  |  Commission ~$106.64
+  maxContractsHeld 2  |  strategy candidate matches on chart: 18 (pin with ADVISOR_STRATEGY_SUBSTRING)
+  Avg bars: in trade 16.49  |  in win 16.13  |  in loss 17.42
+
+================================================================================
+QUESTIONS AND ANSWERS (250)
+================================================================================
+
+Q001: What backtest sample do these answers use?
+A001: Strategy Tester summary for Sweep Engine v2.0 on CME_MINI:MNQ1! 5m — net $5490.36, 43 trades.
+
+Q002: Can we list every winning trade’s entry time from this file?
+A002: No — trade-level PnL was not parsed from the automated export; only aggregate W/L counts and averages are factual here.
+
+Q003: How many losing trades occurred in the sample?
+A003: 12 — from numberOfLosingTrades in metrics.
+
+Q004: How many winning trades?
+A004: 31 — from numberOfWiningTrades (TV spelling) in metrics.
+
+Q005: What was profit factor?
+A005: ~2.2059 — gross profit / gross loss magnitude per tester.
+
+Q006: What was net profit?
+A006: ~$5490.36 USD in this read.
+
+Q007: Was average win larger than average loss?
+A007: No — avg win ~$323.97 vs avg loss ~$379.40; ratio 0.8539 (<1).
+
+Q008: Does that pattern always mean a bad system?
+A008: Not necessarily — high win rate can coexist with smaller avg wins; risk is loss streaks and tail losers.
+
+Q009: Largest single win?
+A009: ~$869.52 — largestWinTrade in metrics.
+
+Q010: Largest single loss?
+A010: ~$858.48 — largestLosTrade in metrics.
+
+Q011: Are largest win and loss similar size?
+A011: Roughly yes (~870 vs ~858) — large single loss is realistic relative to large win.
+
+Q012: Total commission paid in sample?
+A012: ~$106.64 — commissionPaid field.
+
+Q013: How many contracts did the tester use at peak?
+A013: 2 — maxContractsHeld; risk scales with this (not 1-lot).
+
+Q014: Average dollars per trade (all)?
+A014: ~$127.68 — avgTrade.
+
+Q015: Average bars in losing trades?
+A015: ~17.42 bars — avgBarsInLossTrade.
+
+Q016: Average bars in winning trades?
+A016: ~16.13 bars — avgBarsInWinTrade.
+
+Q017: Were losses longer in time than wins on average?
+A017: Yes in this sample (17.42 vs 16.13 bars).
+
+Q018: Margin calls?
+A018: 0 in the metrics object for this read.
+
+Q019: Gross profit dollars?
+A019: ~$10043.12.
+
+Q020: Gross loss dollars?
+A020: ~$4552.76.
+
+Q021: Win rate percentage?
+A021: ~72.09% — percentProfitable.
+
+Q022: Does this sample prove future performance?
+A022: No — past backtest only; regime change can invalidate.
+
+Q023: Why might advisor show TRADE_EXPORT_GAP?
+A023: TV trade JSON may omit or rename PnL fields — factual limitation of the bridge, not Sweep logic.
+
+Q024: Is max drawdown % in this notepad?
+A024: Not reliably from API this session — read Strategy Tester overview in TV for max DD % / $.
+
+Q025: How many strategies on chart matched "Sweep" substring?
+A025: 18 — pin Sweep Engine v2.0 for reproducible CLI reads.
+
+Q026: Is Doyle included in the $5490 net profit?
+A026: No — net profit is for the Sweep strategy under test; Doyle is a separate indicator.
+
+Q027: Is Doyle on the chart?
+A027: Yes — confirmed via tv state study list (title includes v61.1 Signal Fix).
+
+Q028: Did we numerically score Doyle–Sweep agreement?
+A028: No — not available from the same metrics API.
+
+Q029: Can Doyle still help discretionary review?
+A029: Yes visually — mark whether entries sit on supply/demand; log manually for data.
+
+Q030: Does v61.1 "Signal Fix" change appear in this file?
+A030: No changelog here — only the title string from TV.
+
+Q031: Common sense: trading 2 MNQ vs 1 for same signals?
+A031: Doubles PnL and drawdown scale — factual from maxContractsHeld=2.
+
+Q032: Should risk caps use contract count?
+A032: Yes — any $2000 DD idea must match actual qty in tester.
+
+Q033: Does high PF excuse skipping OOS validation?
+A033: No — PF is in-sample unless you define OOS protocol.
+
+Q034: Is 43 trades enough for significance?
+A034: Marginal — better than a handful, still vulnerable to period luck.
+
+Q035: Could one month dominate results?
+A035: Possible — check date range in TV; not expanded here.
+
+Q036: Are commissions realistic for your broker?
+A036: You must compare commission_value in Pine to live/pro sim.
+
+Q037: Slippage sensitivity?
+A037: Default slippage in strategy affects fills — stress-test.
+
+Q038: Is bar-close backtest optimistic vs intrabar stops?
+A038: Often yes — process_orders_on_close reduces intrabar ambiguity but can differ from live.
+
+Q039: Session flat exits affecting PnL?
+A039: Factual from order export earlier: Session flat closes appear — can cut winners/losses before TP.
+
+Q040: Multiple engines on chart — human error risk?
+A040: Yes — conflicting signals (Confluence Engine, Displacement, etc.) can confuse discretion.
+
+Q041: Sweep sessions use which timezone?
+A041: America/Chicago in sweep-engine-v2-export.pine.
+
+Q042: IB sweep requires post-IB window?
+A042: Yes — isPostIB for IB-based sweep definitions.
+
+Q043: London/Asia sweeps use killzone?
+A043: London and Asia sweep formulas include isKillzone in the export Pine.
+
+Q044: What is bull sweep pattern?
+A044: Wick through level, close back through (e.g. low < level, close > level for lows).
+
+Q045: Optional depth filter?
+A045: i_sweepDepthAtr — requires penetration beyond level by ATR multiple when >0.
+
+Q046: Default min confluence score?
+A046: 0 — raising blocks many sweeps with 0 confluence.
+
+Q047: What adds confluence points?
+A047: Near round number, near VWAP, Lon50 alignment — up to 3.
+
+Q048: HTF trend filter default?
+A048: Off — i_useHtfTrend default false.
+
+Q049: ADX filter default?
+A049: Off.
+
+Q050: RSI gate default?
+A050: Off.
+
+Q051: Volume gate default?
+A051: Off.
+
+Q052: EMA gate default?
+A052: Off.
+
+Q053: Max trades per day default?
+A053: 0 = unlimited by that input.
+
+Q054: Cooldown default purpose?
+A054: Reduce re-entry clustering — i_cooldown bars after last signal.
+
+Q055: Flatten CT default meaning?
+A055: pastFlat blocks new trades and triggers flat close logic after flatten time.
+
+Q056: DD USD guard in Pine?
+A056: Tracks peak strategy.equity vs i_maxDdUsd — blocks entries and optional flatten.
+
+Q057: Is predConf a probability?
+A057: No — Pine comments say heuristic, not true probability.
+
+Q058: Reactive vs predictive entry?
+A058: Reactive: market on signal bar; predictive: limit at model level — different fill risk.
+
+Q059: Block reactive long in bear pool?
+A059: When i_blockReactiveLongVsBearModel true — reduces longs against bearish model dominance.
+
+Q060: Pyramiding?
+A060: 0 in strategy declaration — no add-ons in script defaults.
+
+Q061: What is supply/demand generally?
+A061: Zones where price may react — Doyle visualizes; Sweep does not replace that with the same math.
+
+Q062: Should longs prefer demand?
+A062: Common SMC idea — verify on chart when Sweep fires long.
+
+Q063: Should shorts prefer supply?
+A063: Same — discretionary overlay; not in Sweep metrics.
+
+Q064: Does Sweep know Doyle zone freshness?
+A064: No in Sweep code.
+
+Q065: Does Sweep know Doyle strength score?
+A065: No.
+
+Q066: Can you require both for a manual rule?
+A066: Yes — define tolerance in ticks and journal it.
+
+Q067: HTF Doyle vs LTF Sweep?
+A067: Possible mismatch — check both timeframes manually.
+
+Q068: Doyle signal fix — expect fewer bad signals?
+A068: Unknown without Doyle source — title only here.
+
+Q069: If Doyle conflicts Sweep, skip?
+A069: Reasonable discretionary rule — not backtested in this file.
+
+Q070: If Doyle aligns Sweep, guaranteed win?
+A070: No — alignment reduces conflict, not outcome certainty.
+
+Q071: News events modeled?
+A071: No explicit calendar in Sweep export.
+
+Q072: Rollover modeled?
+A072: Continuous contract choice matters — user responsibility.
+
+Q073: VWAP anchor mismatch risk?
+A073: If your mental VWAP differs from Pine session VWAP, perceived edge shifts.
+
+Q074: Round 100 default for NQ?
+A074: Often used — tune for instrument.
+
+Q075: Confluence proximity 1.5 ATR — wide?
+A075: Can tag often — may add noise if too loose.
+
+Q076: Lon50 bias optional?
+A076: i_useLon50 default false — when on, filters sweeps by Lon50 side.
+
+Q077: Sweep raw dots without entry?
+A077: Yes — gates can block entries.
+
+Q078: Model decay after sweep?
+A078: Down-weights level scores after sweep flags — affects predictive ranking.
+
+Q079: Killzone definition same as yours?
+A079: Uses script unions — compare to your trading plan.
+
+Q080: Asia session clock CT?
+A080: Script uses Chicago hour/minute — verify vs futures session you trade.
+
+Q081: London window in script?
+A081: Defined by isLondon hours — factual from code.
+
+Q082: IB window?
+A082: 8:30–9:29 CT style block in script — confirm lines.
+
+Q083: Post-IB definition?
+A083: 9:30–14:59 CT band in script for isPostIB.
+
+Q084: Multiple Sweep engines on chart — which was tested?
+A084: Sweep Engine v2.0 pinned for metrics — others may differ.
+
+Q085: Sweep v2.1 on chart too?
+A085: Listed in state — not the pinned strategy for these numbers unless you change pin.
+
+Q086: Confluence Engine v4 — overlaps Sweep?
+A086: Possibly visual overlap — separate codebases.
+
+Q087: Displacement Engine — momentum conflict?
+A087: Can disagree with mean-reversion sweeps — human judgment.
+
+Q088: FVG indicator — gap confluence?
+A088: Not part of Sweep core entries — optional context.
+
+Q089: Wick rejection ID — similar to sweep?
+A089: Related idea (wicks) — not identical conditions.
+
+Q090: Session levels extract — helps alignment?
+A090: If levels match Sweep’s IB/Lon/Asia, good; if not, confusion.
+
+Q091: Chart load / TV errors with many studies?
+A091: Documented risk — i_lightChart exists in Sweep to reduce plots.
+
+Q092: Doyle only on 5m?
+A092: Whatever TF your chart is — here metrics are 5m.
+
+Q093: Should optimization use same TF?
+A093: Yes for comparability.
+
+Q094: Walk-forward mentioned?
+A094: Not automated here — recommended practice.
+
+Q095: Monte Carlo?
+A095: Not in this file — advanced validation.
+
+Q096: Parameter grid on TV?
+A096: Possible — winrate-grid.mjs exists separately; not run in this answer set.
+
+Q097: Psychology: revenge after loss?
+A097: Not fixable by indicators — process.
+
+Q098: Psychology: overconfidence after 72% WR?
+A098: Dangerous — in-sample win rate.
+
+Q099: Risk: ignore 2-lot scale?
+A099: Common error — doubles equity swings vs 1-lot thinking.
+
+Q100: Risk: ignore commission?
+A100: Commission ~$106.64 already material.
+
+Q101: Operational: wrong strategy selected in tester?
+A101: Possible with 18 matches — pin substring.
+
+Q102: Operational: wrong symbol?
+A102: Metrics are for CME_MINI:MNQ1!.
+
+Q103: Operational: wrong date range?
+A103: Check TV — epochs in JSON if needed.
+
+Q104: Doyle: too many zones on chart?
+A104: Can cause paralysis — zoom context matters.
+
+Q105: Sweep: too many signals with minConf 0?
+A105: Possible — optional minConf and gates exist to thin.
+
+Q106: Mitigate DD: lower size?
+A106: Generally reduces equity DD for same curve shape — not coded here.
+
+Q107: Mitigate DD: fewer trades?
+A107: Filters/cooldown/day cap — tradeoff vs opportunity.
+
+Q108: Mitigate DD: wider stops?
+A108: Fewer stop-outs, larger loss per loser — not free.
+
+Q109: Mitigate DD: tighter stops?
+A109: More stop-outs possible — tune with data.
+
+Q110: Mitigate DD: session filter only best hours?
+A110: Hypothesis — test; not default in Sweep.
+
+Q111: Common sense: trade through major news?
+A111: Risk — no indicator shields from events.
+
+Q112: Common sense: change inputs every week?
+A112: Breaks comparability — keep a journal.
+
+Q113: Edge: mean reversion at session liquidity?
+A113: Sweep premise — fails in trend days.
+
+Q114: Edge: HTF trend filter help on trend days?
+A114: Often reduces counter-trend sweeps when enabled.
+
+Q115: Edge: chop filter via ATR regime?
+A115: Skips dead volatility — may miss setups.
+
+Q116: Data: vendor differences?
+A116: Can change sweeps — validate on your data.
+
+Q117: Live: limit order fills vs backtest?
+A117: Predictive mode especially — validate fill assumptions.
+
+Q118: Live: stop hunting?
+A118: Slippage input approximates — not full book.
+
+Q119: Backtest: equity curve 0 from API?
+A119: Known issue sometimes — read DD in TV UI.
+
+Q120: Summary: one missing confluence?
+A120: No single answer — Doyle zones + HTF structure + news discipline are common adds OUTSIDE raw Sweep.
+
+Q121: Does Sweep use CVD?
+A121: No.
+
+Q122: Does Sweep use footprint?
+A122: No.
+
+Q123: Does Sweep use delta volume?
+A123: No.
+
+Q124: Does Sweep label BOS?
+A124: No.
+
+Q125: Does Sweep use FVG entries?
+A125: Not in core — FVG is another study on chart.
+
+Q126: Does Sweep use order blocks as entries?
+A126: Tier3 OB behind toggle display only by default.
+
+Q127: Is fib display default on?
+A127: i_showT3 default false.
+
+Q128: Does predictive need pool edge?
+A128: Only if i_predMinEdge > 0.
+
+Q129: Default pool edge threshold?
+A129: 0 — off.
+
+Q130: Does model use momentum?
+A130: i_modelMomentum default true in export.
+
+Q131: Does model use VWAP tilt?
+A131: i_modelVwapTilt default true.
+
+Q132: Does model use HTF bias?
+A132: i_modelHtf default true.
+
+Q133: Are scores decayed after sweep?
+A133: Yes via swept flags and i_modelSweptDecay.
+
+Q134: Is Sweep a guarantee?
+A134: No — heuristic model.
+
+Q135: Does reactive entry use market?
+A135: strategy.entry long/short without limit on reactive path.
+
+Q136: Does predictive long use limit?
+A136: At bestLowPx per code.
+
+Q137: Exit labels xL/xS?
+A137: Bracket exits in export.
+
+Q138: Session flat label?
+A138: close_all comment Session flat.
+
+Q139: DD limit label?
+A139: close_all comment DD limit when guard triggers.
+
+Q140: Is equity DD guard optional?
+A140: i_maxDdUsd can be 0 to disable.
+
+Q141: Flatten optional?
+A141: Time inputs define behavior — flat is core to session exit group.
+
+Q142: Cooldown bars default 8?
+A142: i_cooldown default 8 in export.
+
+Q143: SL mult default 4.5?
+A143: i_slMult default 4.5.
+
+Q144: TP mult default 4.0?
+A144: i_tpMult default 4.0.
+
+Q145: ATR length default 14?
+A145: i_atrLen default 14.
+
+Q146: Round interval options include 50?
+A146: Yes in options array.
+
+Q147: Min ATR filter default 0?
+A147: Off.
+
+Q148: Quality sweep depth default 0?
+A148: Off.
+
+Q149: EMA fast/slow defaults?
+A149: 9 and 21 when gate used.
+
+Q150: RSI bands wide?
+A150: Defaults allow mid-range trades when gate on.
+
+Q151: Volume mult default 1.12?
+A151: When vol gate on.
+
+Q152: ADX floor default 15?
+A152: When ADX filter on.
+
+Q153: ADX ceiling default 0?
+A153: Off.
+
+Q154: HTF options include D?
+A154: Yes in i_htfTf string options.
+
+Q155: Regime: single security call?
+A155: One request.security for HTF in export.
+
+Q156: Lon50 for sweep validity?
+A156: lon50Bull/Bear when i_useLon50.
+
+Q157: Sweep sources OR across sessions?
+A157: bullSweep combines enabled session sweeps.
+
+Q158: Bear sweep symmetric?
+A158: Parallel bear conditions for highs.
+
+Q159: Can both sweep directions matter same day?
+A159: Different bars — cooldown may separate.
+
+Q160: tradesToday reset?
+A160: On newDay.
+
+Q161: lastSig update?
+A161: On longSig/shortSig.
+
+Q162: holdSL/holdTP reset?
+A162: On flatBar or justClosed.
+
+Q163: strategy.exit naming?
+A163: xL/xS ids in export.
+
+Q164: Bar color on signal?
+A164: longSig green tint per script.
+
+Q165: bgcolor after flat?
+A165: Gray shade when pastFlat.
+
+Q166: Dashboard table optional?
+A166: i_showDashTable default true.
+
+Q167: Light chart mode?
+A167: i_lightChart reduces plot load.
+
+Q168: max_lines_count 80?
+A168: In strategy() — resource limit.
+
+Q169: Why many studies hurt?
+A169: Human overlay conflict — factual workflow issue.
+
+Q170: Journal template?
+A170: Date, CT time, side, sweep source, Doyle Y/N, outcome.
+
+Q171: Hypothesis: losses on trend days?
+A171: Test with HTF filter on vs off.
+
+Q172: Hypothesis: losses in low ADX?
+A172: Test ADX filter.
+
+Q173: Hypothesis: losses on low volume?
+A173: Test vol gate.
+
+Q174: Hypothesis: shorts worse than longs?
+A174: Export sides manually — not in auto PnL here.
+
+Q175: Mitigation: reduce contracts after DD?
+A175: Risk management outside Pine.
+
+Q176: Mitigation: pause after N losses?
+A176: Discretionary or future automation.
+
+Q177: Mitigation: align with Doyle demand for longs?
+A177: Manual rule.
+
+Q178: Mitigation: skip if inside opposing Doyle zone?
+A178: Manual rule.
+
+Q179: Error: ignoring flatten time?
+A179: Strategy models it — live must honor clock.
+
+Q180: Error: wrong timezone interpretation?
+A180: CT vs local — common mistake.
+
+Q181: Error: assuming 1 lot?
+A181: Tester used 2 contracts.
+
+Q182: Error: curve-fitting 43 trades?
+A182: High — need OOS.
+
+Q183: Final: one sentence on drawdown?
+A183: With avg loss > avg win, loss streaks drive DD — combine filters, size, and external context (Doyle, news) thoughtfully.
+
+Q184: Correlate major news to losses?
+A184: Manual annotation — not modeled in Sweep.
+
+Q185: Correlate time-of-day to PnL?
+A185: Use TV list of trades export — not automated here.
+
+Q186: Sortino vs Sharpe?
+A186: Both need clean return series — use TV or external tools.
+
+Q187: Calmar ratio?
+A187: Requires max DD — read from Strategy Tester UI if API empty.
+
+Q188: Ulcer index?
+A188: Not computed in this notepad.
+
+Q189: Export trades to CSV?
+A189: TradingView allows — do it for offline analysis.
+
+Q190: Benchmark vs buy-and-hold NQ?
+A190: Different question than edge — optional.
+
+Q191: Monte Carlo random entries?
+A191: Stress-test overfitting — optional.
+
+Q192: Define R-multiples?
+A192: Set risk $ per trade from stop distance × point value × qty.
+
+Q193: Track MAE/MFE per trade?
+A193: Not in default export — advanced journaling.
+
+Q194: Expectancy in R units?
+A194: Possible once R is defined consistently.
+
+Q195: Half-sample / half-sample test?
+A195: Simple structural OOS split — recommended.
+
+Q196: Hold out last 20% of range?
+A196: Common walk-forward simplification.
+
+Q197: Freeze parameters after OOS validation?
+A197: Reduces silent curve-fitting.
+
+Q198: Label regimes (trend/chop) manually?
+A198: Helps explain drawdown clusters.
+
+Q199: Volatility regime via ATR percentile?
+A199: Optional filter to test in isolation.
+
+Q200: Section boundary: mechanics block ends here?
+A200: Following rows continue Q201+ in same file.
+
+Q201: Does this notepad change your Pine?
+A201: No — documentation only.
+
+Q202: Re-run TV metrics command?
+A202: ADVISOR_STRATEGY_SUBSTRING=Sweep Engine v2.0 node src/cli/index.js data strategy
+
+Q203: Re-run advisor?
+A203: node scripts/quant-advisor.mjs
+
+Q204: Store env in .env?
+A204: ADVISOR_STRATEGY_SUBSTRING recommended with many strategies on chart.
+
+Q205: Doyle code in repo?
+A205: Not found in tradingview-mcp — cannot quote Doyle rules.
+
+Q206: Sweep code in repo?
+A206: Yes — sweep-engine-v2-export.pine.
+
+Q207: v61.1 vs Sweep version alignment?
+A207: Independent — version numbers unrelated.
+
+Q208: Should you read TV list of trades?
+A208: Yes — for ticket-level truth.
+
+Q209: Should you screenshot Doyle at entry?
+A209: Yes — for qualitative review.
+
+Q210: Can ML infer Doyle from chart?
+A210: Not done here.
+
+Q211: Is 72% WR sustainable live?
+A211: Unknown — slippage and discipline differ.
+
+Q212: Is PF 2.2 sustainable live?
+A212: Unknown — same caveat.
+
+Q213: Does net $5490 imply salary?
+A213: No — sample-specific backtest dollars.
+
+Q214: Account % gain?
+A214: netProfitPercent ~5.49% if initial capital 100k — verify in TV.
+
+Q215: initial_capital in Pine?
+A215: 100000 in export strategy() — verify.
+
+Q216: Does doubling capital halve %?
+A216: Not necessarily — position sizing is fixed qty, not %.
+
+Q217: Kelly sizing?
+A217: Not in export.
+
+Q218: Vol targeting?
+A218: Not in export.
+
+Q219: ATR-based sizing?
+A219: Not in export — fixed default_qty_value 1 per contract semantics; held 2 in test.
+
+Q220: Why held 2?
+A220: User/settings in TV strategy properties — not explained by Pine alone.
+
+Q221: Check qty in Strategy Tester properties?
+A221: Yes — factual step.
+
+Q222: Doyle: red/green signals — follow blindly?
+A222: No — confirm with your rules.
+
+Q223: Sweep: triangle entries always good?
+A223: No — visual marker ≠ guaranteed fill path in predictive mode.
+
+Q224: Combined: best question to ask next?
+A224: "On losing trades, was price rejecting a Doyle supply for longs?" — log 10 examples.
+
+Q225: Combined: second question?
+A225: "Were losses clustered in one week?" — check TV date distribution.
+
+Q226: Third question?
+A226: "Did HTF trend oppose the sweep?" — mark manually.
+
+Q227: Fourth question?
+A227: "Was ADX low?" — mark manually.
+
+Q228: Fifth question?
+A228: "Was volume below average?" — mark manually.
+
+Q229: Sixth question?
+A229: "Was news within 30 min?" — mark manually.
+
+Q230: Seventh question?
+A230: "Was spread wide?" — mark manually.
+
+Q231: Eighth question?
+A231: "Did session flat exit cause loss?" — check exit comment in list of trades.
+
+Q232: Ninth question?
+A232: "Did stop exit occur?" — check STOP in order list.
+
+Q233: Tenth question?
+A233: "Did TP exit occur?" — check LIMIT wins.
+
+Q234: Pattern: many Session flat exits?
+A234: Observed in order export earlier — time exit is real for this strategy.
+
+Q235: Does flat exit help DD?
+A235: Can cut both winners and losers — empirical tradeoff.
+
+Q236: Does DD guard help live DD?
+A236: If enabled in Pine — caps equity DD path in sim; live differs.
+
+Q237: Common sense: trade when tired?
+A237: Human error — outside indicators.
+
+Q238: Common sense: skip plan?
+A238: Error — indicators do not replace plan.
+
+Q239: Common sense: size up after win streak?
+A239: Often increases DD risk — caution.
+
+Q240: Common sense: ignore max loss day rule?
+A240: Risk — no indicator enforces discipline.
+
+Q241: Honest bottom line on confluence?
+A241: Sweep has built-in session + optional rounds/VWAP/Lon50 + optional regime/quality; Doyle adds visual S&D context not in Sweep math — use both with a written rule set.
+
+Q242: Honest bottom line on drawdown?
+A242: This sample shows strong net with PF>2 but avg loss > avg win — mitigate with size, filters, OOS testing, and external context; no magic add-on listed here guarantees lower DD.
+
+Q243: What one action improves rigor most?
+A243: Export TV trade list manually and tag Doyle + HTF context for each trade — turns opinion into data.
+
+Q244: Closing: is this financial advice?
+A244: No — educational Q&A from metrics + known code.
+
+Q245: Closing: 250th question — repeat key metric?
+A245: Net ~$5490.36, PF ~2.206, WR ~72.1%, trades 43, 31W/12L, 2 contracts, Doyle on chart unquantified here.
+
+Q246: Extra tail Q246 — re-read metrics after chart change?
+A246: Yes — any symbol/TF/strategy change invalidates prior numbers.
+
+Q247: Extra tail Q247 — save Strategy Tester screenshot?
+A247: Good practice for audit trail.
+
+Q248: Extra tail Q248 — share notepad with mentor?
+A248: If you want external review — not endorsement.
+
+Q249: Extra tail Q249 — archive this file dated?
+A249: Yes — metrics drift over time.
+
+Q250: Final reminder — regen after new TV pull?
+A250: Re-run node scripts/gen-doyle-sweep-250qa.mjs after refreshing Strategy Tester.
+
+================================================================================
+END — 250 Q&A complete
+================================================================================

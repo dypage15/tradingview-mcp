@@ -1,0 +1,452 @@
+//@version=6
+// Sweep Engine v2.0 — STRATEGY (backtestable in Strategy Tester)
+strategy("Sweep Engine v2.0", shorttitle="Sweep v2", overlay=true, max_lines_count=500, max_labels_count=200,
+     initial_capital=100000, default_qty_type=strategy.fixed, default_qty_value=1, pyramiding=0,
+     commission_type=strategy.commission.cash_per_contract, commission_value=0.62,
+     slippage=2, process_orders_on_close=true, calc_on_every_tick=false)
+
+// ═══════════════════════════════════════════════════════════════
+// INPUTS
+// ═══════════════════════════════════════════════════════════════
+i_atrLen     = input.int(14,     "ATR Length",                   group="Signal")
+i_slMult     = input.float(4.0,  "Stop Loss (x ATR)",           group="Signal", step=0.5)
+i_tpMult     = input.float(6.0,  "Take Profit (x ATR)",         group="Signal", step=0.5)
+i_cooldown   = input.int(6,      "Cooldown (bars)",              group="Signal", minval=1, maxval=50)
+i_minConf    = input.int(0,      "Min confluence score (0–3)",   group="Signal", minval=0, maxval=3,
+     tooltip="Match signals to indicator: 0 = any (default). Higher = stricter.")
+i_minAtr     = input.float(0.0,  "Min ATR filter (0 = off)",     group="Signal", minval=0.0, maxval=200.0, step=0.25)
+
+i_useIB      = input.bool(true,  "Trade IB Sweeps",             group="Session Sweeps")
+i_useLondon  = input.bool(true,  "Trade London Sweeps",         group="Session Sweeps")
+i_useAsia    = input.bool(true,  "Trade Asia Sweeps",           group="Session Sweeps")
+i_useLon50   = input.bool(false, "Require London 50 Bias",      group="Session Sweeps")
+
+i_roundIntvl = input.int(100,    "Round Number Interval",       group="Confluence", options=[50,100,250,500])
+i_confProx   = input.float(1.5,  "Confluence Proximity (x ATR)",group="Confluence", step=0.25, tooltip="How close price must be to a level to count as confluence")
+
+i_flatHr     = input.int(15,     "Flatten — hour (Chicago)",     group="Session Exit", minval=12, maxval=17,
+     tooltip="Close positions & block new entries after this time (CT) until next session day.")
+i_flatMn     = input.int(0,      "Flatten — minute (Chicago)",   group="Session Exit", minval=0, maxval=55, step=5)
+
+i_showT3     = input.bool(false, "Show Tier 3 (Fibs/OB)",       group="Tier 3 Toggle", tooltip="Fibonacci and Order Blocks — statistically unproven")
+i_fibZZlen   = input.int(10,     "Fib Zigzag Lookback",         group="Tier 3 Toggle", minval=3)
+
+i_showSess   = input.bool(true,  "Session Levels",              group="Display")
+i_showVWAP   = input.bool(true,  "VWAP",                        group="Display")
+i_showRound  = input.bool(true,  "Round Numbers",               group="Display")
+i_showSLTP   = input.bool(true,  "SL/TP Lines",                 group="Display")
+i_showCoach  = input.bool(true,  "Coaching Dashboard",          group="Display")
+i_showStats  = input.bool(true,  "Trade Stats",                 group="Display")
+i_showLevels = input.bool(true,  "Level Ranking",               group="Display")
+i_coachPos   = input.string("Top Right","Coach Position",       group="Display", options=["Top Right","Top Left","Bottom Right","Bottom Left"])
+i_statsPos   = input.string("Bottom Right","Stats Position",    group="Display", options=["Top Right","Top Left","Bottom Right","Bottom Left"])
+i_levelPos   = input.string("Bottom Left","Level Rank Position",group="Display", options=["Top Right","Top Left","Bottom Right","Bottom Left"])
+
+// ═══════════════════════════════════════════════════════════════
+// TIME + SESSION DETECTION (CT — Central Time)
+// ═══════════════════════════════════════════════════════════════
+hr = hour(time, "America/Chicago")
+mn = minute(time, "America/Chicago")
+atr = ta.atr(i_atrLen)
+newDay = ta.change(time("D")) != 0
+
+isAsia     = hr >= 18 or hr < 1
+isLondon   = hr >= 1 and hr < 4
+isIB       = (hr == 8 and mn >= 30) or (hr == 9 and mn < 30)
+isPostIB   = (hr == 9 and mn >= 30) or (hr >= 10 and hr < 15)
+isNY_AM_KZ = (hr == 7 and mn >= 30) or hr == 8 or (hr == 9 and mn < 30)
+isSB_AM    = hr == 9 or (hr == 10 and mn == 0)
+isLonClose = hr == 9 or (hr == 10 and mn < 30)
+isKillzone = isNY_AM_KZ or isSB_AM or isLonClose
+
+pastFlat = (hr > i_flatHr) or (hr == i_flatHr and mn >= i_flatMn)
+
+// ═══════════════════════════════════════════════════════════════
+// SESSION LEVELS
+// ═══════════════════════════════════════════════════════════════
+var float ibH=na, var float ibL=na, var float ib50=na, var bool ibOK=false
+var float lonH=na, var float lonL=na, var float lon50=na, var bool lonOK=false
+var float asiaH=na, var float asiaL=na, var bool asiaOK=false
+
+if newDay
+    ibH:=na,ibL:=na,ib50:=na,ibOK:=false,lonH:=na,lonL:=na,lon50:=na,lonOK:=false,asiaH:=na,asiaL:=na,asiaOK:=false
+
+if isIB
+    ibH:=na(ibH)?high:math.max(ibH,high), ibL:=na(ibL)?low:math.min(ibL,low), ib50:=(ibH+ibL)/2
+if isIB[1] and not isIB
+    ibOK:=true
+
+if isLondon
+    lonH:=na(lonH)?high:math.max(lonH,high), lonL:=na(lonL)?low:math.min(lonL,low), lon50:=(lonH+lonL)/2
+if isLondon[1] and not isLondon
+    lonOK:=true
+
+if isAsia
+    asiaH:=na(asiaH)?high:math.max(asiaH,high), asiaL:=na(asiaL)?low:math.min(asiaL,low)
+if isAsia[1] and not isAsia
+    asiaOK:=true
+
+// ═══════════════════════════════════════════════════════════════
+// VWAP
+// ═══════════════════════════════════════════════════════════════
+var float cPV=0., var float cVol=0.
+if newDay
+    cPV:=0., cVol:=0.
+tp_=(high+low+close)/3
+cPV+=tp_*volume, cVol+=volume
+vwap=cVol>0?cPV/cVol:close
+
+// ═══════════════════════════════════════════════════════════════
+// ROUND NUMBERS
+// ═══════════════════════════════════════════════════════════════
+rndAbove = math.ceil(close / i_roundIntvl) * i_roundIntvl
+rndBelow = math.floor(close / i_roundIntvl) * i_roundIntvl
+nearRound = math.min(math.abs(close - rndAbove), math.abs(close - rndBelow)) < atr * i_confProx
+
+// ═══════════════════════════════════════════════════════════════
+// TIER 3: FIBONACCI (behind toggle)
+// ═══════════════════════════════════════════════════════════════
+swHi = ta.pivothigh(high, i_fibZZlen, i_fibZZlen)
+swLo = ta.pivotlow(low, i_fibZZlen, i_fibZZlen)
+var float lSH=na, var float lSL=na
+if not na(swHi)
+    lSH:=swHi
+if not na(swLo)
+    lSL:=swLo
+fibOK = i_showT3 and not na(lSH) and not na(lSL)
+fibR = fibOK ? lSH-lSL : 0.
+fibBull = fibOK and lSL > lSH  // swing low came after swing high = uptrend
+fib618 = fibOK ? (fibBull ? lSH + fibR*0.382 : lSH - fibR*0.618) : na
+fib705 = fibOK ? (fibBull ? lSH + fibR*0.295 : lSH - fibR*0.705) : na
+
+// ═══════════════════════════════════════════════════════════════
+// CONFLUENCE + SWEEP DETECTION
+// ═══════════════════════════════════════════════════════════════
+lon50Bull = not i_useLon50 or (lonOK and close > lon50)
+lon50Bear = not i_useLon50 or (lonOK and close < lon50)
+
+sweepIBlo  = ibOK and isPostIB and (low < ibL) and (close > ibL) and lon50Bull
+sweepIBhi  = ibOK and isPostIB and (high > ibH) and (close < ibH) and lon50Bear
+sweepLonLo = lonOK and isKillzone and (low < lonL) and (close > lonL) and lon50Bull
+sweepLonHi = lonOK and isKillzone and (high > lonH) and (close < lonH) and lon50Bear
+sweepAsLo  = asiaOK and isKillzone and (low < asiaL) and (close > asiaL) and lon50Bull
+sweepAsHi  = asiaOK and isKillzone and (high > asiaH) and (close < asiaH) and lon50Bear
+
+bullSweep = (i_useIB and sweepIBlo) or (i_useAsia and sweepAsLo) or (i_useLondon and sweepLonLo)
+bearSweep = (i_useIB and sweepIBhi) or (i_useAsia and sweepAsHi) or (i_useLondon and sweepLonHi)
+
+sweepSrc = sweepIBlo or sweepIBhi ? "IB" : sweepAsLo or sweepAsHi ? "ASIA" : sweepLonLo or sweepLonHi ? "LON" : ""
+
+nearVWAP = math.abs(close - vwap) < atr * i_confProx
+lon50Aligned_bull = lonOK and close > lon50
+lon50Aligned_bear = lonOK and close < lon50
+
+confBull = (nearRound ? 1 : 0) + (nearVWAP ? 1 : 0) + (lon50Aligned_bull ? 1 : 0)
+confBear = (nearRound ? 1 : 0) + (nearVWAP ? 1 : 0) + (lon50Aligned_bear ? 1 : 0)
+confScore = bullSweep ? confBull : bearSweep ? confBear : 0
+
+volOK = i_minAtr <= 0 or atr >= i_minAtr
+
+// ═══════════════════════════════════════════════════════════════
+// STRATEGY ORDERS (Strategy Tester uses these fills)
+// ═══════════════════════════════════════════════════════════════
+var int lastSig=0
+cdOK = bar_index - lastSig > i_cooldown
+canEnter = not pastFlat and strategy.position_size == 0
+
+longSig  = volOK and bullSweep and cdOK and canEnter and confBull >= i_minConf
+shortSig = volOK and bearSweep and cdOK and canEnter and confBear >= i_minConf
+
+var string trSrc=""
+var int trConf=0
+if longSig
+    lastSig := bar_index
+    trSrc := sweepSrc
+    trConf := confBull
+if shortSig
+    lastSig := bar_index
+    trSrc := sweepSrc
+    trConf := confBear
+
+var float holdSL = na
+var float holdTP = na
+flatBar = pastFlat
+
+if flatBar and strategy.position_size != 0
+    strategy.close_all(comment="Session flat")
+
+if longSig
+    holdSL := close - atr * i_slMult
+    holdTP := close + atr * i_tpMult
+    strategy.entry("Long", strategy.long)
+
+if shortSig
+    holdSL := close + atr * i_slMult
+    holdTP := close - atr * i_tpMult
+    strategy.entry("Short", strategy.short)
+
+if not flatBar and strategy.position_size > 0
+    strategy.exit("xL", "Long", stop=holdSL, limit=holdTP)
+if not flatBar and strategy.position_size < 0
+    strategy.exit("xS", "Short", stop=holdSL, limit=holdTP)
+
+justClosed = strategy.position_size == 0 and nz(strategy.position_size[1], 0) != 0
+if flatBar or justClosed
+    holdSL := na
+    holdTP := na
+
+inLong = strategy.position_size > 0
+inShort = strategy.position_size < 0
+ep = strategy.position_avg_price
+sl = holdSL
+tp = holdTP
+longExit = justClosed and strategy.position_size[1] > 0
+shortExit = justClosed and strategy.position_size[1] < 0
+
+// ═══════════════════════════════════════════════════════════════
+// STRATEGY TESTER STATS (on-chart summary; full detail in tester panel)
+// ═══════════════════════════════════════════════════════════════
+cl = strategy.closedtrades
+wn = strategy.wintrades
+ls = strategy.losstrades
+wr = cl > 0 ? 100.0 * wn / cl : 0.0
+net = strategy.netprofit
+gP = strategy.grossprofit
+gL = strategy.grossloss
+pfV = gL > 0 ? gP / gL : na
+avgW = wn > 0 ? gP / wn : 0.0
+avgL = ls > 0 ? gL / ls : 0.0
+
+// ═══════════════════════════════════════════════════════════════
+// CHART VISUALS
+// ═══════════════════════════════════════════════════════════════
+cG=#00E676, cRd=#FF1744, cO=#FFA726
+cIB=color.new(#42A5F5,30), cLon=color.new(#AB47BC,30), cAsia=color.new(#FF7043,30)
+
+plot(i_showSess and ibOK and isPostIB ? ibH : na, "IB Hi", cIB, 2)
+plot(i_showSess and ibOK and isPostIB ? ibL : na, "IB Lo", cIB, 2)
+plot(i_showSess and ibOK and isPostIB ? ib50 : na, "IB50", color.new(#42A5F5,60), 1)
+plot(i_showSess and lonOK ? lonH : na, "LonH", cLon, 1)
+plot(i_showSess and lonOK ? lonL : na, "LonL", cLon, 1)
+plot(i_showSess and lonOK ? lon50 : na, "Lon50", color.new(#AB47BC,60), 1)
+plot(i_showSess and asiaOK ? asiaH : na, "AsH", cAsia, 1)
+plot(i_showSess and asiaOK ? asiaL : na, "AsL", cAsia, 1)
+
+plot(i_showVWAP ? vwap : na, "VWAP", color.new(#FF9800,0), 2)
+
+plot(i_showRound ? rndAbove : na, "Rnd↑", color.new(#FFD600,50), 1, plot.style_circles)
+plot(i_showRound ? rndBelow : na, "Rnd↓", color.new(#FFD600,50), 1, plot.style_circles)
+
+plot(fibOK ? fib618 : na, ".618", color.new(#9E9E9E,60), 1, plot.style_circles)
+plot(fibOK ? fib705 : na, ".705", color.new(#9E9E9E,60), 1, plot.style_circles)
+
+plot(i_showSLTP and inLong ? sl : na, "SL", color.new(cRd,40), 2, plot.style_linebr)
+plot(i_showSLTP and inShort ? sl : na, "SLs", color.new(cRd,40), 2, plot.style_linebr)
+plot(i_showSLTP and inLong ? tp : na, "TP", color.new(cG,40), 2, plot.style_linebr)
+plot(i_showSLTP and inShort ? tp : na, "TPs", color.new(cG,40), 2, plot.style_linebr)
+plot(i_showSLTP and (inLong or inShort) ? ep : na, "EP", color.new(#FFFFFF,60), 1, plot.style_linebr)
+
+plotshape(longSig, "Long", shape.triangleup, location.belowbar, cG, size=size.small)
+plotshape(shortSig, "Short", shape.triangledown, location.abovebar, cRd, size=size.small)
+plotshape(longExit, "ExL", shape.xcross, location.abovebar, cO, size=size.tiny)
+plotshape(shortExit, "ExS", shape.xcross, location.belowbar, cO, size=size.tiny)
+barcolor(longSig ? cG : shortSig ? cRd : na)
+
+confCol = confScore >= 2 ? cG : confScore == 1 ? cO : cRd
+if longSig
+    label.new(bar_index, low-atr*0.3, sweepSrc+" LOW\nConf:"+str.tostring(confScore), color=color.new(confCol,20), textcolor=color.white, size=size.tiny, style=label.style_label_up)
+if shortSig
+    label.new(bar_index, high+atr*0.3, sweepSrc+" HIGH\nConf:"+str.tostring(confScore), color=color.new(confCol,20), textcolor=color.white, size=size.tiny, style=label.style_label_down)
+
+// ═══════════════════════════════════════════════════════════════
+// COACHING DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+if i_showCoach and barstate.islast
+    pos=i_coachPos=="Top Right"?position.top_right:i_coachPos=="Top Left"?position.top_left:i_coachPos=="Bottom Right"?position.bottom_right:position.bottom_left
+    var table ct=table.new(pos,2,15,bgcolor=color.new(#1a1a2e,5),border_width=1,border_color=color.new(#333355,0),frame_width=2,frame_color=color.new(#333355,0))
+    cH=#16213e,c1=#1a1a2e,c2=#0f3460,cW2=#e0e0e0,cD=#888899
+
+    kzStr=isIB?"IB FORMING":isNY_AM_KZ?"NY AM KZ":isSB_AM?"SILVER BULLET":isLonClose?"LON CLOSE":isPostIB?"POST-IB":"OFF"
+    kzC=isKillzone or isPostIB?cG:cO
+    table.cell(ct,0,0,"SWEEP v2",text_color=cW2,text_size=size.small,bgcolor=cH)
+    table.cell(ct,1,0,kzStr,text_color=kzC,text_size=size.small,bgcolor=cH,text_halign=text.align_center)
+
+    ibStr=ibOK?str.tostring(ibH,"#.0")+" / "+str.tostring(ibL,"#.0"):"Forming..."
+    table.cell(ct,0,1,"IB",text_color=color.new(#42A5F5,0),text_size=size.tiny,bgcolor=c1)
+    table.cell(ct,1,1,ibStr,text_color=ibOK?cW2:cD,text_size=size.tiny,bgcolor=c1,text_halign=text.align_center)
+
+    lonStr=lonOK?str.tostring(lonH,"#.0")+" / "+str.tostring(lonL,"#.0"):"—"
+    table.cell(ct,0,2,"London",text_color=color.new(#AB47BC,0),text_size=size.tiny,bgcolor=c2)
+    table.cell(ct,1,2,lonStr,text_color=lonOK?cW2:cD,text_size=size.tiny,bgcolor=c2,text_halign=text.align_center)
+
+    asStr=asiaOK?str.tostring(asiaH,"#.0")+" / "+str.tostring(asiaL,"#.0"):"—"
+    table.cell(ct,0,3,"Asia",text_color=color.new(#FF7043,0),text_size=size.tiny,bgcolor=c1)
+    table.cell(ct,1,3,asStr,text_color=asiaOK?cW2:cD,text_size=size.tiny,bgcolor=c1,text_halign=text.align_center)
+
+    table.cell(ct,0,4,"CONFLUENCE",text_color=color.white,text_size=size.tiny,bgcolor=color.new(#0d47a1,0))
+    table.cell(ct,1,4,"",bgcolor=color.new(#0d47a1,0))
+
+    lon50Str=lonOK?(close>lon50?"ABOVE — Long bias":"BELOW — Short bias"):"—"
+    lon50C=lonOK?(close>lon50?cG:cRd):cD
+    table.cell(ct,0,5,"  Lon50",text_color=cD,text_size=size.tiny,bgcolor=c2)
+    table.cell(ct,1,5,lon50Str,text_color=lon50C,text_size=size.tiny,bgcolor=c2,text_halign=text.align_center)
+
+    table.cell(ct,0,6,"  VWAP",text_color=cD,text_size=size.tiny,bgcolor=c1)
+    vStr=(close>vwap?"Above +":"Below ")+str.tostring(close-vwap,"#.0")
+    table.cell(ct,1,6,vStr+(nearVWAP?"  NEAR":""),text_color=close>vwap?cG:cRd,text_size=size.tiny,bgcolor=c1,text_halign=text.align_center)
+
+    table.cell(ct,0,7,"  Round#",text_color=cD,text_size=size.tiny,bgcolor=c2)
+    nearRndStr=str.tostring(rndBelow,"#")+" / "+str.tostring(rndAbove,"#")+(nearRound?"  NEAR":"")
+    table.cell(ct,1,7,nearRndStr,text_color=nearRound?color.new(#FFD600,0):cD,text_size=size.tiny,bgcolor=c2,text_halign=text.align_center)
+
+    table.cell(ct,0,8,"Position",text_color=cD,text_size=size.tiny,bgcolor=c1)
+    posStr=inLong?"LONG "+trSrc+" C:"+str.tostring(trConf):inShort?"SHORT "+trSrc+" C:"+str.tostring(trConf):"FLAT"
+    posC=inLong?cG:inShort?cRd:cD
+    table.cell(ct,1,8,posStr,text_color=posC,text_size=size.tiny,bgcolor=c1,text_halign=text.align_center)
+
+    table.cell(ct,0,9,"ATR",text_color=cD,text_size=size.tiny,bgcolor=c2)
+    table.cell(ct,1,9,str.tostring(atr,"#.0")+" | SL="+str.tostring(atr*i_slMult,"#.0")+" TP="+str.tostring(atr*i_tpMult,"#.0"),text_color=cW2,text_size=size.tiny,bgcolor=c2,text_halign=text.align_center)
+
+    table.cell(ct,0,10,"COACH",text_color=color.white,text_size=size.tiny,bgcolor=color.new(#0d47a1,0))
+    table.cell(ct,1,10,"",bgcolor=color.new(#0d47a1,0))
+
+    distIBhi=ibOK?math.abs(high-ibH):9999, distIBlo=ibOK?math.abs(low-ibL):9999
+    distAsHi=asiaOK?math.abs(high-asiaH):9999, distAsLo=asiaOK?math.abs(low-asiaL):9999
+    nearT=atr*1.0
+    prox=distIBhi<nearT and isPostIB?"NEAR IB HIGH — bearish sweep zone":distIBlo<nearT and isPostIB?"NEAR IB LOW — bullish sweep zone":distAsLo<nearT and isKillzone?"NEAR ASIA LOW — sweep zone":distAsHi<nearT and isKillzone?"NEAR ASIA HIGH — sweep zone":"No levels in range"
+    proxC=str.contains(prox,"NEAR")?cO:cD
+    table.cell(ct,0,11,"  Setup",text_color=cW2,text_size=size.tiny,bgcolor=color.new(#0a0a1a,0))
+    table.cell(ct,1,11,prox,text_color=proxC,text_size=size.tiny,bgcolor=color.new(#0a0a1a,0),text_halign=text.align_left)
+
+    plan=""
+    planC=cD
+    if not ibOK and isIB
+        plan:="IB forming. Mark the range. No trades yet."
+    else if inLong or inShort
+        plan:="In trade. Hands off. Let SL/TP work.", planC:=cO
+    else if not (isPostIB or isKillzone)
+        plan:="No active kill zone. Wait."
+    else if not cdOK
+        plan:="Cooling down. "+str.tostring(math.max(0,i_cooldown-(bar_index-lastSig)))+" bars.", planC:=cO
+    else if ibOK and isPostIB
+        plan:="Hunt sweeps of "+str.tostring(ibH,"#.0")+" or "+str.tostring(ibL,"#.0"), planC:=cG
+    else
+        plan:="Watch for session level sweeps.", planC:=cW2
+    table.cell(ct,0,12,"  Plan",text_color=cW2,text_size=size.tiny,bgcolor=color.new(#0a0a1a,0))
+    table.cell(ct,1,12,plan,text_color=planC,text_size=size.tiny,bgcolor=color.new(#0a0a1a,0),text_halign=text.align_left)
+
+    risk=inLong or inShort?"Trade active. Don't add or move stop.":"Normal risk. 1-2% max."
+    riskC=inLong or inShort?cO:cG
+    table.cell(ct,0,13,"  Risk",text_color=cW2,text_size=size.tiny,bgcolor=color.new(#0a0a1a,0))
+    table.cell(ct,1,13,risk,text_color=riskC,text_size=size.tiny,bgcolor=color.new(#0a0a1a,0),text_halign=text.align_left)
+
+    dont=not ibOK and not isKillzone?"Don't trade before IB completes.":lonOK and close>lon50?"Don't short against Lon50 bull bias.":lonOK and close<lon50?"Don't buy against Lon50 bear bias.":"Don't chase breakouts. Wait for sweep."
+    table.cell(ct,0,14,"  Avoid",text_color=cW2,text_size=size.tiny,bgcolor=color.new(#1a0a0a,0))
+    table.cell(ct,1,14,dont,text_color=cRd,text_size=size.tiny,bgcolor=color.new(#1a0a0a,0),text_halign=text.align_left)
+
+// ═══════════════════════════════════════════════════════════════
+// STATS TABLE (from Strategy Tester metrics — use panel for detail)
+// ═══════════════════════════════════════════════════════════════
+if i_showStats and barstate.islast
+    sp=i_statsPos=="Top Right"?position.top_right:i_statsPos=="Top Left"?position.top_left:i_statsPos=="Bottom Right"?position.bottom_right:position.bottom_left
+    var table st=table.new(sp,3,8,bgcolor=color.new(#1a1a2e,5),border_width=1,border_color=color.new(#333355,0),frame_width=2,frame_color=color.new(#333355,0))
+    sH=#16213e,s1=#1a1a2e,s2=#0f3460,sW=#e0e0e0,sD=#888899
+
+    wrC=wr>=70?cG:wr>=50?cO:cRd
+    table.cell(st,0,0,"STRATEGY",text_color=sW,text_size=size.small,bgcolor=sH)
+    table.cell(st,1,0,str.tostring(cl)+" tr",text_color=sW,text_size=size.small,bgcolor=sH,text_halign=text.align_center)
+    table.cell(st,2,0,str.tostring(wr,"#.1")+"%",text_color=wrC,text_size=size.small,bgcolor=sH,text_halign=text.align_right)
+
+    table.cell(st,0,1,"Net $",text_color=sD,text_size=size.tiny,bgcolor=s1)
+    table.cell(st,1,1,(net>=0?"+":"")+str.tostring(net,"#.2"),text_color=net>=0?cG:cRd,text_size=size.tiny,bgcolor=s1,text_halign=text.align_center)
+    table.cell(st,2,1,"PF "+str.tostring(pfV,"#.00"),text_color=pfV>=1.5?cG:pfV>=1?cO:cRd,text_size=size.tiny,bgcolor=s1,text_halign=text.align_right)
+
+    table.cell(st,0,2,"Win / Loss",text_color=sD,text_size=size.tiny,bgcolor=s2)
+    table.cell(st,1,2,str.tostring(wn)+" W",text_color=cG,text_size=size.tiny,bgcolor=s2,text_halign=text.align_center)
+    table.cell(st,2,2,str.tostring(ls)+" L",text_color=cRd,text_size=size.tiny,bgcolor=s2,text_halign=text.align_right)
+
+    table.cell(st,0,3,"Avg W / L $",text_color=sD,text_size=size.tiny,bgcolor=s1)
+    table.cell(st,1,3,"+"+str.tostring(avgW,"#.2"),text_color=cG,text_size=size.tiny,bgcolor=s1,text_halign=text.align_center)
+    table.cell(st,2,3,"-"+str.tostring(avgL,"#.2"),text_color=cRd,text_size=size.tiny,bgcolor=s1,text_halign=text.align_right)
+
+    table.cell(st,0,4,"Open P/L",text_color=sD,text_size=size.tiny,bgcolor=s2)
+    table.cell(st,1,4,str.tostring(strategy.openprofit,"#.2"),text_color=sW,text_size=size.tiny,bgcolor=s2,text_halign=text.align_center)
+    table.cell(st,2,4,"pos "+str.tostring(strategy.position_size),text_color=sW,text_size=size.tiny,bgcolor=s2,text_halign=text.align_right)
+
+    table.cell(st,0,5,"Session",text_color=sD,text_size=size.tiny,bgcolor=s1)
+    table.cell(st,1,5,"Flat "+str.tostring(i_flatHr)+":"+str.tostring(i_flatMn,"00"),text_color=sW,text_size=size.tiny,bgcolor=s1,text_halign=text.align_center)
+    table.cell(st,2,5,pastFlat?"NO NEW":"OK",text_color=pastFlat?cO:cG,text_size=size.tiny,bgcolor=s1,text_halign=text.align_right)
+
+    table.cell(st,0,6,"Note",text_color=sD,text_size=size.tiny,bgcolor=s2)
+    table.cell(st,1,6,"Open Strategy",text_color=sW,text_size=size.tiny,bgcolor=s2,text_halign=text.align_center)
+    table.cell(st,2,6,"Tester ▼",text_color=sW,text_size=size.tiny,bgcolor=s2,text_halign=text.align_right)
+
+    table.cell(st,0,7,"IB/Lon/Asia",text_color=sD,text_size=size.tiny,bgcolor=s1)
+    table.cell(st,1,7,"Use tester",text_color=sD,text_size=size.tiny,bgcolor=s1,text_halign=text.align_center)
+    table.cell(st,2,7,"list view",text_color=sD,text_size=size.tiny,bgcolor=s1,text_halign=text.align_right)
+
+// ═══════════════════════════════════════════════════════════════
+// LEVEL RANKING DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+if i_showLevels and barstate.islast
+    lp=i_levelPos=="Top Right"?position.top_right:i_levelPos=="Top Left"?position.top_left:i_levelPos=="Bottom Right"?position.bottom_right:position.bottom_left
+    var table lt=table.new(lp,3,12,bgcolor=color.new(#1a1a2e,5),border_width=1,border_color=color.new(#333355,0),frame_width=2,frame_color=color.new(#333355,0))
+    lH=#16213e,l1=#1a1a2e,l2=#0f3460,lW=#e0e0e0,lD=#888899
+
+    table.cell(lt,0,0,"LEVEL MAP",text_color=lW,text_size=size.small,bgcolor=lH)
+    table.cell(lt,1,0,"Price",text_color=lD,text_size=size.small,bgcolor=lH,text_halign=text.align_center)
+    table.cell(lt,2,0,"Tier",text_color=lD,text_size=size.small,bgcolor=lH,text_halign=text.align_right)
+
+    table.cell(lt,0,1,"VWAP",text_color=color.new(#FF9800,0),text_size=size.tiny,bgcolor=l1)
+    table.cell(lt,1,1,str.tostring(vwap,"#.0"),text_color=lW,text_size=size.tiny,bgcolor=l1,text_halign=text.align_center)
+    vDist=math.abs(close-vwap)
+    table.cell(lt,2,1,"T1 "+(vDist<atr?"★":""),text_color=cG,text_size=size.tiny,bgcolor=l1,text_halign=text.align_right)
+
+    table.cell(lt,0,2,"Round ↑",text_color=color.new(#FFD600,0),text_size=size.tiny,bgcolor=l2)
+    table.cell(lt,1,2,str.tostring(rndAbove,"#"),text_color=lW,text_size=size.tiny,bgcolor=l2,text_halign=text.align_center)
+    rDist=math.abs(close-rndAbove)
+    table.cell(lt,2,2,"T1 "+(rDist<atr?"★":""),text_color=cG,text_size=size.tiny,bgcolor=l2,text_halign=text.align_right)
+
+    table.cell(lt,0,3,"Round ↓",text_color=color.new(#FFD600,0),text_size=size.tiny,bgcolor=l1)
+    table.cell(lt,1,3,str.tostring(rndBelow,"#"),text_color=lW,text_size=size.tiny,bgcolor=l1,text_halign=text.align_center)
+    rDist2=math.abs(close-rndBelow)
+    table.cell(lt,2,3,"T1 "+(rDist2<atr?"★":""),text_color=cG,text_size=size.tiny,bgcolor=l1,text_halign=text.align_right)
+
+    table.cell(lt,0,4,"IB High",text_color=color.new(#42A5F5,0),text_size=size.tiny,bgcolor=l2)
+    table.cell(lt,1,4,ibOK?str.tostring(ibH,"#.0"):"—",text_color=lW,text_size=size.tiny,bgcolor=l2,text_halign=text.align_center)
+    ibHdist=ibOK?math.abs(close-ibH):999
+    table.cell(lt,2,4,"T1 "+(ibHdist<atr?"★":""),text_color=cG,text_size=size.tiny,bgcolor=l2,text_halign=text.align_right)
+
+    table.cell(lt,0,5,"IB Low",text_color=color.new(#42A5F5,0),text_size=size.tiny,bgcolor=l1)
+    table.cell(lt,1,5,ibOK?str.tostring(ibL,"#.0"):"—",text_color=lW,text_size=size.tiny,bgcolor=l1,text_halign=text.align_center)
+    ibLdist=ibOK?math.abs(close-ibL):999
+    table.cell(lt,2,5,"T1 "+(ibLdist<atr?"★":""),text_color=cG,text_size=size.tiny,bgcolor=l1,text_halign=text.align_right)
+
+    table.cell(lt,0,6,"London Hi",text_color=color.new(#AB47BC,0),text_size=size.tiny,bgcolor=l2)
+    table.cell(lt,1,6,lonOK?str.tostring(lonH,"#.0"):"—",text_color=lW,text_size=size.tiny,bgcolor=l2,text_halign=text.align_center)
+    lonHd=lonOK?math.abs(close-lonH):999
+    table.cell(lt,2,6,"T2 "+(lonHd<atr?"★":""),text_color=cO,text_size=size.tiny,bgcolor=l2,text_halign=text.align_right)
+
+    table.cell(lt,0,7,"London Lo",text_color=color.new(#AB47BC,0),text_size=size.tiny,bgcolor=l1)
+    table.cell(lt,1,7,lonOK?str.tostring(lonL,"#.0"):"—",text_color=lW,text_size=size.tiny,bgcolor=l1,text_halign=text.align_center)
+    lonLd=lonOK?math.abs(close-lonL):999
+    table.cell(lt,2,7,"T2 "+(lonLd<atr?"★":""),text_color=cO,text_size=size.tiny,bgcolor=l1,text_halign=text.align_right)
+
+    table.cell(lt,0,8,"Lon 50",text_color=color.new(#AB47BC,0),text_size=size.tiny,bgcolor=l2)
+    table.cell(lt,1,8,lonOK?str.tostring(lon50,"#.0"):"—",text_color=lW,text_size=size.tiny,bgcolor=l2,text_halign=text.align_center)
+    table.cell(lt,2,8,"T2 bias",text_color=cO,text_size=size.tiny,bgcolor=l2,text_halign=text.align_right)
+
+    table.cell(lt,0,9,"Asia Hi",text_color=color.new(#FF7043,0),text_size=size.tiny,bgcolor=l1)
+    table.cell(lt,1,9,asiaOK?str.tostring(asiaH,"#.0"):"—",text_color=lW,text_size=size.tiny,bgcolor=l1,text_halign=text.align_center)
+    asHd=asiaOK?math.abs(close-asiaH):999
+    table.cell(lt,2,9,"T2 "+(asHd<atr?"★":""),text_color=cO,text_size=size.tiny,bgcolor=l1,text_halign=text.align_right)
+
+    table.cell(lt,0,10,"Asia Lo",text_color=color.new(#FF7043,0),text_size=size.tiny,bgcolor=l2)
+    table.cell(lt,1,10,asiaOK?str.tostring(asiaL,"#.0"):"—",text_color=lW,text_size=size.tiny,bgcolor=l2,text_halign=text.align_center)
+    asLd=asiaOK?math.abs(close-asiaL):999
+    table.cell(lt,2,10,"T2 "+(asLd<atr?"★":""),text_color=cO,text_size=size.tiny,bgcolor=l2,text_halign=text.align_right)
+
+    table.cell(lt,0,11,"GEX≈",text_color=color.new(#FFD600,0),text_size=size.tiny,bgcolor=lH)
+    r500a=math.ceil(close/500)*500, r500b=math.floor(close/500)*500
+    table.cell(lt,1,11,str.tostring(r500b,"#")+" / "+str.tostring(r500a,"#"),text_color=lW,text_size=size.tiny,bgcolor=lH,text_halign=text.align_center)
+    table.cell(lt,2,11,"T1 approx",text_color=cG,text_size=size.tiny,bgcolor=lH,text_halign=text.align_right)

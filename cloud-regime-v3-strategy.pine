@@ -1,0 +1,744 @@
+// CLOUD REGIME STRATEGY v3.0
+// MNQ Micro Nasdaq — Tiered Institutional Architecture
+// Next Level Foundry
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// ARCHITECTURE: Five-tier decision system. Each tier answers ONE question.
+// Nothing fires unless every tier above it has cleared.
+//
+// TIER 1 — SESSION    → "Should we trade today?"
+//          ATR Risk Quantifier + Initial Balance classification
+//
+// TIER 2 — DIRECTION  → "Long or short?"
+//          Cloud regime + HTF alignment + VWAP side
+//
+// TIER 3 — TRIGGER    → "Enter now?"
+//          Pullback to structure OR pullback to VWAP zone
+//          ADX (from HTF) confirms trend strength
+//          Squeeze fire (from HTF) = momentum confirmation
+//
+// TIER 4 — QUALITY    → Score label (HQ/SQ); order size = fixed contracts input
+// RESEARCH (inputs) → Optional selective filters: turn checks OFF to isolate what improves backtests (defaults = full stack).
+//
+// TIER 5 — MANAGEMENT → "Protect, scale, trail, exit"
+//          Breakeven → Scale-out at 1R → Trail via structure
+//          Cloud flip / RQ spike / Stale trade = hard exits
+//
+// BEST ON: MNQ or MES, 1-3 minute chart, NY AM session
+// HTF:     5-minute (for ADX + Squeeze reads)
+//
+// ══════════════════════════════════════════════════════════════════════════════
+
+//@version=6
+strategy("Cloud Regime v3.0", 
+     overlay            = true, 
+     pyramiding          = 0,
+     default_qty_type    = strategy.fixed, 
+     default_qty_value   = 1,
+     initial_capital     = 10000,
+     commission_type     = strategy.commission.cash_per_contract, 
+     commission_value    = 0.62,
+     slippage            = 1,
+     calc_on_every_tick  = false,
+     max_bars_back       = 1000)
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║  INPUTS                                                                    ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+// ─── Tier 1: Session ────────────────────────────────────────────────────────
+grp_t1 = "══ T1: SESSION FILTERS ══"
+rqLength     = input.int(14,   "RQ — ATR Length",         minval=2,   group=grp_t1)
+rqSmooth     = input.int(5,    "RQ — Smoothing",          minval=1,   group=grp_t1)
+rqNormLen    = input.int(100,  "RQ — Normalization",      minval=20,  group=grp_t1)
+rqGateOn     = input.float(35, "RQ — Gate (max to trade)",minval=5,   maxval=100, group=grp_t1)
+rqKillSwitch = input.float(50, "RQ — Kill Switch",        minval=10,  maxval=100, group=grp_t1)
+rqExitLevel  = input.float(70, "RQ — Emergency Flatten",  minval=20,  maxval=100, group=grp_t1)
+
+ibMinutes    = input.int(30,   "IB — Duration (min)",     minval=15,  maxval=120, group=grp_t1, tooltip="First N minutes define the Initial Balance range (Dalton)")
+ibExtMult    = input.float(1.5,"IB — Extension Target",   minval=1.0, step=0.25,  group=grp_t1)
+
+useSession   = input.bool(true,   "Session Time Filter",  group=grp_t1)
+sessWindow   = input.session("0930-1200", "Trading Window", group=grp_t1)
+
+maxConsecLoss = input.int(3,     "Circuit Breaker — Max Losses", minval=2, maxval=10, group=grp_t1)
+dailyMaxLoss  = input.float(200, "Daily Max Loss ($)",     minval=50, step=25,  group=grp_t1)
+
+// ─── Tier 2: Direction ──────────────────────────────────────────────────────
+grp_t2 = "══ T2: DIRECTIONAL ALIGNMENT ══"
+fastEmaLen   = input.int(9,    "Cloud — Fast EMA",        minval=2,  group=grp_t2)
+slowEmaLen   = input.int(21,   "Cloud — Slow EMA",        minval=2,  group=grp_t2)
+smaLen       = input.int(50,   "Cloud — SMA Baseline",    minval=5,  group=grp_t2)
+cloudSmooth  = input.int(3,    "Cloud — Confirmation Bars",minval=1,  group=grp_t2, tooltip="Bars cloud must hold before regime confirms")
+
+htfPeriod    = input.timeframe("5", "HTF Timeframe",       group=grp_t2, tooltip="Higher timeframe for trend alignment, ADX, and squeeze")
+
+vwapSrc      = input.source(hlc3, "VWAP Source",           group=grp_t2)
+vwapDev1     = input.float(1.0,   "VWAP — 1st Std Dev",   minval=0.5, step=0.25, group=grp_t2)
+vwapDev2     = input.float(2.0,   "VWAP — 2nd Std Dev",   minval=1.0, step=0.25, group=grp_t2)
+
+// ─── Tier 3: Entry Triggers ─────────────────────────────────────────────────
+grp_t3 = "══ T3: ENTRY TRIGGERS ══"
+swingLen     = input.int(5,    "Structure — Swing Length", minval=2,  group=grp_t3)
+minSteps     = input.int(2,    "Structure — Min Steps",   minval=1,  group=grp_t3)
+stepBuffer   = input.float(2.0,"Structure — Buffer (pts)", minval=0.5, step=0.25, group=grp_t3)
+
+vwapEntryZone = input.float(0.5,"VWAP — Entry Zone (σ)",  minval=0.1, step=0.1, group=grp_t3, tooltip="Pullback into VWAP ± this fraction of 1σ band qualifies as VWAP entry")
+
+htfAdxLen    = input.int(14,   "ADX — Length (on HTF)",    minval=5,  group=grp_t3)
+htfAdxMin    = input.float(20, "ADX — Min for Trend",     minval=10, maxval=50, group=grp_t3, tooltip="Wilder standard: 20-25. Read from HTF.")
+htfAdxChop   = input.float(15, "ADX — Chop Ceiling",      minval=5,  maxval=25, group=grp_t3)
+
+sqzBBLen     = input.int(20,   "Squeeze — BB Length",      minval=5,  group=grp_t3)
+sqzBBMult    = input.float(2.0,"Squeeze — BB Mult",        minval=0.5, step=0.5, group=grp_t3)
+sqzKCLen     = input.int(20,   "Squeeze — KC Length",      minval=5,  group=grp_t3)
+sqzKCMult    = input.float(1.5,"Squeeze — KC Mult",        minval=0.5, step=0.5, group=grp_t3)
+
+atrLen       = input.int(3,    "ATR — Candle Period",      minval=1,  group=grp_t3)
+atrMeanLen   = input.int(20,   "ATR — Mean Lookback",      minval=5,  group=grp_t3)
+atrMaxMult   = input.float(1.5,"ATR — Expansion Mult",     minval=1.0, step=0.1, group=grp_t3)
+
+// ─── Tier 4: Entry Quality ──────────────────────────────────────────────────
+grp_t4 = "══ T4: ENTRY QUALITY / SIZING ══"
+volMaLen           = input.int(20,   "Volume MA Length",     minval=5, group=grp_t4)
+contractsPerTrade = input.int(1,    "Contracts per entry", minval=1, maxval=100, group=grp_t4,
+     tooltip="Contracts on each open. Old risk-% sizing capped at 10 and often filled that cap.")
+
+// ─── Tier 5: Management ─────────────────────────────────────────────────────
+grp_t5 = "══ T5: TRADE MANAGEMENT ══"
+bePoints     = input.float(8.0, "Breakeven Trigger (pts)", minval=1.0, step=0.5, group=grp_t5)
+maxMAE       = input.float(10.0,"Max Stop Distance (pts)", minval=2.0, step=0.5, group=grp_t5)
+scaleOutPct  = input.int(50,    "Scale-Out % at 1R",       minval=25, maxval=75, group=grp_t5)
+staleAfter   = input.int(15,    "Stale Trade Timeout (bars)",minval=5,  group=grp_t5)
+
+// ─── Prev Day Levels ────────────────────────────────────────────────────────
+grp_pdl = "══ PREV DAY LEVELS ══"
+usePDL = input.bool(true, "Show Previous Day H/L/C", group=grp_pdl)
+
+// ─── Research — optional selective filters (all ON = stock behavior; turn OFF to ablate) ──
+grp_research = "══ RESEARCH: SELECTIVE FILTERS ══"
+enforce_t1_rqGate    = input.bool(true, "T1 — RQ gate (vol quant below threshold)", group=grp_research)
+enforce_t1_rqSuspend = input.bool(true, "T1 — Block entry when RQ kill switch", group=grp_research)
+enforce_t1_session   = input.bool(true, "T1 — Session time window", group=grp_research)
+enforce_t1_circuit   = input.bool(true, "T1 — Circuit breaker blocks new entries", group=grp_research)
+enforce_t1_dailyLoss = input.bool(true, "T1 — Daily max loss blocks new entries", group=grp_research)
+
+enforce_t2_cloud     = input.bool(true, "T2 — Chart cloud (fast/slow/SMA)", group=grp_research)
+enforce_t2_noFlipBar = input.bool(true, "T2 — Disallow regime-flip confirmation bar", group=grp_research)
+enforce_t2_htf       = input.bool(true, "T2 — HTF cloud alignment", group=grp_research)
+enforce_t2_vwapSide  = input.bool(true, "T2 — Price on trend side of VWAP", group=grp_research)
+enforce_t2_vwap2sig  = input.bool(true, "T2 — Reject trades past VWAP ±2σ", group=grp_research)
+
+use_t3_trigStruct    = input.bool(true, "T3 — Use structure pullback path", group=grp_research)
+use_t3_trigVwap      = input.bool(true, "T3 — Use VWAP zone pullback path", group=grp_research)
+use_t3_trigSqz       = input.bool(true, "T3 — Use HTF squeeze-fire path", group=grp_research)
+enforce_t3_adxTrend  = input.bool(true, "T3 — HTF ADX ≥ trend minimum", group=grp_research)
+enforce_t3_adxNoChop = input.bool(true, "T3 — HTF ADX above chop ceiling", group=grp_research)
+enforce_t3_atrCandle = input.bool(true, "T3 — ATR candle not extended vs mean", group=grp_research)
+
+minQScoreForEntry    = input.int(0, "Min quality score for entry (0 = off)", minval=0, maxval=12, group=grp_research,
+     tooltip="Block entries when score is below this. Quality score stays computed either way.")
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║  TIER 1: SESSION FILTERS                                                   ║
+// ║  "Should we trade today?"                                                  ║
+// ║  Three independent checks. ALL must pass.                                  ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+// ─── 1A. ATR Risk Quantifier ────────────────────────────────────────────────
+atrRaw      = ta.atr(rqLength)
+atrSmoothed = ta.ema(atrRaw, rqSmooth)
+rqHigh      = ta.highest(atrSmoothed, rqNormLen)
+rqLow       = ta.lowest(atrSmoothed, rqNormLen)
+rqRange     = rqHigh - rqLow
+
+riskQuantifier = rqRange > 0 ? ((atrSmoothed - rqLow) / rqRange) * 100 : 50.0
+
+rqAllowEntry = riskQuantifier < rqGateOn
+rqSuspended  = riskQuantifier >= rqKillSwitch
+rqEmergency  = riskQuantifier >= rqExitLevel
+
+// ─── 1B. Initial Balance (Dalton / Steidlmayer) ────────────────────────────
+// First N minutes of RTH define the range. Break = trend day. Hold = rotation.
+var float ibHigh     = na
+var float ibLow      = na
+var bool  ibFormed   = false
+var int   ibBarCount = 0
+
+newDay = ta.change(time("D")) != 0
+
+if newDay
+    ibHigh     := high
+    ibLow      := low
+    ibFormed   := false
+    ibBarCount := 1
+else if not ibFormed
+    ibBarCount += 1
+    ibHigh     := math.max(nz(ibHigh, high), high)
+    ibLow      := math.min(nz(ibLow, low), low)
+    if ibBarCount >= ibMinutes
+        ibFormed := true
+
+ibRange      = ibFormed ? ibHigh - ibLow : 0.0
+ibBrokenUp   = ibFormed and close > ibHigh
+ibBrokenDown = ibFormed and close < ibLow
+ibInside     = ibFormed and close <= ibHigh and close >= ibLow
+ibTargetUp   = ibFormed ? ibHigh + ibRange * ibExtMult : na
+ibTargetDown = ibFormed ? ibLow  - ibRange * ibExtMult : na
+
+// ─── 1C. Session Time Window ────────────────────────────────────────────────
+inSession = useSession ? not na(time(timeframe.period, sessWindow)) : true
+
+// ─── 1D. Circuit Breaker + Daily Loss ───────────────────────────────────────
+var int   consecLosses  = 0
+var float dailyPnL      = 0.0
+var bool  circuitBroken = false
+var bool  dailyLimitHit = false
+
+if newDay
+    dailyPnL      := 0.0
+    consecLosses  := 0
+    circuitBroken := false
+    dailyLimitHit := false
+
+closedTradesDelta = ta.change(strategy.closedtrades)
+
+if strategy.closedtrades > 0 and closedTradesDelta != 0
+    lastPL = strategy.closedtrades.profit(strategy.closedtrades - 1)
+    dailyPnL += lastPL
+    if lastPL < 0
+        consecLosses += 1
+    else
+        consecLosses := 0
+
+circuitBroken := consecLosses >= maxConsecLoss
+dailyLimitHit := dailyPnL <= -dailyMaxLoss
+
+// ═══ TIER 1 VERDICT ═══
+tier1_pass = (enforce_t1_rqGate ? rqAllowEntry : true) and (enforce_t1_rqSuspend ? not rqSuspended : true) and (enforce_t1_session ? inSession : true) and (enforce_t1_circuit ? not circuitBroken : true) and (enforce_t1_dailyLoss ? not dailyLimitHit : true)
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║  TIER 2: DIRECTIONAL ALIGNMENT                                             ║
+// ║  "Long or short?"                                                          ║
+// ║  Cloud + HTF trend + VWAP side must ALL agree on direction.                ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+// ─── 2A. EMA/SMA Cloud (chart TF) ──────────────────────────────────────────
+fastEma = ta.ema(close, fastEmaLen)
+slowEma = ta.ema(close, slowEmaLen)
+smaBase = ta.sma(close, smaLen)
+
+rawBull = fastEma > slowEma and slowEma > smaBase
+rawBear = fastEma < slowEma and slowEma < smaBase
+
+bullCount    = math.sum(rawBull ? 1 : 0, cloudSmooth)
+bearCount    = math.sum(rawBear ? 1 : 0, cloudSmooth)
+cloudBull    = bullCount == cloudSmooth
+cloudBear    = bearCount == cloudSmooth
+cloudNeutral = not cloudBull and not cloudBear
+cloudFlipped = (cloudBull and cloudBear[1]) or (cloudBear and cloudBull[1])
+
+// ─── 2B. HTF Trend Alignment (Elder Triple Screen) ─────────────────────────
+htfFast = request.security(syminfo.tickerid, htfPeriod, ta.ema(close, fastEmaLen), lookahead=barmerge.lookahead_off)
+htfSlow = request.security(syminfo.tickerid, htfPeriod, ta.ema(close, slowEmaLen), lookahead=barmerge.lookahead_off)
+htfSma  = request.security(syminfo.tickerid, htfPeriod, ta.sma(close, smaLen),     lookahead=barmerge.lookahead_off)
+
+htfBull = htfFast > htfSlow and htfSlow > htfSma
+htfBear = htfFast < htfSlow and htfSlow < htfSma
+
+// ─── 2C. Session VWAP ──────────────────────────────────────────────────────
+var float vwapSum    = 0.0
+var float vwapVolSum = 0.0
+var float vwapSqSum  = 0.0
+
+if newDay
+    vwapSum    := vwapSrc * volume
+    vwapVolSum := volume
+    vwapSqSum  := vwapSrc * vwapSrc * volume
+else
+    vwapSum    += vwapSrc * volume
+    vwapVolSum += volume
+    vwapSqSum  += vwapSrc * vwapSrc * volume
+
+vwapValue = vwapVolSum > 0 ? vwapSum / vwapVolSum : close
+vwapVar   = vwapVolSum > 0 ? (vwapSqSum / vwapVolSum) - (vwapValue * vwapValue) : 0.0
+vwapStdev = math.sqrt(math.max(vwapVar, 0))
+
+vwapUpper1 = vwapValue + vwapStdev * vwapDev1
+vwapLower1 = vwapValue - vwapStdev * vwapDev1
+vwapUpper2 = vwapValue + vwapStdev * vwapDev2
+vwapLower2 = vwapValue - vwapStdev * vwapDev2
+
+priceAboveVwap = close > vwapValue
+priceBelowVwap = close < vwapValue
+overextLong    = close > vwapUpper2
+overextShort   = close < vwapLower2
+
+// ═══ TIER 2 VERDICT ═══
+dirLong  = (enforce_t2_cloud ? cloudBull : true) and (enforce_t2_noFlipBar ? not cloudFlipped : true) and (enforce_t2_htf ? htfBull : true) and (enforce_t2_vwapSide ? priceAboveVwap : true) and (enforce_t2_vwap2sig ? not overextLong : true)
+dirShort = (enforce_t2_cloud ? cloudBear : true) and (enforce_t2_noFlipBar ? not cloudFlipped : true) and (enforce_t2_htf ? htfBear : true) and (enforce_t2_vwapSide ? priceBelowVwap : true) and (enforce_t2_vwap2sig ? not overextShort : true)
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║  TIER 3: ENTRY TRIGGERS                                                    ║
+// ║  "Enter now?"                                                              ║
+// ║  Two entry setups: pullback to structure OR pullback to VWAP zone.         ║
+// ║  ADX (HTF) confirms trend strength. Squeeze fire (HTF) = bonus trigger.    ║
+// ║  ATR candle filter prevents entering during expansion bars.                ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+// ─── 3A. Stepped Trailing Structure ─────────────────────────────────────────
+swingLow  = ta.pivotlow(low, swingLen, swingLen)
+swingHigh = ta.pivothigh(high, swingLen, swingLen)
+
+var float stepLongCurrent  = na
+var float stepLongPrior    = na
+var int   stepLongCount    = 0
+var float stepShortCurrent = na
+var float stepShortPrior   = na
+var int   stepShortCount   = 0
+
+if not na(swingLow)
+    newStep = low[swingLen]
+    if na(stepLongCurrent) or newStep > stepLongCurrent
+        stepLongPrior   := stepLongCurrent
+        stepLongCurrent := newStep
+        stepLongCount   += 1
+    else if not na(stepLongPrior) and newStep > stepLongPrior and newStep < stepLongCurrent
+        stepLongPrior := newStep
+
+if not na(swingHigh)
+    newStep = high[swingLen]
+    if na(stepShortCurrent) or newStep < stepShortCurrent
+        stepShortPrior   := stepShortCurrent
+        stepShortCurrent := newStep
+        stepShortCount   += 1
+    else if not na(stepShortPrior) and newStep < stepShortPrior and newStep > stepShortCurrent
+        stepShortPrior := newStep
+
+longStepsReady  = stepLongCount  >= minSteps and not na(stepLongCurrent)
+shortStepsReady = stepShortCount >= minSteps and not na(stepShortCurrent)
+
+// Pullback to structure
+structLong  = longStepsReady  and low <= stepLongCurrent * 1.001 and close > stepLongCurrent
+structShort = shortStepsReady and high >= stepShortCurrent * 0.999 and close < stepShortCurrent
+
+// ─── 3B. Pullback to VWAP Zone ─────────────────────────────────────────────
+// Price pulls back INTO the VWAP ± entry zone, then closes back in trend direction.
+// This is the institutional re-entry: price returns to the execution benchmark,
+// institutions reload, price continues.
+vwapZoneUpper = vwapValue + vwapStdev * vwapEntryZone
+vwapZoneLower = vwapValue - vwapStdev * vwapEntryZone
+
+vwapLongTrigger  = low <= vwapZoneUpper and close > vwapValue and close > open  // Dipped to VWAP zone, closed bullish above
+vwapShortTrigger = high >= vwapZoneLower and close < vwapValue and close < open // Rallied to VWAP zone, closed bearish below
+
+// ─── 3C. ADX from HTF (Wilder) ─────────────────────────────────────────────
+// Read ADX from the higher timeframe so it reflects genuine trend strength,
+// not 1-minute noise. Destructure on chart TF first — request.security
+// re-evaluates in HTF context.
+[chartDiPlus, chartDiMinus, chartAdx] = ta.dmi(htfAdxLen, htfAdxLen)
+
+htfDiPlus  = request.security(syminfo.tickerid, htfPeriod, chartDiPlus,  lookahead=barmerge.lookahead_off)
+htfDiMinus = request.security(syminfo.tickerid, htfPeriod, chartDiMinus, lookahead=barmerge.lookahead_off)
+htfAdxVal  = request.security(syminfo.tickerid, htfPeriod, chartAdx,     lookahead=barmerge.lookahead_off)
+
+adxTrending   = htfAdxVal >= htfAdxMin
+adxConfirmDir = (dirLong and htfDiPlus > htfDiMinus) or (dirShort and htfDiMinus > htfDiPlus)
+adxChop       = htfAdxVal < htfAdxChop
+
+// ─── 3D. Squeeze Fire from HTF (Bollinger/Keltner) ─────────────────────────
+// Detect squeeze on HTF. Fire = compression released. Directional.
+htfBBBasis = request.security(syminfo.tickerid, htfPeriod, ta.sma(close, sqzBBLen),   lookahead=barmerge.lookahead_off)
+htfBBDev   = request.security(syminfo.tickerid, htfPeriod, ta.stdev(close, sqzBBLen), lookahead=barmerge.lookahead_off)
+htfKCBasis = request.security(syminfo.tickerid, htfPeriod, ta.sma(close, sqzKCLen),   lookahead=barmerge.lookahead_off)
+htfKCAtr   = request.security(syminfo.tickerid, htfPeriod, ta.atr(sqzKCLen),          lookahead=barmerge.lookahead_off)
+
+htfBBUp = htfBBBasis + htfBBDev * sqzBBMult
+htfBBLo = htfBBBasis - htfBBDev * sqzBBMult
+htfKCUp = htfKCBasis + htfKCAtr * sqzKCMult
+htfKCLo = htfKCBasis - htfKCAtr * sqzKCMult
+
+htfSqzOn    = htfBBLo > htfKCLo and htfBBUp < htfKCUp
+htfSqzOff   = not htfSqzOn
+htfSqzFired = htfSqzOff and htfSqzOn[1]
+
+// Squeeze momentum direction
+htfSqzMom   = request.security(syminfo.tickerid, htfPeriod, 
+     ta.linreg(close - ((ta.highest(high, sqzKCLen) + ta.lowest(low, sqzKCLen)) / 2 + ta.sma(close, sqzKCLen)) / 2, sqzKCLen, 0), 
+     lookahead=barmerge.lookahead_off)
+
+sqzBullFire = htfSqzFired and htfSqzMom > 0
+sqzBearFire = htfSqzFired and htfSqzMom < 0
+
+// ─── 3E. ATR Candle Filter ─────────────────────────────────────────────────
+atrCurrent  = ta.atr(atrLen)
+atrMean     = ta.sma(atrCurrent, atrMeanLen)
+atrNormal   = atrCurrent <= atrMean * atrMaxMult
+
+// ═══ TIER 3 VERDICT ═══
+// Entry paths are toggleable for research (see RESEARCH inputs). Shared ADX / ATR pack may be lifted per toggle.
+t3adx = (enforce_t3_adxTrend ? adxTrending : true) and (enforce_t3_adxNoChop ? not adxChop : true) and (enforce_t3_atrCandle ? atrNormal : true)
+
+triggerLongStruct  = use_t3_trigStruct and structLong and t3adx
+triggerLongVwap    = use_t3_trigVwap and vwapLongTrigger and t3adx
+triggerLongSqz     = use_t3_trigSqz and sqzBullFire and t3adx
+
+triggerShortStruct = use_t3_trigStruct and structShort and t3adx
+triggerShortVwap   = use_t3_trigVwap and vwapShortTrigger and t3adx
+triggerShortSqz    = use_t3_trigSqz and sqzBearFire and t3adx
+
+triggerLong  = triggerLongStruct or triggerLongVwap or triggerLongSqz
+triggerShort = triggerShortStruct or triggerShortVwap or triggerShortSqz
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║  TIER 4: ENTRY QUALITY — SCORE LABELS                                         ║
+// ║  "Full vs reduced?" (display / internal score only.)                          ║
+// ║  Volume and PD proximity weight the score, not gates. Order size is fixed     ║
+// ║  contracts (Contracts per entry).                                             ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+// ─── Volume Assessment ──────────────────────────────────────────────────────
+volMA       = ta.sma(volume, volMaLen)
+volAboveAvg = volume >= volMA
+volStrong   = volume >= volMA * 1.5
+
+// ─── Previous Day Levels ────────────────────────────────────────────────────
+pdHigh  = request.security(syminfo.tickerid, "D", high[1],  lookahead=barmerge.lookahead_on)
+pdLow   = request.security(syminfo.tickerid, "D", low[1],   lookahead=barmerge.lookahead_on)
+pdClose = request.security(syminfo.tickerid, "D", close[1], lookahead=barmerge.lookahead_on)
+
+pdRange     = pdHigh - pdLow
+pdProximity = pdRange * 0.05
+nearPDH     = math.abs(close - pdHigh)  <= pdProximity
+nearPDL     = math.abs(close - pdLow)   <= pdProximity
+nearPDC     = math.abs(close - pdClose) <= pdProximity
+nearPDLevel = nearPDH or nearPDL or nearPDC
+
+// ─── Quality Score ──────────────────────────────────────────────────────────
+// High quality = both structure AND vwap triggered, volume strong, near PD level
+// Standard quality = single trigger, volume OK
+// Low quality = single trigger, no volume confirm
+
+qualityScore = 0
+qualityScore += (structLong or structShort) and (vwapLongTrigger or vwapShortTrigger) ? 3 : 0  // Both triggers
+qualityScore += volStrong                ? 2 : volAboveAvg ? 1 : 0   // Volume weight
+qualityScore += nearPDLevel              ? 2 : 0                     // PD level proximity
+qualityScore += adxConfirmDir            ? 1 : 0                     // DI directional confirm
+qualityScore += (sqzBullFire or sqzBearFire) ? 2 : 0                 // Squeeze fire bonus
+qualityScore += ibBrokenUp or ibBrokenDown   ? 1 : 0                 // IB broken in trend direction
+
+highQuality = qualityScore >= 5
+
+tradeQty = contractsPerTrade
+
+// Stop distances (structure-based; qty is fixed contract count above)
+longStopDist  = longStepsReady ? math.min(close - (stepLongCurrent - stepBuffer), maxMAE) : maxMAE
+shortStopDist = shortStepsReady ? math.min((stepShortCurrent + stepBuffer) - close, maxMAE) : maxMAE
+
+// Ensure minimum stop distance
+longStopDist  := math.max(longStopDist, 2.0)
+shortStopDist := math.max(shortStopDist, 2.0)
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║  ENTRY EXECUTION                                                           ║
+// ║  All five tiers must clear: Session + Direction + Trigger + Quality score   ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+// Single fill per directional trade: flat book only, pyramiding=0 (no scale-in adds).
+entryQOk   = qualityScore >= minQScoreForEntry
+longEntry  = tier1_pass and dirLong  and triggerLong  and entryQOk and strategy.position_size == 0
+shortEntry = tier1_pass and dirShort and triggerShort and entryQOk and strategy.position_size == 0
+
+longStop  = close - longStopDist
+shortStop = close + shortStopDist
+
+// Entry type label for trade comments
+longType  = triggerLongStruct and vwapLongTrigger ? "Struct+VWAP" : triggerLongStruct ? "Struct" : triggerLongSqz ? "SqzFire" : "VWAP"
+shortType = triggerShortStruct and vwapShortTrigger ? "Struct+VWAP" : triggerShortStruct ? "Struct" : triggerShortSqz ? "SqzFire" : "VWAP"
+
+if longEntry
+    qLabel = highQuality ? "HQ" : "SQ"
+    strategy.entry("Long", strategy.long, qty=tradeQty, comment=longType + " " + qLabel + " [" + str.tostring(qualityScore) + "]")
+    strategy.exit("L_InitStop", "Long", stop=longStop)
+
+if shortEntry
+    qLabel = highQuality ? "HQ" : "SQ"
+    strategy.entry("Short", strategy.short, qty=tradeQty, comment=shortType + " " + qLabel + " [" + str.tostring(qualityScore) + "]")
+    strategy.exit("S_InitStop", "Short", stop=shortStop)
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║  TIER 5: TRADE MANAGEMENT                                                 ║
+// ║  Phase 1: Breakeven at configurable MFE                                    ║
+// ║  Phase 2: Scale-out 50% at 1R                                              ║
+// ║  Phase 3: Trail remainder via stepped structure                            ║
+// ║  Hard exits: Cloud flip, RQ emergency, stale trade, daily limit           ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+var int   longEntryBar    = na
+var float longEntryPrice  = na
+var float longInitStop    = na
+var bool  longAtBE        = false
+var bool  longScaledOut   = false
+var int   shortEntryBar   = na
+var float shortEntryPrice = na
+var float shortInitStop   = na
+var bool  shortAtBE       = false
+var bool  shortScaledOut  = false
+
+// Detect new entries
+if strategy.position_size > 0 and strategy.position_size[1] <= 0
+    longEntryBar   := bar_index
+    longEntryPrice := strategy.position_avg_price
+    longInitStop   := longStop
+    longAtBE       := false
+    longScaledOut  := false
+
+if strategy.position_size < 0 and strategy.position_size[1] >= 0
+    shortEntryBar   := bar_index
+    shortEntryPrice := strategy.position_avg_price
+    shortInitStop   := shortStop
+    shortAtBE       := false
+    shortScaledOut  := false
+
+if strategy.position_size == 0
+    longEntryBar    := na
+    longEntryPrice  := na
+    longInitStop    := na
+    longAtBE        := false
+    longScaledOut   := false
+    shortEntryBar   := na
+    shortEntryPrice := na
+    shortInitStop   := na
+    shortAtBE       := false
+    shortScaledOut  := false
+
+// ─── Phase 1: Breakeven ─────────────────────────────────────────────────────
+if strategy.position_size > 0 and not na(longEntryPrice) and not longAtBE
+    if high >= longEntryPrice + bePoints
+        strategy.exit("L_BE", "Long", stop=longEntryPrice + 0.5)
+        longAtBE := true
+
+if strategy.position_size < 0 and not na(shortEntryPrice) and not shortAtBE
+    if low <= shortEntryPrice - bePoints
+        strategy.exit("S_BE", "Short", stop=shortEntryPrice - 0.5)
+        shortAtBE := true
+
+// ─── Phase 2: Scale-Out at 1R ───────────────────────────────────────────────
+if strategy.position_size > 0 and longAtBE and not longScaledOut and not na(longEntryPrice) and not na(longInitStop)
+    riskDist = longEntryPrice - nz(longInitStop, longEntryPrice - maxMAE)
+    target1R = longEntryPrice + riskDist
+    if high >= target1R and riskDist > 0
+        closeQty = math.max(1, math.round(strategy.position_size * (scaleOutPct / 100.0)))
+        strategy.close("Long", comment="ScaleOut_1R", qty=closeQty)
+        longScaledOut := true
+
+if strategy.position_size < 0 and shortAtBE and not shortScaledOut and not na(shortEntryPrice) and not na(shortInitStop)
+    riskDist = nz(shortInitStop, shortEntryPrice + maxMAE) - shortEntryPrice
+    target1R = shortEntryPrice - riskDist
+    if low <= target1R and riskDist > 0
+        closeQty = math.max(1, math.round(math.abs(strategy.position_size) * (scaleOutPct / 100.0)))
+        strategy.close("Short", comment="ScaleOut_1R", qty=closeQty)
+        shortScaledOut := true
+
+// ─── Phase 3: Trail via Structure ───────────────────────────────────────────
+if strategy.position_size > 0 and longAtBE and not na(stepLongPrior) and not na(longEntryPrice)
+    trailStop = stepLongPrior - stepBuffer
+    if trailStop > longEntryPrice
+        strategy.exit("L_Trail", "Long", stop=trailStop)
+
+if strategy.position_size < 0 and shortAtBE and not na(stepShortPrior) and not na(shortEntryPrice)
+    trailStop = stepShortPrior + stepBuffer
+    if trailStop < shortEntryPrice
+        strategy.exit("S_Trail", "Short", stop=trailStop)
+
+// ─── Hard Exits ─────────────────────────────────────────────────────────────
+
+// Cloud flip — regime invalidation
+if strategy.position_size > 0 and cloudBear
+    strategy.close("Long", comment="CloudFlip_X")
+if strategy.position_size < 0 and cloudBull
+    strategy.close("Short", comment="CloudFlip_X")
+
+// RQ Emergency — flatten everything
+if strategy.position_size != 0 and rqEmergency
+    strategy.close_all(comment="RQ_Emergency_X")
+
+// RQ Spike — tighten aggressively
+if strategy.position_size > 0 and rqSuspended and not rqEmergency and not na(stepLongCurrent)
+    strategy.exit("L_RQ_Tight", "Long", stop=stepLongCurrent - 1.0)
+if strategy.position_size < 0 and rqSuspended and not rqEmergency and not na(stepShortCurrent)
+    strategy.exit("S_RQ_Tight", "Short", stop=stepShortCurrent + 1.0)
+
+// Stale trade — no progress
+if strategy.position_size > 0 and not na(longEntryBar) and not na(longEntryPrice)
+    if (bar_index - longEntryBar) >= staleAfter and close <= longEntryPrice
+        strategy.close("Long", comment="Stale_X")
+if strategy.position_size < 0 and not na(shortEntryBar) and not na(shortEntryPrice)
+    if (bar_index - shortEntryBar) >= staleAfter and close >= shortEntryPrice
+        strategy.close("Short", comment="Stale_X")
+
+// Daily limit / Circuit breaker — flatten
+if strategy.position_size != 0 and (dailyLimitHit or circuitBroken)
+    strategy.close_all(comment="RiskLimit_X")
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║  PLOTS & VISUALS                                                           ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+// ─── VWAP ───────────────────────────────────────────────────────────────────
+plot(vwapValue,  "VWAP",     color=color.new(#a855f7, 15), linewidth=2)
+plot(vwapUpper1, "VWAP +1σ", color=color.new(#a855f7, 55), linewidth=1)
+plot(vwapLower1, "VWAP -1σ", color=color.new(#a855f7, 55), linewidth=1)
+plot(vwapUpper2, "VWAP +2σ", color=color.new(#a855f7, 80), linewidth=1, style=plot.style_circles)
+plot(vwapLower2, "VWAP -2σ", color=color.new(#a855f7, 80), linewidth=1, style=plot.style_circles)
+
+// ─── VWAP Entry Zone ────────────────────────────────────────────────────────
+p_vz_up = plot(vwapZoneUpper, "VWAP Zone Up", color=color.new(#a855f7, 85), display=display.none)
+p_vz_lo = plot(vwapZoneLower, "VWAP Zone Lo", color=color.new(#a855f7, 85), display=display.none)
+fill(p_vz_up, p_vz_lo, color=color.new(#a855f7, 92), title="VWAP Entry Zone")
+
+// ─── Previous Day Levels ────────────────────────────────────────────────────
+plot(usePDL ? pdHigh  : na, "PD High",  color=color.new(#06d6a0, 40), linewidth=1, style=plot.style_stepline)
+plot(usePDL ? pdLow   : na, "PD Low",   color=color.new(#ff3860, 40), linewidth=1, style=plot.style_stepline)
+plot(usePDL ? pdClose : na, "PD Close", color=color.new(#8b89a0, 40), linewidth=1, style=plot.style_stepline)
+
+// ─── Initial Balance ────────────────────────────────────────────────────────
+plot(ibFormed ? ibHigh : na, "IB High", color=color.new(#3b82f6, 25), linewidth=2, style=plot.style_stepline)
+plot(ibFormed ? ibLow  : na, "IB Low",  color=color.new(#3b82f6, 25), linewidth=2, style=plot.style_stepline)
+plot(ibBrokenUp   ? ibTargetUp   : na, "IB Target ▲", color=color.new(#06d6a0, 55), linewidth=1, style=plot.style_cross)
+plot(ibBrokenDown ? ibTargetDown : na, "IB Target ▼", color=color.new(#ff3860, 55), linewidth=1, style=plot.style_cross)
+
+// ─── Stepped Structure ──────────────────────────────────────────────────────
+plot(longStepsReady  ? stepLongCurrent  : na, "Step L Current", color=color.new(#f59e0b, 25), style=plot.style_stepline_diamond, linewidth=2)
+plot(longStepsReady  ? stepLongPrior    : na, "Step L Prior",   color=color.new(#f59e0b, 55), style=plot.style_stepline, linewidth=1)
+plot(shortStepsReady ? stepShortCurrent : na, "Step S Current", color=color.new(#f59e0b, 25), style=plot.style_stepline_diamond, linewidth=2)
+plot(shortStepsReady ? stepShortPrior   : na, "Step S Prior",   color=color.new(#f59e0b, 55), style=plot.style_stepline, linewidth=1)
+
+// ─── Entry Signals ──────────────────────────────────────────────────────────
+plotshape(longEntry,  "Long Signal",  shape.triangleup,   location.belowbar, color=#06d6a0, size=size.small)
+plotshape(shortEntry, "Short Signal", shape.triangledown, location.abovebar, color=#ff3860, size=size.small)
+plotshape(sqzBullFire and dirLong,  "Squeeze Bull", shape.diamond, location.belowbar, color=#a855f7, size=size.tiny)
+plotshape(sqzBearFire and dirShort, "Squeeze Bear", shape.diamond, location.abovebar, color=#a855f7, size=size.tiny)
+
+// ─── Background ─────────────────────────────────────────────────────────────
+bgcolor(inSession and useSession ? color.new(#3b82f6, 95) : na, title="Session")
+bgcolor(rqSuspended and not rqEmergency ? color.new(#f59e0b, 93) : na, title="RQ Warn")
+bgcolor(rqEmergency ? color.new(#ff3860, 90) : na, title="RQ Emergency")
+bgcolor(htfSqzOn ? color.new(#a855f7, 95) : na, title="HTF Squeeze")
+bgcolor(circuitBroken or dailyLimitHit ? color.new(#ff3860, 92) : na, title="Circuit Broken")
+
+
+// ╔══════════════════════════════════════════════════════════════════════════════╗
+// ║  INFO PANEL                                                                ║
+// ╚══════════════════════════════════════════════════════════════════════════════╝
+
+var table panel = table.new(position.top_right, 2, 15, 
+     bgcolor=color.new(#0a0a0f, 10), 
+     border_color=color.new(#a855f7, 70), 
+     border_width=1, 
+     frame_color=color.new(#a855f7, 50), 
+     frame_width=1)
+
+if bar_index == last_bar_index
+    r = 0
+
+    // Header
+    table.cell(panel, 0, r, "CLOUD REGIME", text_color=#a855f7, text_size=size.small, text_halign=text.align_left, bgcolor=color.new(#12121e, 10))
+    table.cell(panel, 1, r, "v3.0", text_color=color.new(#8b89a0, 0), text_size=size.small, text_halign=text.align_right, bgcolor=color.new(#12121e, 10))
+    r += 1
+
+    // T1: Session
+    t1Text = tier1_pass ? "✓ ACTIVE" : circuitBroken ? "⊘ CIRCUIT" : dailyLimitHit ? "⊘ DAILY LIM" : rqSuspended ? "⊘ RQ KILL" : "⊘ GATED"
+    t1Clr  = tier1_pass ? #06d6a0 : #ff3860
+    table.cell(panel, 0, r, "T1 Session", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, t1Text, text_color=t1Clr, text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // Risk Quantifier value
+    rqClr = riskQuantifier < rqGateOn ? #06d6a0 : riskQuantifier < rqKillSwitch ? #f59e0b : #ff3860
+    table.cell(panel, 0, r, "Risk Quant", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, str.tostring(riskQuantifier, "#.#"), text_color=rqClr, text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // T2: Direction
+    t2Text = dirLong ? "▲ LONG" : dirShort ? "▼ SHORT" : "— FLAT"
+    t2Clr  = dirLong ? #06d6a0 : dirShort ? #ff3860 : color.gray
+    table.cell(panel, 0, r, "T2 Direction", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, t2Text, text_color=t2Clr, text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // Cloud + HTF
+    htfAgree = (cloudBull and htfBull) or (cloudBear and htfBear)
+    table.cell(panel, 0, r, "HTF Align", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, htfAgree ? "✓ YES" : "✗ NO", text_color=htfAgree ? #06d6a0 : #ff3860, text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // VWAP
+    vwapText = close > vwapUpper1 ? "ABOVE +1σ" : priceAboveVwap ? "ABOVE" : close < vwapLower1 ? "BELOW -1σ" : "BELOW"
+    table.cell(panel, 0, r, "VWAP", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, vwapText, text_color=priceAboveVwap ? #06d6a0 : #ff3860, text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // ADX
+    adxClr = adxTrending ? #06d6a0 : adxChop ? #ff3860 : #f59e0b
+    table.cell(panel, 0, r, "ADX (HTF)", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, str.tostring(htfAdxVal, "#.#") + (adxTrending ? " ✓" : " ✗"), text_color=adxClr, text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // Squeeze
+    sqzText = htfSqzOn ? "SQUEEZE" : htfSqzFired ? "FIRED!" : "OFF"
+    sqzClr  = htfSqzOn ? #f59e0b : htfSqzFired ? #06d6a0 : color.new(#8b89a0, 0)
+    table.cell(panel, 0, r, "Squeeze (HTF)", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, sqzText, text_color=sqzClr, text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // IB
+    ibText = not ibFormed ? "FORMING" : ibBrokenUp ? "▲ BREAK" : ibBrokenDown ? "▼ BREAK" : "INSIDE"
+    ibClr  = ibBrokenUp ? #06d6a0 : ibBrokenDown ? #ff3860 : #f59e0b
+    table.cell(panel, 0, r, "Init Balance", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, ibText, text_color=ibClr, text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // Volume
+    volText = volStrong ? "STRONG" : volAboveAvg ? "OK" : "WEAK"
+    volClr  = volStrong ? #06d6a0 : volAboveAvg ? color.new(#8b89a0, 0) : #ff3860
+    table.cell(panel, 0, r, "Volume", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, volText, text_color=volClr, text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // Quality
+    qText = str.tostring(qualityScore) + (highQuality ? " ★ HQ" : " ○ std")
+    table.cell(panel, 0, r, "Quality", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, qText, text_color=highQuality ? #06d6a0 : #f59e0b, text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // Step Level
+    stepVal  = dirLong ? stepLongCurrent : dirShort ? stepShortCurrent : na
+    table.cell(panel, 0, r, "Active Step", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, na(stepVal) ? "—" : str.tostring(stepVal, "#.##"), text_color=color.new(#f59e0b, 0), text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // Daily P&L
+    pnlClr = dailyPnL >= 0 ? #06d6a0 : #ff3860
+    table.cell(panel, 0, r, "Daily P&L", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, "$" + str.tostring(dailyPnL, "#.##"), text_color=pnlClr, text_size=size.tiny, text_halign=text.align_right)
+    r += 1
+
+    // Losses
+    cbClr = circuitBroken ? #ff3860 : consecLosses > 0 ? #f59e0b : #06d6a0
+    cbText = circuitBroken ? "⊘ TRIPPED" : str.tostring(consecLosses) + " / " + str.tostring(maxConsecLoss)
+    table.cell(panel, 0, r, "Consec Loss", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, r, cbText, text_color=cbClr, text_size=size.tiny, text_halign=text.align_right)
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// END
+// ══════════════════════════════════════════════════════════════════════════════

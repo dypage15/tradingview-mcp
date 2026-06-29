@@ -1,0 +1,172 @@
+﻿//@version=6
+// Sweep Engine v2.0 ΓÇö STRATEGY (for backtesting & optimization)
+// Mirrors sweep-engine-v2-export.pine signal logic + mandatory same-day session flatten (CT).
+// Use Strategy Tester ΓåÆ Optimization on MNQ/ES/MES etc. 3ΓÇô15m for intraday.
+strategy("Sweep Engine v2.0 Strategy", shorttitle="SEv2 Strat", overlay=true, max_lines_count=120, max_labels_count=40,
+     initial_capital=100000, default_qty_type=strategy.fixed, default_qty_value=1,
+     commission_type=strategy.commission.cash_per_contract, commission_value=0.62,
+     slippage=2, process_orders_on_close=true, calc_on_every_tick=false)
+
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// INPUTS (ranges friendly to TV Strategy Tester optimization)
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+i_atrLen     = input.int(14,     "ATR Length",                   group="Signal", minval=5, maxval=30, step=1)
+i_slMult     = input.float(4.0,  "Stop Loss (x ATR)",           group="Signal", minval=1.0, maxval=8.0, step=0.5)
+i_tpMult     = input.float(6.0,  "Take Profit (x ATR)",         group="Signal", minval=2.0, maxval=14.0, step=0.5)
+i_cooldown   = input.int(6,      "Cooldown (bars)",              group="Signal", minval=1, maxval=30, step=1)
+i_minConf    = input.int(0,      "Min confluence score (0ΓÇô3)",   group="Signal", minval=0, maxval=3, step=1,
+     tooltip="0 = same as indicator (any). Higher = fewer, higher-quality signals.")
+
+i_useIB      = input.bool(true,  "Trade IB Sweeps",             group="Session Sweeps")
+i_useLondon  = input.bool(true,  "Trade London Sweeps",         group="Session Sweeps")
+i_useAsia    = input.bool(true,  "Trade Asia Sweeps",           group="Session Sweeps")
+i_useLon50   = input.bool(false, "Require London 50 Bias",      group="Session Sweeps")
+
+i_roundIntvl = input.int(100,    "Round Number Interval",       group="Confluence", options=[50,100,250,500])
+i_confProx   = input.float(1.5,  "Confluence Proximity (x ATR)",group="Confluence", minval=0.5, maxval=4.0, step=0.25)
+
+// Same-day flatten ΓÇö no overnight holds (intraday requirement)
+i_flatHr     = input.int(15,     "Flatten ΓÇö hour (Chicago)",    group="Session Exit", minval=12, maxval=17, step=1,
+     tooltip="Close all positions at or after this time (CT). Default 15:00 = 4pm ET cash close (DST-dependent). Tune for your session.")
+i_flatMn     = input.int(0,      "Flatten ΓÇö minute (Chicago)",    group="Session Exit", minval=0, maxval=55, step=5)
+
+i_plotSig    = input.bool(true,  "Plot entry markers",          group="Display")
+
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// TIME + SESSION (CT ΓÇö Central Time; matches original indicator)
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+hr = hour(time, "America/Chicago")
+mn = minute(time, "America/Chicago")
+atr = ta.atr(i_atrLen)
+newDay = ta.change(time("D")) != 0
+
+isAsia     = hr >= 18 or hr < 1
+isLondon   = hr >= 1 and hr < 4
+isIB       = (hr == 8 and mn >= 30) or (hr == 9 and mn < 30)
+isPostIB   = (hr == 9 and mn >= 30) or (hr >= 10 and hr < 15)
+isNY_AM_KZ = (hr == 7 and mn >= 30) or hr == 8 or (hr == 9 and mn < 30)
+isSB_AM    = hr == 9 or (hr == 10 and mn == 0)
+isLonClose = hr == 9 or (hr == 10 and mn < 30)
+isKillzone = isNY_AM_KZ or isSB_AM or isLonClose
+
+// Flatten window: at or after (i_flatHr:i_flatMn) Chicago, block new entries until next chart day
+pastFlat = (hr > i_flatHr) or (hr == i_flatHr and mn >= i_flatMn)
+
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// SESSION LEVELS
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+var float ibH=na, var float ibL=na, var float ib50=na, var bool ibOK=false
+var float lonH=na, var float lonL=na, var float lon50=na, var bool lonOK=false
+var float asiaH=na, var float asiaL=na, var bool asiaOK=false
+
+if newDay
+    ibH:=na,ibL:=na,ib50:=na,ibOK:=false,lonH:=na,lonL:=na,lon50:=na,lonOK:=false,asiaH:=na,asiaL:=na,asiaOK:=false
+
+if isIB
+    ibH:=na(ibH)?high:math.max(ibH,high), ibL:=na(ibL)?low:math.min(ibL,low), ib50:=(ibH+ibL)/2
+if isIB[1] and not isIB
+    ibOK:=true
+
+if isLondon
+    lonH:=na(lonH)?high:math.max(lonH,high), lonL:=na(lonL)?low:math.min(lonL,low), lon50:=(lonH+lonL)/2
+if isLondon[1] and not isLondon
+    lonOK:=true
+
+if isAsia
+    asiaH:=na(asiaH)?high:math.max(asiaH,high), asiaL:=na(asiaL)?low:math.min(asiaL,low)
+if isAsia[1] and not isAsia
+    asiaOK:=true
+
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// VWAP (session)
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+var float cPV=0., var float cVol=0.
+if newDay
+    cPV:=0., cVol:=0.
+tp_=(high+low+close)/3
+cPV+=tp_*volume, cVol+=volume
+vwap=cVol>0?cPV/cVol:close
+
+rndAbove = math.ceil(close / i_roundIntvl) * i_roundIntvl
+rndBelow = math.floor(close / i_roundIntvl) * i_roundIntvl
+nearRound = math.min(math.abs(close - rndAbove), math.abs(close - rndBelow)) < atr * i_confProx
+
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// SWEEPS + CONFLUENCE
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+lon50Bull = not i_useLon50 or (lonOK and close > lon50)
+lon50Bear = not i_useLon50 or (lonOK and close < lon50)
+
+sweepIBlo  = ibOK and isPostIB and (low < ibL) and (close > ibL) and lon50Bull
+sweepIBhi  = ibOK and isPostIB and (high > ibH) and (close < ibH) and lon50Bear
+sweepLonLo = lonOK and isKillzone and (low < lonL) and (close > lonL) and lon50Bull
+sweepLonHi = lonOK and isKillzone and (high > lonH) and (close < lonH) and lon50Bear
+sweepAsLo  = asiaOK and isKillzone and (low < asiaL) and (close > asiaL) and lon50Bull
+sweepAsHi  = asiaOK and isKillzone and (high > asiaH) and (close < asiaH) and lon50Bear
+
+bullSweep = (i_useIB and sweepIBlo) or (i_useAsia and sweepAsLo) or (i_useLondon and sweepLonLo)
+bearSweep = (i_useIB and sweepIBhi) or (i_useAsia and sweepAsHi) or (i_useLondon and sweepLonHi)
+
+nearVWAP = math.abs(close - vwap) < atr * i_confProx
+lon50Aligned_bull = lonOK and close > lon50
+lon50Aligned_bear = lonOK and close < lon50
+
+confBull = (nearRound ? 1 : 0) + (nearVWAP ? 1 : 0) + (lon50Aligned_bull ? 1 : 0)
+confBear = (nearRound ? 1 : 0) + (nearVWAP ? 1 : 0) + (lon50Aligned_bear ? 1 : 0)
+
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// SIGNALS (flat = no new trades; same-day session discipline)
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+var int lastSig = 0
+cdOK = bar_index - lastSig > i_cooldown
+
+canEnter = not pastFlat and strategy.position_size == 0
+
+longSig  = bullSweep and cdOK and canEnter and confBull >= i_minConf
+shortSig = bearSweep and cdOK and canEnter and confBear >= i_minConf
+
+if longSig or shortSig
+    lastSig := bar_index
+
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// POSITIONS ΓÇö fixed SL/TP at entry (ATR at signal bar)
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+var float holdSL = na
+var float holdTP = na
+
+flatBar = pastFlat
+
+// 1) Mandatory session flatten ΓÇö close all before hold carries past flatten time
+if flatBar and strategy.position_size != 0
+    strategy.close_all(comment="Session flat")
+
+// 2) Entries first (sets holdSL/holdTP), then bracket exits reference those prices
+if longSig
+    holdSL := close - atr * i_slMult
+    holdTP := close + atr * i_tpMult
+    strategy.entry("Long", strategy.long)
+
+if shortSig
+    holdSL := close + atr * i_slMult
+    holdTP := close - atr * i_tpMult
+    strategy.entry("Short", strategy.short)
+
+// 3) Bracket exits ΓÇö after entries so same-bar signals get valid stops
+if not flatBar and strategy.position_size > 0
+    strategy.exit("xL", "Long", stop=holdSL, limit=holdTP)
+if not flatBar and strategy.position_size < 0
+    strategy.exit("xS", "Short", stop=holdSL, limit=holdTP)
+
+// Clear bracket prices after flat or filled exit (do NOT clear on entry bar while size still 0)
+justClosed = strategy.position_size == 0 and nz(strategy.position_size[1], 0) != 0
+if flatBar or justClosed
+    holdSL := na
+    holdTP := na
+
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+// PLOTS
+// ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+plot(i_plotSig and longSig ? low : na, "Long", color=color.new(color.lime, 0), style=plot.style_circles, linewidth=3)
+plot(i_plotSig and shortSig ? high : na, "Short", color=color.new(color.red, 0), style=plot.style_circles, linewidth=3)
+bgcolor(pastFlat ? color.new(color.gray, 92) : na, title="After flatten (no new trades)")
+

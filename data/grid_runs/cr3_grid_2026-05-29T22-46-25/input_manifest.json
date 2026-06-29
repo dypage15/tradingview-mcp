@@ -1,0 +1,22 @@
+{
+  "scenario_count": 54,
+  "base": {
+    "htfTF": "5",
+    "cloudSmooth": 3,
+    "zOptLow": 20,
+    "zOptHigh": 35,
+    "tpPoints": 20,
+    "slPoints": 10,
+    "useSession": true,
+    "sessStart": "0930-1600",
+    "enableResearch": true,
+    "outcomeLB": 10,
+    "clusterBars": 12,
+    "useTrendTier": true,
+    "useWickTier": false,
+    "wickMinConf": 3,
+    "adxEntryHigh": 45,
+    "useVwap2Bar": true,
+    "minWickConfDisplay": 3
+  }
+}

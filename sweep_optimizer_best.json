@@ -1,0 +1,23 @@
+{
+  "scenario_id": 139,
+  "contracts": 3,
+  "atr_len": 20,
+  "sl_mult": 5.0,
+  "tp_mult": 3.5,
+  "cooldown": 10,
+  "min_conf": 0,
+  "round_intvl": 250,
+  "conf_prox": 1.25,
+  "sweep_depth_atr": 0.0,
+  "use_lon50": false,
+  "block_reactive_long_bear_pool": false,
+  "sandbox": "none",
+  "exec_style": "limit_level",
+  "flat_hr": 15,
+  "flat_mn": 30,
+  "net_profit": 28775.369999999933,
+  "max_drawdown": 5139.427500000005,
+  "trades": 94,
+  "win_rate": 0.6808510638297872,
+  "profit_factor": 2.575860482691768
+}

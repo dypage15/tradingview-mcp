@@ -1,0 +1,201 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\cr3_oos_2026-05-29T22-42-54",
+  "method": "insufficient_trade_data",
+  "spec": {
+    "htfTF": "5",
+    "cloudSmooth": 3,
+    "zOptLow": 20,
+    "zOptHigh": 35,
+    "tpPoints": 20,
+    "slPoints": 10,
+    "useSession": true,
+    "sessStart": "0930-1600",
+    "enableResearch": true,
+    "outcomeLB": 10,
+    "clusterBars": 12,
+    "useTrendTier": true,
+    "useWickTier": false,
+    "wickMinConf": 3,
+    "adxEntryHigh": 45,
+    "useVwap2Bar": false,
+    "minWickConfDisplay": 3
+  },
+  "entity_id": "eMrsNq",
+  "symbol": "CME_MINI:MNQ1!",
+  "timeframe": "5",
+  "date_range": {
+    "from": "2026-02-17T16:25:00.000Z",
+    "to": "2026-05-29T20:55:00.000Z",
+    "split": "2026-04-29T12:22:00.000Z",
+    "train_frac": 0.7
+  },
+  "full_window": {
+    "trades": 6,
+    "netProfit": 67.56,
+    "profitFactor": 1.7722908093278462,
+    "percentProfitable": 0.6666666666666666
+  },
+  "train": {
+    "trades": 6,
+    "netProfit": 67.56,
+    "profitFactor": 1.7722908093278462
+  },
+  "test": {
+    "trades": 6,
+    "netProfit": 67.56,
+    "profitFactor": 1.7722908093278462,
+    "note": "no split — fewer than 20 closed trades"
+  },
+  "oos_within_80pct_pf": true,
+  "train_test_net_ratio": 1,
+  "research_buckets_full_window": [
+    {
+      "signal": "W_L_1",
+      "n": 169,
+      "winPct": 55,
+      "avgPts": 8.21,
+      "avgMfe": 50.72,
+      "avgMae": 50.2
+    },
+    {
+      "signal": "W_L_2",
+      "n": 258,
+      "winPct": 57.4,
+      "avgPts": 7.79,
+      "avgMfe": 51.7,
+      "avgMae": 52.05
+    },
+    {
+      "signal": "W_L_3+",
+      "n": 137,
+      "winPct": 51.8,
+      "avgPts": 1.79,
+      "avgMfe": 45.07,
+      "avgMae": 48.9
+    },
+    {
+      "signal": "W_L_OS",
+      "n": 52,
+      "winPct": 55.8,
+      "avgPts": 8.48,
+      "avgMfe": 52.08,
+      "avgMae": 49.57
+    },
+    {
+      "signal": "W_L_CT",
+      "n": 288,
+      "winPct": 53.8,
+      "avgPts": 3.8,
+      "avgMfe": 48.85,
+      "avgMae": 51.56
+    },
+    {
+      "signal": "W_U_1",
+      "n": 174,
+      "winPct": 48.3,
+      "avgPts": 1.42,
+      "avgMfe": 52.13,
+      "avgMae": 48.08
+    },
+    {
+      "signal": "W_U_2",
+      "n": 225,
+      "winPct": 46.2,
+      "avgPts": -5.25,
+      "avgMfe": 45.01,
+      "avgMae": 49.58
+    },
+    {
+      "signal": "W_U_3+",
+      "n": 165,
+      "winPct": 43.6,
+      "avgPts": -5.46,
+      "avgMfe": 40.88,
+      "avgMae": 42.68
+    },
+    {
+      "signal": "W_U_OB",
+      "n": 65,
+      "winPct": 47.7,
+      "avgPts": -2.1,
+      "avgMfe": 44.27,
+      "avgMae": 38.87
+    },
+    {
+      "signal": "W_U_CT",
+      "n": 360,
+      "winPct": 46.1,
+      "avgPts": -2.66,
+      "avgMfe": 42.11,
+      "avgMae": 42.09
+    },
+    {
+      "signal": "T_L",
+      "n": 2,
+      "winPct": 50,
+      "avgPts": -2,
+      "avgMfe": 67.75,
+      "avgMae": 28.38
+    },
+    {
+      "signal": "T_S",
+      "n": 4,
+      "winPct": 100,
+      "avgPts": 55.56,
+      "avgMfe": 110.25,
+      "avgMae": 31.31
+    },
+    {
+      "signal": "E_L",
+      "n": 2,
+      "winPct": 50,
+      "avgPts": -2,
+      "avgMfe": 67.75,
+      "avgMae": 28.38
+    },
+    {
+      "signal": "E_S",
+      "n": 4,
+      "winPct": 100,
+      "avgPts": 55.56,
+      "avgMfe": 110.25,
+      "avgMae": 31.31
+    },
+    {
+      "signal": "WK_L",
+      "n": 0,
+      "winPct": null,
+      "avgPts": null,
+      "avgMfe": null,
+      "avgMae": null
+    },
+    {
+      "signal": "WK_S",
+      "n": 0,
+      "winPct": null,
+      "avgPts": null,
+      "avgMfe": null,
+      "avgMae": null
+    }
+  ],
+  "research_best_bucket": {
+    "signal": "W_L_2",
+    "n": 258,
+    "winPct": 57.4,
+    "avgPts": 7.79,
+    "avgMfe": 51.7,
+    "avgMae": 52.05
+  },
+  "random_baseline": {
+    "simulated_trades": 100,
+    "tpPts": 20,
+    "slPts": 10,
+    "netPts": 500,
+    "winPct": 50,
+    "profitFactor": 2,
+    "expectancy": 5,
+    "note": "Null baseline — random direction at same TP/SL; not session-aware"
+  },
+  "split_detail": null,
+  "report_trades_used": 6
+}

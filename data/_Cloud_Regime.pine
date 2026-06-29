@@ -1,0 +1,164 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// 01 — CLOUD REGIME
+// Independent confluence indicator — Next Level Foundry
+// ══════════════════════════════════════════════════════════════════════════════
+// Outputs: regime state, flip event, EMA slope direction + magnitude,
+//          slope confirmation, and a 0–3 quality score for the data recorder.
+// Score logic:
+//   3 = flip + slope confirms direction + steep
+//   2 = flip + slope confirms direction + mild
+//   1 = flip + flat or opposing slope
+//   0 = no flip
+// ══════════════════════════════════════════════════════════════════════════════
+
+//@version=6
+indicator("01 — Cloud Regime", overlay=true, max_bars_back=500)
+
+
+// ─── INPUTS ──────────────────────────────────────────────────────────────────
+
+grp_cloud = "═══ EMA CLOUD ═══"
+fastEmaLen  = input.int(9,  "Fast EMA Length", minval=2, group=grp_cloud)
+slowEmaLen  = input.int(21, "Slow EMA Length", minval=2, group=grp_cloud)
+smaLen      = input.int(50, "SMA Baseline",    minval=5, group=grp_cloud)
+cloudSmooth = input.int(3,  "Cloud Smoothing", minval=1, group=grp_cloud,
+     tooltip="Bars cloud must hold one color before flip confirms")
+
+grp_slope = "═══ SLOPE ═══"
+slopeLen    = input.int(5,     "Slope Lookback (bars)",      minval=2,    group=grp_slope)
+steepThresh = input.float(0.15,"Steep Threshold (ATR-norm)", minval=0.01, step=0.01, group=grp_slope,
+     tooltip="ATR-normalized EMA slope. Above = steep. Below half = flat.")
+
+grp_panel = "═══ PANEL ═══"
+showPanel = input.bool(true,        "Show Panel", group=grp_panel)
+panelPos  = input.string("Top Right","Position",  options=["Top Right","Top Left","Bottom Right","Bottom Left","Middle Right","Middle Left"], group=grp_panel)
+
+
+// ─── CLOUD ───────────────────────────────────────────────────────────────────
+
+fastEma = ta.ema(close, fastEmaLen)
+slowEma = ta.ema(close, slowEmaLen)
+smaBase = ta.sma(close, smaLen)
+
+rawBull = fastEma > slowEma and slowEma > smaBase
+rawBear = fastEma < slowEma and slowEma < smaBase
+
+bullCount = math.sum(rawBull ? 1 : 0, cloudSmooth)
+bearCount = math.sum(rawBear ? 1 : 0, cloudSmooth)
+
+cloudBull    = bullCount == cloudSmooth
+cloudBear    = bearCount == cloudSmooth
+cloudNeutral = not cloudBull and not cloudBear
+
+flipToBull = cloudBull and not cloudBull[1]
+flipToBear = cloudBear and not cloudBear[1]
+anyFlip    = flipToBull or flipToBear
+
+
+// ─── SLOPE ───────────────────────────────────────────────────────────────────
+
+atr14      = ta.atr(14)
+slopeRaw   = ta.linreg(fastEma, slopeLen, 0) - ta.linreg(fastEma, slopeLen, 1)
+slopeNorm  = atr14 > 0 ? slopeRaw / atr14 : 0.0
+mildThresh = steepThresh * 0.5
+slopeMag   = math.abs(slopeNorm)
+
+slopeLabel = slopeNorm >  steepThresh ? "▲▲ steep"  :
+             slopeNorm >  mildThresh  ? "▲  mild"   :
+             slopeNorm < -steepThresh ? "▼▼ steep"  :
+             slopeNorm < -mildThresh  ? "▼  mild"   :
+             "──  flat"
+
+slopeConfirms    = (cloudBull and slopeNorm > 0) or (cloudBear and slopeNorm < 0)
+flipDirConfirmed = (flipToBull and slopeNorm > 0) or (flipToBear and slopeNorm < 0)
+
+
+// ─── QUALITY SCORE (0–3) ─────────────────────────────────────────────────────
+
+cloudScore = anyFlip and flipDirConfirmed and slopeMag >= steepThresh ? 3 :
+             anyFlip and flipDirConfirmed and slopeMag >= mildThresh  ? 2 :
+             anyFlip                                                   ? 1 :
+             0
+
+qualLabel = cloudScore == 3 ? "HIGH" :
+            cloudScore == 2 ? "MED"  :
+            cloudScore == 1 ? "LOW"  :
+            "—"
+
+qualClr = cloudScore == 3 ? color.new(#06d6a0, 0) :
+          cloudScore == 2 ? color.new(#f59e0b, 0) :
+          cloudScore == 1 ? color.new(#ff3860, 0) :
+          color.new(#8b89a0, 0)
+
+
+// ─── POSITION MAPPING ────────────────────────────────────────────────────────
+
+posVal = panelPos == "Top Left"     ? position.top_left     :
+         panelPos == "Bottom Right" ? position.bottom_right :
+         panelPos == "Bottom Left"  ? position.bottom_left  :
+         panelPos == "Middle Right" ? position.middle_right :
+         panelPos == "Middle Left"  ? position.middle_left  :
+         position.top_right
+
+
+// ─── PLOTS ───────────────────────────────────────────────────────────────────
+
+p_fast = plot(fastEma, "Fast EMA",    color=color.new(color.white, 70), linewidth=1)
+p_slow = plot(slowEma, "Slow EMA",    color=color.new(color.white, 80), linewidth=1)
+plot(smaBase,           "SMA Baseline", color=color.new(color.yellow, 80), linewidth=1)
+
+cloudColor = cloudBull ? color.new(#06d6a0, 75) :
+             cloudBear ? color.new(#ff3860, 75) :
+             color.new(color.gray, 85)
+fill(p_fast, p_slow, color=cloudColor, title="Cloud Fill")
+
+plotshape(flipToBull, "Bull Flip", shape.triangleup,   location.belowbar, color=#06d6a0, size=size.small)
+plotshape(flipToBear, "Bear Flip", shape.triangledown, location.abovebar, color=#ff3860, size=size.small)
+
+bgcolor(flipToBull ? color.new(#06d6a0, 88) : na, title="Bull Flip Bar")
+bgcolor(flipToBear ? color.new(#ff3860, 88) : na, title="Bear Flip Bar")
+
+
+// ─── PANEL ───────────────────────────────────────────────────────────────────
+
+if barstate.islast and showPanel
+    t = table.new(posVal, 2, 7,
+         bgcolor      = color.new(#0a0a0f, 10),
+         border_color = color.new(#a855f7, 70),
+         border_width = 1,
+         frame_color  = color.new(#a855f7, 50),
+         frame_width  = 1)
+
+    table.cell(t, 0, 0, "CLOUD REGIME",
+         text_color=color.new(#a855f7, 0), text_size=size.small,
+         text_halign=text.align_left, bgcolor=color.new(#12121e, 10))
+    table.cell(t, 1, 0, "score  " + str.tostring(cloudScore),
+         text_color=qualClr, text_size=size.small,
+         text_halign=text.align_right, bgcolor=color.new(#12121e, 10))
+
+    regimeText = cloudBull ? "▲ BULLISH" : cloudBear ? "▼ BEARISH" : "◆ NEUTRAL"
+    regimeClr  = cloudBull ? color.new(#06d6a0, 0) : cloudBear ? color.new(#ff3860, 0) : color.gray
+    table.cell(t, 0, 1, "Regime",   text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 1, regimeText, text_color=regimeClr,             text_size=size.tiny, text_halign=text.align_right)
+
+    flipText = flipToBull ? "→ BULL" : flipToBear ? "→ BEAR" : "—"
+    flipClr  = flipToBull ? color.new(#06d6a0, 0) : flipToBear ? color.new(#ff3860, 0) : color.gray
+    table.cell(t, 0, 2, "Flip",   text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 2, flipText, text_color=flipClr,               text_size=size.tiny, text_halign=text.align_right)
+
+    slopeClr = slopeNorm > 0 ? color.new(#06d6a0, 0) : slopeNorm < 0 ? color.new(#ff3860, 0) : color.gray
+    table.cell(t, 0, 3, "Slope dir",   text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 3, slopeLabel,    text_color=slopeClr,              text_size=size.tiny, text_halign=text.align_right)
+
+    table.cell(t, 0, 4, "Slope norm",
+         text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 4, str.tostring(slopeNorm, "#.###"),
+         text_color=color.new(#e8e6f0, 0), text_size=size.tiny, text_halign=text.align_right)
+
+    confirmText = slopeConfirms ? "YES" : "NO"
+    confirmClr  = slopeConfirms ? color.new(#06d6a0, 0) : color.new(#ff3860, 0)
+    table.cell(t, 0, 5, "Slope confirms", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 5, confirmText,      text_color=confirmClr,            text_size=size.tiny, text_halign=text.align_right)
+
+    table.cell(t, 0, 6, "Quality", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(t, 1, 6, qualLabel, text_color=qualClr,               text_size=size.tiny, text_halign=text.align_right)

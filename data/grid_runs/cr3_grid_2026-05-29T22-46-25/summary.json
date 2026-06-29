@@ -1,0 +1,175 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\cr3_grid_2026-05-29T22-46-25",
+  "scenario_count": 54,
+  "profitable_count": 27,
+  "best_trades": {
+    "scenarioId": 1,
+    "spec": {
+      "htfTF": "5",
+      "cloudSmooth": 3,
+      "zOptLow": 18,
+      "zOptHigh": 35,
+      "tpPoints": 20,
+      "slPoints": 10,
+      "useSession": true,
+      "sessStart": "0930-1600",
+      "enableResearch": true,
+      "outcomeLB": 8,
+      "clusterBars": 12,
+      "useTrendTier": true,
+      "useWickTier": false,
+      "wickMinConf": 2,
+      "adxEntryHigh": 35,
+      "useVwap2Bar": true,
+      "minWickConfDisplay": 3,
+      "adxBandLabel": "18-35",
+      "sessionLabel": "rth"
+    },
+    "error": null,
+    "totalTrades": 10,
+    "percentProfitable": 60,
+    "profitFactor": 1.7758094074526571,
+    "netProfit": 101.6,
+    "expectancy": 10.16,
+    "research": {
+      "parsed": true,
+      "bestBucket": {
+        "signal": "W_L_OS",
+        "n": 52,
+        "winPct": 55.8,
+        "avgPts": 0,
+        "avgMfe": 46.73,
+        "avgMae": 46.88
+      },
+      "trendTL": {
+        "signal": "T_L",
+        "n": 5,
+        "winPct": 80,
+        "avgPts": 21.1,
+        "avgMfe": 57.35,
+        "avgMae": 32.8
+      },
+      "trendTS": {
+        "signal": "T_S",
+        "n": 5,
+        "winPct": 80,
+        "avgPts": 43.9,
+        "avgMfe": 104.2,
+        "avgMae": 34.45
+      }
+    },
+    "metConstraint": true,
+    "score": 15.231237629810629
+  },
+  "best_research": {
+    "scenarioId": 4,
+    "spec": {
+      "htfTF": "5",
+      "cloudSmooth": 3,
+      "zOptLow": 18,
+      "zOptHigh": 35,
+      "tpPoints": 20,
+      "slPoints": 10,
+      "useSession": true,
+      "sessStart": "0930-1200",
+      "enableResearch": true,
+      "outcomeLB": 20,
+      "clusterBars": 12,
+      "useTrendTier": true,
+      "useWickTier": false,
+      "wickMinConf": 2,
+      "adxEntryHigh": 35,
+      "useVwap2Bar": true,
+      "minWickConfDisplay": 3,
+      "adxBandLabel": "18-35",
+      "sessionLabel": "morning"
+    },
+    "error": null,
+    "totalTrades": 7,
+    "percentProfitable": 57.14285714285714,
+    "profitFactor": 1.419520234389306,
+    "netProfit": 45.82000000000001,
+    "expectancy": 6.545714285714287,
+    "research": {
+      "parsed": true,
+      "bestBucket": {
+        "signal": "W_L_2",
+        "n": 274,
+        "winPct": 59.1,
+        "avgPts": 12.51,
+        "avgMfe": 73.12,
+        "avgMae": 67.91
+      },
+      "trendTL": {
+        "signal": "T_L",
+        "n": 2,
+        "winPct": 0,
+        "avgPts": -43.88,
+        "avgMfe": 67.75,
+        "avgMae": 97.25
+      },
+      "trendTS": {
+        "signal": "T_S",
+        "n": 5,
+        "winPct": 60,
+        "avgPts": 56.2,
+        "avgMfe": 132.75,
+        "avgMae": 51.95
+      }
+    },
+    "metConstraint": false,
+    "score": -4954.18
+  },
+  "top_trades": [
+    {
+      "id": 1,
+      "wickMinConf": 2,
+      "adx": "18-35",
+      "outcomeLB": 8,
+      "session": "rth",
+      "net": 101.6,
+      "pf": 1.7758094074526571,
+      "trades": 10
+    },
+    {
+      "id": 3,
+      "wickMinConf": 2,
+      "adx": "18-35",
+      "outcomeLB": 10,
+      "session": "rth",
+      "net": 101.6,
+      "pf": 1.7758094074526571,
+      "trades": 10
+    },
+    {
+      "id": 5,
+      "wickMinConf": 2,
+      "adx": "18-35",
+      "outcomeLB": 20,
+      "session": "rth",
+      "net": 101.6,
+      "pf": 1.7758094074526571,
+      "trades": 10
+    },
+    {
+      "id": 19,
+      "wickMinConf": 3,
+      "adx": "18-35",
+      "outcomeLB": 8,
+      "session": "rth",
+      "net": 101.6,
+      "pf": 1.7758094074526571,
+      "trades": 10
+    },
+    {
+      "id": 21,
+      "wickMinConf": 3,
+      "adx": "18-35",
+      "outcomeLB": 10,
+      "session": "rth",
+      "net": 101.6,
+      "pf": 1.7758094074526571,
+      "trades": 10
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+[
+  {
+    "at": "2026-05-17T19:52:13.457Z",
+    "label": "healthCheck",
+    "payload": {
+      "success": true,
+      "cdp_connected": true,
+      "target_id": "9CAC450640DA2204C4CE6D9FFCAF445F",
+      "target_url": "https://www.tradingview.com/chart/MpJIwKdk/",
+      "target_title": "Live stock, index, futures, Forex and Bitcoin charts on TradingView",
+      "chart_symbol": "CME_MINI:MNQ1!",
+      "chart_resolution": "5",
+      "chart_type": 1,
+      "api_available": true
+    }
+  },
+  {
+    "at": "2026-05-17T19:52:13.471Z",
+    "label": "pine_setSource",
+    "payload": {
+      "success": true,
+      "lines_set": 439
+    }
+  },
+  {
+    "at": "2026-05-17T19:52:13.506Z",
+    "label": "pine_panel",
+    "payload": {
+      "performed": "open"
+    }
+  },
+  {
+    "at": "2026-05-17T19:52:17.983Z",
+    "label": "pine_smartCompile",
+    "payload": {
+      "success": true,
+      "button_clicked": "Pine Save",
+      "has_errors": false,
+      "errors": [],
+      "study_added": false
+    }
+  },
+  {
+    "at": "2026-05-17T19:52:17.987Z",
+    "label": "pine_errors",
+    "payload": {
+      "success": true,
+      "has_errors": false,
+      "error_count": 0,
+      "errors": []
+    }
+  },
+  {
+    "at": "2026-05-17T19:52:17.992Z",
+    "label": "strategy_tester_panel",
+    "payload": {
+      "performed": "open"
+    }
+  },
+  {
+    "at": "2026-05-17T19:52:34.042Z",
+    "label": "data_getStrategyResults",
+    "payload": {
+      "metric_count": 34,
+      "strategy_name": "ERL → IRL Engine Strategy [NLF]",
+      "pick_note": null,
+      "report_ready": true
+    }
+  },
+  {
+    "at": "2026-05-17T19:52:34.063Z",
+    "label": "data_getTrades",
+    "payload": {
+      "trade_count": 138
+    }
+  },
+  {
+    "at": "2026-05-17T19:52:34.064Z",
+    "label": "chart_getState",
+    "payload": {
+      "symbol": "CME_MINI:MNQ1!",
+      "resolution": "5",
+      "studies": [
+        {
+          "id": "AJNLxO",
+          "name": "ERL → IRL Engine Strategy [NLF]"
+        },
+        {
+          "id": "1NOsNG",
+          "name": "CBC Cloud Confluence v1.0"
+        }
+      ]
+    }
+  }
+]

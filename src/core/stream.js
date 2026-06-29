@@ -33,11 +33,16 @@ async function pollLoop(fetcher, { interval = 500, dedupe = true, label = 'strea
       const data = await fetcher();
       if (!data) { await sleep(interval); continue; }
 
-      const hash = dedupe ? JSON.stringify(data) : null;
-      if (!dedupe || hash !== lastHash) {
-        lastHash = hash;
+      if (!dedupe) {
         const line = JSON.stringify({ ...data, _ts: Date.now(), _stream: label });
         process.stdout.write(line + '\n');
+      } else {
+        const hash = JSON.stringify(data);
+        if (hash !== lastHash) {
+          lastHash = hash;
+          const line = JSON.stringify({ ...data, _ts: Date.now(), _stream: label });
+          process.stdout.write(line + '\n');
+        }
       }
     } catch (err) {
       // Connection errors — retry silently
@@ -126,8 +131,11 @@ async function fetchValues() {
       var results = [];
       for (var i = 0; i < studies.length; i++) {
         try {
-          var study = chart.getStudyById(studies[i].id);
-          if (!study || !study.isVisible()) continue;
+          var study = studies[i];
+          if (!study) continue;
+          try {
+            if (typeof study.isVisible === 'function' && !study.isVisible()) continue;
+          } catch (_) {}
           var src = study._study || study;
           var data = src._lastBarValues || src._data;
           if (!data) continue;
@@ -163,7 +171,7 @@ async function fetchLines(studyFilter) {
         var s = studies[i];
         if (filter && (s.name || '').toLowerCase().indexOf(filter.toLowerCase()) === -1) continue;
         try {
-          var study = chart.getStudyById(s.id);
+          var study = s;
           if (!study) continue;
           var src = study._study || study;
           var g = src._graphics || (src._source && src._source._graphics);
@@ -209,7 +217,7 @@ async function fetchLabels(studyFilter) {
         var s = studies[i];
         if (filter && (s.name || '').toLowerCase().indexOf(filter.toLowerCase()) === -1) continue;
         try {
-          var study = chart.getStudyById(s.id);
+          var study = s;
           if (!study) continue;
           var src = study._study || study;
           var g = src._graphics || (src._source && src._source._graphics);
@@ -252,7 +260,7 @@ async function fetchTables(studyFilter) {
         var s = studies[i];
         if (filter && (s.name || '').toLowerCase().indexOf(filter.toLowerCase()) === -1) continue;
         try {
-          var study = chart.getStudyById(s.id);
+          var study = s;
           if (!study) continue;
           var src = study._study || study;
           var g = src._graphics || (src._source && src._source._graphics);
@@ -284,8 +292,8 @@ async function fetchTables(studyFilter) {
   `);
 }
 
-export async function streamTables({ interval, filter } = {}) {
-  return pollLoop(() => fetchTables(filter), { interval: interval || 2000, label: 'tables' });
+export async function streamTables({ interval, filter, dedupe = true } = {}) {
+  return pollLoop(() => fetchTables(filter), { interval: interval || 2000, label: 'tables', dedupe });
 }
 
 // ── Stream: all panes (multi-symbol) ──

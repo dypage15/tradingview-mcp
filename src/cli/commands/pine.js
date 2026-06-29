@@ -33,8 +33,19 @@ register('pine', {
       },
     }],
     ['compile', {
-      description: 'Smart compile: detect button, compile, check errors',
-      handler: () => core.smartCompile(),
+      description:
+        'Smart compile: detect button, compile, check errors. Optional --recover-strip removes a stale study before retry when Monaco shows parse errors.',
+      options: {
+        recover: { type: 'boolean', short: 'R', description: 'Parse recovery (remove study + retry) when Monaco shows stale parse diagnostics' },
+        'recover-study': { type: 'string', short: 'S', description: 'Study name substring to remove (recommended with --recover)' },
+        'recover-entity': { type: 'string', short: 'e', description: 'Study entity id to remove (from chart_get_state)' },
+      },
+      handler: (opts) =>
+        core.smartCompile({
+          recover_parse: !!opts.recover,
+          recover_study_contains: String(opts['recover-study'] || '').trim(),
+          recover_entity_id: String(opts['recover-entity'] || '').trim(),
+        }),
     }],
     ['raw-compile', {
       description: 'Click compile/add button without smart detection',

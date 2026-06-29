@@ -1,0 +1,43 @@
+{
+  "run_id": "2026-05-17_19-52-13",
+  "created_at": "2026-05-17T19:52:34.068Z",
+  "strategy_file_snapshot": "strategy_snapshot.pine",
+  "advisor_substring_used": "ERL",
+  "chart": {
+    "symbol": "CME_MINI:MNQ1!",
+    "resolution": "5"
+  },
+  "pine_compile": {
+    "success": true,
+    "button_clicked": "Pine Save",
+    "has_errors": false,
+    "errors": [],
+    "study_added": false
+  },
+  "pine_errors_terminal": {
+    "success": true,
+    "has_errors": false,
+    "error_count": 0,
+    "errors": []
+  },
+  "strategy": {
+    "strategy_name": "ERL → IRL Engine Strategy [NLF]",
+    "pick_note": null,
+    "candidate_count": 6,
+    "report_ready": true,
+    "kpis": {
+      "netProfitPercent": -0.018579306250000007,
+      "netProfit": -1857.9306250000009,
+      "profitFactor": 0.6931617667019572,
+      "percentProfitable": 0.5217391304347826,
+      "totalTrades": 69,
+      "marginCalls": 0,
+      "commissionPaid": 1773.430625
+    }
+  },
+  "trades_returned": 138,
+  "notes": [
+    "Compare runs by opening data/strategy_runs/*/summary.json",
+    "Tighten Inputs on chart vs defaults baked into strategy_snapshot.pine."
+  ]
+}

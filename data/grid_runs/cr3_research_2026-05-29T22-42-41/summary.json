@@ -1,0 +1,391 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\cr3_research_2026-05-29T22-42-41",
+  "timestamp": "2026-05-29T22:42:41.863Z",
+  "symbol": "CME_MINI:MNQ1!",
+  "timeframe": "5",
+  "entity_id": "eMrsNq",
+  "spec": {
+    "htfTF": "5",
+    "cloudSmooth": 3,
+    "zOptLow": 20,
+    "zOptHigh": 35,
+    "tpPoints": 20,
+    "slPoints": 10,
+    "useSession": true,
+    "sessStart": "0930-1600",
+    "enableResearch": true,
+    "outcomeLB": 10,
+    "clusterBars": 12,
+    "useTrendTier": true,
+    "useWickTier": false,
+    "wickMinConf": 3,
+    "adxEntryHigh": 45,
+    "useVwap2Bar": false,
+    "minWickConfDisplay": 3
+  },
+  "inputs_applied": {
+    "in_0": "5",
+    "in_1": 9,
+    "in_2": 21,
+    "in_3": 50,
+    "in_4": 3,
+    "in_5": 5,
+    "in_6": 0.15,
+    "in_7": 12,
+    "in_8": 26,
+    "in_9": 9,
+    "in_10": 1,
+    "in_11": 14,
+    "in_12": 14,
+    "in_13": 14,
+    "in_14": 20,
+    "in_15": 35,
+    "in_16": true,
+    "in_17": 21,
+    "in_18": 14,
+    "in_19": 9,
+    "in_20": "Direction Change",
+    "in_21": true,
+    "in_22": true,
+    "in_23": 20,
+    "in_24": 2,
+    "in_25": 14,
+    "in_26": 30,
+    "in_27": 70,
+    "in_28": 3,
+    "in_29": 20,
+    "in_30": 10,
+    "in_31": true,
+    "in_32": "0930-1600",
+    "in_33": true,
+    "in_34": true,
+    "in_35": 10,
+    "in_36": 12,
+    "in_37": 0,
+    "in_38": true,
+    "in_39": true,
+    "in_40": true,
+    "in_41": false,
+    "in_42": 3,
+    "in_43": 45,
+    "in_44": false,
+    "in_45": true,
+    "in_46": true,
+    "in_47": true,
+    "in_48": true
+  },
+  "research": {
+    "parsed": true,
+    "outcomeLB": 10,
+    "buckets": [
+      {
+        "signal": "W_L_1",
+        "n": 169,
+        "winPct": 55,
+        "avgPts": 8.21,
+        "avgMfe": 50.72,
+        "avgMae": 50.2
+      },
+      {
+        "signal": "W_L_2",
+        "n": 258,
+        "winPct": 57.4,
+        "avgPts": 7.79,
+        "avgMfe": 51.7,
+        "avgMae": 52.05
+      },
+      {
+        "signal": "W_L_3+",
+        "n": 137,
+        "winPct": 51.8,
+        "avgPts": 1.79,
+        "avgMfe": 45.07,
+        "avgMae": 48.9
+      },
+      {
+        "signal": "W_L_OS",
+        "n": 52,
+        "winPct": 55.8,
+        "avgPts": 8.48,
+        "avgMfe": 52.08,
+        "avgMae": 49.57
+      },
+      {
+        "signal": "W_L_CT",
+        "n": 288,
+        "winPct": 53.8,
+        "avgPts": 3.8,
+        "avgMfe": 48.85,
+        "avgMae": 51.56
+      },
+      {
+        "signal": "W_U_1",
+        "n": 174,
+        "winPct": 48.3,
+        "avgPts": 1.42,
+        "avgMfe": 52.13,
+        "avgMae": 48.08
+      },
+      {
+        "signal": "W_U_2",
+        "n": 225,
+        "winPct": 46.2,
+        "avgPts": -5.25,
+        "avgMfe": 45.01,
+        "avgMae": 49.58
+      },
+      {
+        "signal": "W_U_3+",
+        "n": 165,
+        "winPct": 43.6,
+        "avgPts": -5.46,
+        "avgMfe": 40.88,
+        "avgMae": 42.68
+      },
+      {
+        "signal": "W_U_OB",
+        "n": 65,
+        "winPct": 47.7,
+        "avgPts": -2.1,
+        "avgMfe": 44.27,
+        "avgMae": 38.87
+      },
+      {
+        "signal": "W_U_CT",
+        "n": 360,
+        "winPct": 46.1,
+        "avgPts": -2.66,
+        "avgMfe": 42.11,
+        "avgMae": 42.09
+      },
+      {
+        "signal": "T_L",
+        "n": 2,
+        "winPct": 50,
+        "avgPts": -2,
+        "avgMfe": 67.75,
+        "avgMae": 28.38
+      },
+      {
+        "signal": "T_S",
+        "n": 4,
+        "winPct": 100,
+        "avgPts": 55.56,
+        "avgMfe": 110.25,
+        "avgMae": 31.31
+      },
+      {
+        "signal": "E_L",
+        "n": 2,
+        "winPct": 50,
+        "avgPts": -2,
+        "avgMfe": 67.75,
+        "avgMae": 28.38
+      },
+      {
+        "signal": "E_S",
+        "n": 4,
+        "winPct": 100,
+        "avgPts": 55.56,
+        "avgMfe": 110.25,
+        "avgMae": 31.31
+      },
+      {
+        "signal": "WK_L",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      },
+      {
+        "signal": "WK_S",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      }
+    ],
+    "wickRows": [
+      {
+        "signal": "W_L_1",
+        "n": 169,
+        "winPct": 55,
+        "avgPts": 8.21,
+        "avgMfe": 50.72,
+        "avgMae": 50.2
+      },
+      {
+        "signal": "W_L_2",
+        "n": 258,
+        "winPct": 57.4,
+        "avgPts": 7.79,
+        "avgMfe": 51.7,
+        "avgMae": 52.05
+      },
+      {
+        "signal": "W_L_3+",
+        "n": 137,
+        "winPct": 51.8,
+        "avgPts": 1.79,
+        "avgMfe": 45.07,
+        "avgMae": 48.9
+      },
+      {
+        "signal": "W_L_OS",
+        "n": 52,
+        "winPct": 55.8,
+        "avgPts": 8.48,
+        "avgMfe": 52.08,
+        "avgMae": 49.57
+      },
+      {
+        "signal": "W_L_CT",
+        "n": 288,
+        "winPct": 53.8,
+        "avgPts": 3.8,
+        "avgMfe": 48.85,
+        "avgMae": 51.56
+      },
+      {
+        "signal": "W_U_1",
+        "n": 174,
+        "winPct": 48.3,
+        "avgPts": 1.42,
+        "avgMfe": 52.13,
+        "avgMae": 48.08
+      },
+      {
+        "signal": "W_U_2",
+        "n": 225,
+        "winPct": 46.2,
+        "avgPts": -5.25,
+        "avgMfe": 45.01,
+        "avgMae": 49.58
+      },
+      {
+        "signal": "W_U_3+",
+        "n": 165,
+        "winPct": 43.6,
+        "avgPts": -5.46,
+        "avgMfe": 40.88,
+        "avgMae": 42.68
+      },
+      {
+        "signal": "W_U_OB",
+        "n": 65,
+        "winPct": 47.7,
+        "avgPts": -2.1,
+        "avgMfe": 44.27,
+        "avgMae": 38.87
+      },
+      {
+        "signal": "W_U_CT",
+        "n": 360,
+        "winPct": 46.1,
+        "avgPts": -2.66,
+        "avgMfe": 42.11,
+        "avgMae": 42.09
+      }
+    ],
+    "trendRows": [
+      {
+        "signal": "T_L",
+        "n": 2,
+        "winPct": 50,
+        "avgPts": -2,
+        "avgMfe": 67.75,
+        "avgMae": 28.38
+      },
+      {
+        "signal": "T_S",
+        "n": 4,
+        "winPct": 100,
+        "avgPts": 55.56,
+        "avgMfe": 110.25,
+        "avgMae": 31.31
+      }
+    ],
+    "entryRows": [
+      {
+        "signal": "E_L",
+        "n": 2,
+        "winPct": 50,
+        "avgPts": -2,
+        "avgMfe": 67.75,
+        "avgMae": 28.38
+      },
+      {
+        "signal": "E_S",
+        "n": 4,
+        "winPct": 100,
+        "avgPts": 55.56,
+        "avgMfe": 110.25,
+        "avgMae": 31.31
+      }
+    ],
+    "wickEntryRows": [
+      {
+        "signal": "WK_L",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      },
+      {
+        "signal": "WK_S",
+        "n": 0,
+        "winPct": null,
+        "avgPts": null,
+        "avgMfe": null,
+        "avgMae": null
+      }
+    ],
+    "bestByWin": {
+      "signal": "W_L_2",
+      "n": 258,
+      "winPct": 57.4,
+      "avgPts": 7.79,
+      "avgMfe": 51.7,
+      "avgMae": 52.05
+    },
+    "bestByPts": {
+      "signal": "W_L_OS",
+      "n": 52,
+      "winPct": 55.8,
+      "avgPts": 8.48,
+      "avgMfe": 52.08,
+      "avgMae": 49.57
+    },
+    "studyName": "Cloud Regime v3.0 — Full Stack",
+    "row_count": 16
+  },
+  "strategy_tester": {
+    "totalTrades": 6,
+    "netProfit": 67.56,
+    "profitFactor": 1.7722908093278462,
+    "percentProfitable": 0.6666666666666666,
+    "dateRange": {
+      "from": 1771345500000,
+      "to": 1780088100000
+    }
+  },
+  "random_baseline": {
+    "simulated_trades": 100,
+    "tpPts": 20,
+    "slPts": 10,
+    "netPts": 500,
+    "winPct": 50,
+    "profitFactor": 2,
+    "expectancy": 5,
+    "note": "Null baseline — random direction at same TP/SL; not session-aware"
+  },
+  "success_criteria": {
+    "clustered_wick_n_lt_raw_labels": true,
+    "bucket_win_gt_55": true,
+    "bucket_avg_pts_gt_5": true,
+    "bucket_n_gte_30": true
+  }
+}

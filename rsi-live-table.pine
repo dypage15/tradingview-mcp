@@ -1,0 +1,65 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// RSI LIVE TABLE
+// Standalone indicator — add separately from the strategy
+// Next Level Foundry
+// ══════════════════════════════════════════════════════════════════════════════
+
+//@version=6
+indicator("RSI Live Table", shorttitle="RSI Live", overlay=true)
+
+
+// ─── INPUTS ──────────────────────────────────────────────────────────────────
+
+grp_rsi = "═══ RSI ═══"
+rsiLen        = input.int(14, "RSI Length", minval=2, group=grp_rsi)
+rsiOversold   = input.int(30, "Oversold level", minval=10, maxval=49, group=grp_rsi)
+rsiOverbought = input.int(70, "Overbought level", minval=51, maxval=90, group=grp_rsi)
+
+grp_tbl = "═══ TABLE ═══"
+tblPos  = input.string("Bottom Left", "Position", options=["Top Right", "Top Left", "Bottom Right", "Bottom Left", "Middle Right", "Middle Left"], group=grp_tbl)
+tblSize = input.string("Normal", "Text Size", options=["Tiny", "Small", "Normal", "Large"], group=grp_tbl)
+
+
+// ─── RSI (Wilder — matches built-in RSI indicator) ───────────────────────────
+
+f_rsi_wilder(float src, int len) =>
+    float chg = ta.change(src)
+    float up  = ta.rma(math.max(chg, 0), len)
+    float dn  = ta.rma(-math.min(chg, 0), len)
+    dn == 0 ? 100.0 : up == 0 ? 0.0 : 100.0 - (100.0 / (1.0 + up / dn))
+
+rsiVal       = f_rsi_wilder(close, rsiLen)
+isOversold   = rsiVal <= rsiOversold
+isOverbought = rsiVal >= rsiOverbought
+
+
+// ─── MAPPINGS ────────────────────────────────────────────────────────────────
+
+posVal = tblPos == "Top Left" ? position.top_left : tblPos == "Bottom Right" ? position.bottom_right : tblPos == "Bottom Left" ? position.bottom_left : tblPos == "Middle Right" ? position.middle_right : tblPos == "Middle Left" ? position.middle_left : position.top_right
+
+txtSize = tblSize == "Tiny" ? size.tiny : tblSize == "Small" ? size.small : tblSize == "Large" ? size.large : size.normal
+
+// Green / red cell background behind text when OS / OB
+zoneBg  = isOversold ? color.new(color.green, 30) : isOverbought ? color.new(color.red, 30) : color.new(#12121e, 10)
+headBg  = color.new(#12121e, 10)
+txtDark = color.new(#8b89a0, 0)
+txtMain = color.white
+
+
+// ─── TABLE (var — do not table.new inside barstate.islast every tick) ────────
+
+var table t = table.new(posVal, 2, 3, border_width=1, border_color=color.new(#a855f7, 70), frame_width=1, frame_color=color.new(#a855f7, 50))
+
+if barstate.islast
+    // Header
+    table.cell(t, 0, 0, "RSI", text_color=color.new(#a855f7, 0), text_size=txtSize, text_halign=text.align_left, bgcolor=headBg)
+    table.cell(t, 1, 0, str.tostring(rsiLen), text_color=txtDark, text_size=txtSize, text_halign=text.align_right, bgcolor=headBg)
+
+    // Value — green/red/neutral fills behind number
+    table.cell(t, 0, 1, "Value", text_color=txtDark, text_size=txtSize, text_halign=text.align_left, bgcolor=zoneBg)
+    table.cell(t, 1, 1, str.tostring(rsiVal, "#.##") + (barstate.isrealtime ? " ●" : ""), text_color=txtMain, text_size=txtSize, text_halign=text.align_right, bgcolor=zoneBg)
+
+    // State
+    stateText = isOversold ? "OVERSOLD" : isOverbought ? "OVERBOUGHT" : "midzone"
+    table.cell(t, 0, 2, "State", text_color=txtDark, text_size=txtSize, text_halign=text.align_left, bgcolor=zoneBg)
+    table.cell(t, 1, 2, stateText, text_color=txtMain, text_size=txtSize, text_halign=text.align_right, bgcolor=zoneBg)

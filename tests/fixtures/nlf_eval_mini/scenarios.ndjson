@@ -1,0 +1,3 @@
+{"scenarioId":0,"spec":{"scenarioId":0,"minBarsBetween":0,"minScoreCont":52,"minScoreRev":50},"netProfit":-100,"profitFactor":0.9,"totalTrades":10,"tradesPerCalendarDay":1.2,"calendar_days_trade_span":100,"metConstraint":true,"report_ready":true}
+{"scenarioId":1,"spec":{"scenarioId":1,"minBarsBetween":2,"minScoreCont":52,"minScoreRev":50},"netProfit":-50,"profitFactor":0.95,"totalTrades":8,"tradesPerCalendarDay":0.8,"calendar_days_trade_span":100,"metConstraint":false,"report_ready":true}
+{"scenarioId":2,"spec":{"scenarioId":2,"minBarsBetween":0,"minScoreCont":58,"minScoreRev":50},"error":"compile failed"}

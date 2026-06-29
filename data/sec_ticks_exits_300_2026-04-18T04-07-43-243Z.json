@@ -1,0 +1,481 @@
+{
+  "success": true,
+  "generatedAt": "2026-04-18T04:19:05.499Z",
+  "entityId": "9UjsqW",
+  "advisorSubstring": "Sec (Ticks)",
+  "grid": {
+    "in_11_trailTicks": [
+      8,
+      12,
+      16,
+      20,
+      24
+    ],
+    "in_12_trailActivateTicks": [
+      4,
+      8,
+      12,
+      16,
+      20
+    ],
+    "in_20_moveToBEafterTicks": [
+      10,
+      14,
+      18,
+      26
+    ],
+    "in_21_runnerCapTicks": [
+      0,
+      100,
+      140
+    ]
+  },
+  "countOk": 4,
+  "countFail": 296,
+  "top25": [
+    {
+      "scenarioId": 3,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 14,
+      "in_21": 0,
+      "netProfit": 3234.360000000008,
+      "profitFactor": 1.8461771908160511,
+      "percentProfitable": 0.7049180327868853,
+      "totalTrades": 61,
+      "grossProfit": 7056.680000000007,
+      "grossLoss": 3822.319999999999,
+      "strategy_name": "CBC Asia Sweep v4 Daily50 — Sec (Ticks)",
+      "score": 3592.632099533277
+    },
+    {
+      "scenarioId": 0,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 10,
+      "in_21": 0,
+      "netProfit": 1248.1200000000035,
+      "profitFactor": 1.4458272014173672,
+      "percentProfitable": 0.2903225806451613,
+      "totalTrades": 62,
+      "grossProfit": 4047.680000000001,
+      "grossLoss": 2799.5599999999977,
+      "strategy_name": "CBC Asia Sweep v4 Daily50 — Sec (Ticks)",
+      "score": 1356.3939507979865
+    },
+    {
+      "scenarioId": 1,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 10,
+      "in_21": 100,
+      "netProfit": 1248.1200000000035,
+      "profitFactor": 1.4458272014173672,
+      "percentProfitable": 0.2903225806451613,
+      "totalTrades": 62,
+      "grossProfit": 4047.680000000001,
+      "grossLoss": 2799.5599999999977,
+      "strategy_name": "CBC Asia Sweep v4 Daily50 — Sec (Ticks)",
+      "score": 1356.3939507979865
+    },
+    {
+      "scenarioId": 2,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 10,
+      "in_21": 140,
+      "netProfit": 1248.1200000000035,
+      "profitFactor": 1.4458272014173672,
+      "percentProfitable": 0.2903225806451613,
+      "totalTrades": 62,
+      "grossProfit": 4047.680000000001,
+      "grossLoss": 2799.5599999999977,
+      "strategy_name": "CBC Asia Sweep v4 Daily50 — Sec (Ticks)",
+      "score": 1356.3939507979865
+    }
+  ],
+  "failedSample": [
+    {
+      "scenarioId": 4,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 14,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":4,\"in_20\":14,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 5,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 14,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":4,\"in_20\":14,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 6,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 18,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":4,\"in_20\":18,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 7,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 18,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":4,\"in_20\":18,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 8,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 18,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":4,\"in_20\":18,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 9,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 26,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":4,\"in_20\":26,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 10,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 26,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":4,\"in_20\":26,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 11,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 26,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":4,\"in_20\":26,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 12,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 10,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":10,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 13,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 10,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":10,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 14,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 10,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":10,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 15,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 14,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":14,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 16,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 14,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":14,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 17,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 14,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":14,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 18,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 18,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":18,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 19,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 18,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":18,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 20,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 18,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":18,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 21,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 26,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":26,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 22,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 26,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":26,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 23,
+      "in_11": 8,
+      "in_12": 8,
+      "in_20": 26,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":8,\"in_20\":26,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 24,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 10,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":10,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 25,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 10,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":10,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 26,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 10,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":10,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 27,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 14,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":14,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 28,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 14,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":14,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 29,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 14,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":14,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 30,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 18,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":18,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 31,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 18,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":18,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 32,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 18,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":18,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 33,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 26,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":26,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 34,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 26,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":26,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 35,
+      "in_11": 8,
+      "in_12": 12,
+      "in_20": 26,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":12,\"in_20\":26,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 36,
+      "in_11": 8,
+      "in_12": 16,
+      "in_20": 10,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":16,\"in_20\":10,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 37,
+      "in_11": 8,
+      "in_12": 16,
+      "in_20": 10,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":16,\"in_20\":10,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 38,
+      "in_11": 8,
+      "in_12": 16,
+      "in_20": 10,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":16,\"in_20\":10,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 39,
+      "in_11": 8,
+      "in_12": 16,
+      "in_20": 14,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":16,\"in_20\":14,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 40,
+      "in_11": 8,
+      "in_12": 16,
+      "in_20": 14,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":16,\"in_20\":14,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 41,
+      "in_11": 8,
+      "in_12": 16,
+      "in_20": 14,
+      "in_21": 140,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":16,\"in_20\":14,\"in_21\":140} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 42,
+      "in_11": 8,
+      "in_12": 16,
+      "in_20": 18,
+      "in_21": 0,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":16,\"in_20\":18,\"in_21\":0} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    },
+    {
+      "scenarioId": 43,
+      "in_11": 8,
+      "in_12": 16,
+      "in_20": 18,
+      "in_21": 100,
+      "reason": "Command failed: c:\\Users\\dypag\\AppData\\Local\\Programs\\cursor\\resources\\app\\resources\\helpers\\node.exe C:\\Users\\dypag\\tradingview-mcp\\src\\cli\\index.js indicator set 9UjsqW -i {\"in_11\":8,\"in_12\":16,\"in_20\":18,\"in_21\":100} --no-persist\n{\n  \"success\": false,\n  \"error\": \"JS evaluation error: Error: There is no such study\\n    at gt.getStudyById (https://static.tradingview.com/static/bundles/6660.eca77abe7f1bea3672e5.js:58:1303)\\n    at <anonymous>:4:25\\n    at <anonymous>:32:7\"\n}\n"
+    }
+  ],
+  "all": [
+    {
+      "scenarioId": 3,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 14,
+      "in_21": 0,
+      "netProfit": 3234.360000000008,
+      "profitFactor": 1.8461771908160511,
+      "percentProfitable": 0.7049180327868853,
+      "totalTrades": 61,
+      "grossProfit": 7056.680000000007,
+      "grossLoss": 3822.319999999999,
+      "strategy_name": "CBC Asia Sweep v4 Daily50 — Sec (Ticks)",
+      "score": 3592.632099533277
+    },
+    {
+      "scenarioId": 0,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 10,
+      "in_21": 0,
+      "netProfit": 1248.1200000000035,
+      "profitFactor": 1.4458272014173672,
+      "percentProfitable": 0.2903225806451613,
+      "totalTrades": 62,
+      "grossProfit": 4047.680000000001,
+      "grossLoss": 2799.5599999999977,
+      "strategy_name": "CBC Asia Sweep v4 Daily50 — Sec (Ticks)",
+      "score": 1356.3939507979865
+    },
+    {
+      "scenarioId": 1,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 10,
+      "in_21": 100,
+      "netProfit": 1248.1200000000035,
+      "profitFactor": 1.4458272014173672,
+      "percentProfitable": 0.2903225806451613,
+      "totalTrades": 62,
+      "grossProfit": 4047.680000000001,
+      "grossLoss": 2799.5599999999977,
+      "strategy_name": "CBC Asia Sweep v4 Daily50 — Sec (Ticks)",
+      "score": 1356.3939507979865
+    },
+    {
+      "scenarioId": 2,
+      "in_11": 8,
+      "in_12": 4,
+      "in_20": 10,
+      "in_21": 140,
+      "netProfit": 1248.1200000000035,
+      "profitFactor": 1.4458272014173672,
+      "percentProfitable": 0.2903225806451613,
+      "totalTrades": 62,
+      "grossProfit": 4047.680000000001,
+      "grossLoss": 2799.5599999999977,
+      "strategy_name": "CBC Asia Sweep v4 Daily50 — Sec (Ticks)",
+      "score": 1356.3939507979865
+    }
+  ]
+}

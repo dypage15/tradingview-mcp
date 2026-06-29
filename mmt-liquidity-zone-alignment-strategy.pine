@@ -1,0 +1,162 @@
+//@version=6
+// MMT-style sandbox: session sweeps only when swept liquidity stacks with other zone levels (PDH/PDL, sessions, midnight open).
+// Add to chart alongside CBC for visualization, or run Strategy Tester on this alone to validate the "stacked liquidity" hypothesis.
+// Does not modify closed-source CBC — use as an experimental alternative / filter idea source.
+strategy("MMT Zone-Aligned Sweep (sandbox)", shorttitle="MMT ZAlign", overlay=true, max_lines_count=120, max_labels_count=80,
+     initial_capital=100000, default_qty_type=strategy.fixed, default_qty_value=1, pyramiding=0,
+     commission_type=strategy.commission.cash_per_contract, commission_value=0.62,
+     slippage=2, process_orders_on_close=true, calc_on_every_tick=false,
+     margin_long=0, margin_short=0)
+
+// ═══════════════════════════════════════════════════════════════
+// INPUTS
+// ═══════════════════════════════════════════════════════════════
+groupAlign = "Liquidity stack"
+i_alignPts = input.float(4.0, "Max distance between levels (pts)", group=groupAlign, minval=0.25, step=0.25,
+     tooltip="Two zones 'line up' if their prices are within this many index points.")
+i_minNear = input.int(2, "Min nearby levels (incl. swept level)", group=groupAlign, minval=2, maxval=8,
+     tooltip="Require at least this many liquidity references within i_alignPts of the swept price.")
+
+groupSess = "Sessions (ET)"
+i_asiaHStart = input.int(19, "Asia start hour (ET)", group=groupSess, minval=0, maxval=23)
+i_lonStart = input.int(3, "London start hour (ET)", group=groupSess, minval=0, maxval=23)
+i_lonEnd = input.int(12, "London end hour (ET)", group=groupSess, minval=0, maxval=23)
+i_ibStartMin = input.int(570, "IB start (minutes from midnight ET)", group=groupSess, minval=0, maxval=1439,
+     tooltip="570 = 9:30 AM ET.")
+i_ibEndMin = input.int(600, "IB end (minutes from midnight ET)", group=groupSess, minval=0, maxval=1439,
+     tooltip="600 = 10:00 AM ET, end exclusive.")
+
+groupKz = "NY killzone"
+i_useKz = input.bool(true, "NY KZ only (new entries)", group=groupKz)
+i_kzStart = input.int(8, "NY KZ start hour (ET)", group=groupKz, minval=0, maxval=23)
+i_kzEnd = input.int(15, "NY KZ end hour (ET)", group=groupKz, minval=0, maxval=23,
+     tooltip="No new entries at or after this hour (3 PM ET default).")
+
+groupSig = "Signal / risk"
+i_atrLen = input.int(14, "ATR length", group=groupSig, minval=2)
+i_slAtr = input.float(1.5, "Stop (x ATR)", group=groupSig, minval=0.25, step=0.25)
+i_tpAtr = input.float(2.0, "Target (x ATR)", group=groupSig, minval=0.25, step=0.25)
+i_flatPastKz = input.bool(true, "Flatten at/after NY KZ end", group=groupSig)
+
+// ═══════════════════════════════════════════════════════════════
+// TIME (ET)
+// ═══════════════════════════════════════════════════════════════
+hNY = hour(time, "America/New_York")
+mNY = minute(time, "America/New_York")
+tMin = hNY * 60 + mNY
+newDayET = ta.change(time("D", "America/New_York")) != 0
+
+// Asia ~ 19:00 ET through midnight (hour 0)
+inAsia = hNY >= i_asiaHStart or hNY < 1
+inLondon = hNY >= i_lonStart and hNY < i_lonEnd
+inIB = tMin >= i_ibStartMin and tMin < i_ibEndMin
+
+inKZ = hNY >= i_kzStart and hNY < i_kzEnd
+pastKz = hNY >= i_kzEnd
+noNew = i_useKz and not inKZ
+
+// ═══════════════════════════════════════════════════════════════
+// LEVELS: prior day H/L, midnight open, session ranges
+// ═══════════════════════════════════════════════════════════════
+pdh = request.security(syminfo.tickerid, "D", high[1], lookahead=barmerge.lookahead_off)
+pdl = request.security(syminfo.tickerid, "D", low[1], lookahead=barmerge.lookahead_off)
+
+var float midOpen = na
+if newDayET
+    midOpen := open
+
+var float asiaH = na
+var float asiaL = na
+var float lonH = na
+var float lonL = na
+var float ibH = na
+var float ibL = na
+
+asiaOn = inAsia and not inAsia[1]
+lonOn = inLondon and not inLondon[1]
+ibOn = inIB and not inIB[1]
+
+if newDayET
+    asiaH := na
+    asiaL := na
+    lonH := na
+    lonL := na
+    ibH := na
+    ibL := na
+
+if asiaOn
+    asiaH := high
+    asiaL := low
+else if inAsia
+    asiaH := na(asiaH) ? high : math.max(asiaH, high)
+    asiaL := na(asiaL) ? low : math.min(asiaL, low)
+
+if lonOn
+    lonH := high
+    lonL := low
+else if inLondon
+    lonH := na(lonH) ? high : math.max(lonH, high)
+    lonL := na(lonL) ? low : math.min(lonL, low)
+
+if ibOn
+    ibH := high
+    ibL := low
+else if inIB
+    ibH := na(ibH) ? high : math.max(ibH, high)
+    ibL := na(ibL) ? low : math.min(ibL, low)
+
+atr = ta.atr(i_atrLen)
+
+// ═══════════════════════════════════════════════════════════════
+// Count levels within i_alignPts of price (stacked liquidity)
+// ═══════════════════════════════════════════════════════════════
+countNear(float px) =>
+    (not na(pdh) and math.abs(pdh - px) <= i_alignPts ? 1 : 0) +
+     (not na(pdl) and math.abs(pdl - px) <= i_alignPts ? 1 : 0) +
+     (not na(midOpen) and math.abs(midOpen - px) <= i_alignPts ? 1 : 0) +
+     (not na(asiaH) and math.abs(asiaH - px) <= i_alignPts ? 1 : 0) +
+     (not na(asiaL) and math.abs(asiaL - px) <= i_alignPts ? 1 : 0) +
+     (not na(lonH) and math.abs(lonH - px) <= i_alignPts ? 1 : 0) +
+     (not na(lonL) and math.abs(lonL - px) <= i_alignPts ? 1 : 0) +
+     (not na(ibH) and math.abs(ibH - px) <= i_alignPts ? 1 : 0) +
+     (not na(ibL) and math.abs(ibL - px) <= i_alignPts ? 1 : 0)
+
+// Sweeps (wick through level, close back)
+sweepBull(float L) =>
+    not na(L) and low < L and close > L
+
+sweepBear(float L) =>
+    not na(L) and high > L and close < L
+
+bullSweepIB = sweepBull(ibL) and not na(ibL)
+bearSweepIB = sweepBear(ibH) and not na(ibH)
+bullSweepLon = sweepBull(lonL) and not na(lonL)
+bearSweepLon = sweepBear(lonH) and not na(lonH)
+bullSweepAsia = sweepBull(asiaL) and not na(asiaL)
+bearSweepAsia = sweepBear(asiaH) and not na(asiaH)
+
+longSigRaw = (bullSweepIB and countNear(ibL) >= i_minNear) or (bullSweepLon and countNear(lonL) >= i_minNear) or (bullSweepAsia and countNear(asiaL) >= i_minNear)
+
+shortSigRaw = (bearSweepIB and countNear(ibH) >= i_minNear) or (bearSweepLon and countNear(lonH) >= i_minNear) or (bearSweepAsia and countNear(asiaH) >= i_minNear)
+
+longSig = longSigRaw and not noNew and strategy.position_size == 0
+shortSig = shortSigRaw and not noNew and strategy.position_size == 0
+
+if longSig
+    strategy.entry("Long", strategy.long)
+if shortSig
+    strategy.entry("Short", strategy.short)
+
+if strategy.position_size > 0
+    strategy.exit("XL", from_entry="Long", profit=atr * i_tpAtr, loss=atr * i_slAtr)
+if strategy.position_size < 0
+    strategy.exit("XS", from_entry="Short", profit=atr * i_tpAtr, loss=atr * i_slAtr)
+
+if i_flatPastKz and pastKz and strategy.position_size != 0
+    strategy.close_all(comment="Past NY KZ end")
+
+// ═══════════════════════════════════════════════════════════════
+// Visuals
+// ═══════════════════════════════════════════════════════════════
+plotshape(longSig, title="Long (stacked)", style=shape.triangleup, location=location.belowbar, size=size.tiny, color=color.new(color.teal, 0))
+plotshape(shortSig, title="Short (stacked)", style=shape.triangledown, location=location.abovebar, size=size.tiny, color=color.new(color.orange, 0))

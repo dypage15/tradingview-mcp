@@ -1,0 +1,519 @@
+// CLOUD REJECTION STRATEGY v1.4
+// Instrument-agnostic trend-pullback system
+// ──────────────────────────────────────────────────────────────────────────────
+// v1.4:
+//   • Swing proximity gate — long entries only near last confirmed pivot low; shorts near pivot high (ATR-scaled distance + optional pivot age cap).
+// v1.3 (equity curve / win‑rate tilt):
+//   • NY vs overnight (“Asia/Globex OR NY”) session OR — widen opportunity for ~daily signals.
+//   • Min pullback depth (× ATR) — drops shallow kisses of the cloud (common stop‑out fuel).
+//   • Optional scalp take‑profit limit before BE fires; BE+trail only after (captures chop wins).
+//   • VWAP filter default ON for longs (bias with daytime flow — toggle off anytime).
+// v1.2: single managed exit id, sane stale semantics, stable defaults on 5m.
+// v1.1 baseline: rejection pattern + RQ + structure trail.
+// ══════════════════════════════════════════════════════════════════════════════
+
+//@version=6
+strategy("Cloud Rejection Strategy v1.1",
+     overlay              = true,
+     pyramiding           = 0,
+     default_qty_type     = strategy.fixed,
+     default_qty_value    = 1,
+     initial_capital      = 10000,
+     commission_type      = strategy.commission.cash_per_contract,
+     commission_value     = 0.62,
+     slippage             = 1,
+     calc_on_every_tick   = false,
+     max_bars_back        = 500)
+
+// ─── INPUTS ─────────────────────────────────────────────────────────────────
+
+grp_cloud = "═══ EMA CLOUD ═══"
+fastEmaLen  = input.int(9,  "Fast EMA Length",        minval=2, group=grp_cloud)
+slowEmaLen  = input.int(21, "Slow EMA Length",        minval=2, group=grp_cloud)
+smaLen      = input.int(50, "SMA Baseline Length",    minval=5, group=grp_cloud)
+cloudSmooth = input.int(2,  "Cloud Smoothing (bars)", minval=1, group=grp_cloud,
+     tooltip="Bars cloud must hold regime before entries are allowed")
+
+grp_entry = "═══ ENTRY FILTERS ═══"
+longOnlyMode  = input.bool(true, "Long Only Mode",       group=grp_entry,
+     tooltip="Disable all short entries — use to isolate long-side edge in backtesting")
+cooldownBars  = input.int(3,      "Cooldown After Exit (bars)", minval=0, group=grp_entry,
+     tooltip="Block new entries for this many bars after any exit fires — prevents re-entering the same stopped zone")
+minPullbackAtr = input.float(0.12, "Min Cloud Pullback (× entry ATR)", minval=0, step=0.02, group=grp_entry,
+     tooltip="Requires price to penetrate the cloud by at least entry ATR × this before a rejection counts. Set 0 to disable.")
+
+grp_rq = "═══ ATR RISK QUANTIFIER ═══"
+rqLength     = input.int(14,   "RQ ATR Length",         minval=2,             group=grp_rq)
+rqSmooth     = input.int(5,    "RQ Smoothing",           minval=1,             group=grp_rq)
+rqNormLen    = input.int(100,  "Normalization Lookback", minval=20,            group=grp_rq)
+rqGateOn     = input.float(42, "Gate — Max to Trade",    minval=5, maxval=100, group=grp_rq,
+     tooltip="Block new entries when Risk Quantifier is at or above this level")
+rqKillSwitch = input.float(55, "Kill Switch",            minval=10, maxval=100, group=grp_rq,
+     tooltip="Suspend entries and tighten trail when RQ exceeds this")
+rqExitLevel  = input.float(70, "Emergency Exit",         minval=20, maxval=100, group=grp_rq,
+     tooltip="Flatten all positions when RQ exceeds this")
+
+grp_atr = "═══ ATR CANDLE FILTER ═══"
+atrLen     = input.int(3,     "ATR Period",           minval=1,             group=grp_atr)
+atrMeanLen = input.int(20,    "ATR Mean Lookback",    minval=5,             group=grp_atr)
+atrMaxMult = input.float(1.85, "Expansion Multiplier", minval=1.0, step=0.1, group=grp_atr,
+     tooltip="Skip entries when current ATR exceeds mean ATR × this value")
+
+grp_stop = "═══ STOP & MANAGEMENT ═══"
+stopAtrLen  = input.int(14,   "Stop ATR Length",           minval=2,              group=grp_stop)
+stopMult    = input.float(0.5,"Stop Buffer (ATR ×)",       minval=0.1, step=0.1,  group=grp_stop,
+     tooltip="Stop placed at slow EMA minus this × ATR — scales with instrument volatility")
+maxStopMult = input.float(2.0,"Max Stop Distance (ATR ×)", minval=0.5, step=0.25, group=grp_stop,
+     tooltip="Hard cap — stop can never be more than this × ATR from entry price")
+beAtrMult   = input.float(1.15,"Breakeven Trigger (ATR ×)", minval=0.5, step=0.25, group=grp_stop,
+     tooltip="Lift stop toward breakeven sooner — tends to improve win rate vs wide BE runs")
+scalpTpAtr  = input.float(1.6, "Scalp TP Before BE (× stop ATR, 0=off)", minval=0, step=0.1, group=grp_stop,
+     tooltip="OCO limit TP while still under BE path; clears after BE activates so trail/runner dominate")
+staleAfter  = input.int(24,   "Stale Exit (bars)",         minval=5,              group=grp_stop,
+     tooltip="Close trade if BE has NOT been triggered and close is still at or below entry after this many bars (long).")
+
+grp_struct = "═══ STRUCTURE TRAIL ═══"
+swingLen   = input.int(3,    "Swing Detection Length", minval=2,             group=grp_struct)
+minSteps   = input.int(1,    "Min Steps Required",     minval=1,             group=grp_struct,
+     tooltip="Minimum ratcheting swing levels required before entries are allowed")
+trailMult  = input.float(0.5,"Trail Buffer (ATR ×)",   minval=0.1, step=0.1, group=grp_struct,
+     tooltip="Phase 2 trail placed at prior swing step ± this × ATR")
+
+grp_prox = "═══ SWING PROXIMITY ═══"
+swingProximityOn = input.bool(true, "Gate entries near pivots", group=grp_prox,
+     tooltip="Longs allowed only within ATR × mult of latest confirmed swing low (bar low proximity). Shorts use latest swing high (bar high proximity). Uses same pivot length as structure swings.")
+swingProximityMult = input.float(1.65, "Max distance from pivot (× ATR)", minval=0.1, step=0.05, group=grp_prox,
+     tooltip="Vertical tolerance: abs(bar low − last swing low) ≤ this × scaling ATR on long setups (high − swing high for shorts). Increase if signals vanish.")
+swingProxScaleStopAtr = input.bool(true, "Scale proximity with Stop ATR", group=grp_prox,
+     tooltip="If false, scales with short ATR (entry filter ATR period on chart). Stop ATR usually matches exits better.")
+swingProxMaxPivotAge = input.int(72, "Max bars since pivot (0 = ignore age)", minval=0, maxval=1000, group=grp_prox,
+     tooltip="Blocks entries if the latest pivot occurred more than this many bars ago. 0 = no age ceiling.")
+
+grp_vwap = "═══ VWAP FILTER ═══"
+vwapFilterOn = input.bool(true, "Enable VWAP Confirmation", group=grp_vwap,
+     tooltip="Long entries require close > VWAP (short mirror). Off = ignore VWAP gate.")
+showVwap     = input.bool(true,  "Show VWAP Line",           group=grp_vwap)
+
+grp_sess = "═══ SESSION — NY ∪ OVERNIGHT ═══"
+useSession       = input.bool(true,           "Restrict to Session Windows Below", group=grp_sess)
+nySessionOn      = input.bool(true,           "Allow NY Regular Window",        group=grp_sess)
+sessNy           = input.session("0930-1600", "NY Regular (cash hours)",              group=grp_sess)
+globexAsiaOn    = input.bool(true,           "Allow Overnight Globex Window",group=grp_sess,
+     tooltip="Captures ETH overnight / Asia-heavy liquidity chunk before NY open")
+sessGlobexAsia   = input.session("1800-0900", "Globex Overnight (overlap window)",group=grp_sess)
+
+
+// ─── EMA CLOUD ──────────────────────────────────────────────────────────────
+
+fastEma = ta.ema(close, fastEmaLen)
+slowEma = ta.ema(close, slowEmaLen)
+smaBase = ta.sma(close, smaLen)
+
+rawBull = fastEma > slowEma and slowEma > smaBase
+rawBear = fastEma < slowEma and slowEma < smaBase
+
+bullCount = math.sum(rawBull ? 1 : 0, cloudSmooth)
+bearCount = math.sum(rawBear ? 1 : 0, cloudSmooth)
+
+cloudBull    = bullCount == cloudSmooth
+cloudBear    = bearCount == cloudSmooth
+cloudFlipped = (cloudBull and cloudBear[1]) or (cloudBear and cloudBull[1])
+
+// ─── Intrabar volatility (needs ATR candle values before pullback filter) ───
+atrCurrent = ta.atr(atrLen)
+atrMean    = ta.sma(atrCurrent, atrMeanLen)
+atrNormal  = atrCurrent <= atrMean * atrMaxMult
+
+// ─── CLOUD REJECTION ────────────────────────────────────────────────────────
+
+float penLong  = math.max(slowEma - low, 0)
+float penShort = math.max(high - slowEma, 0)
+
+bool pullbackLongOk =
+     minPullbackAtr <= 0 or penLong >= atrCurrent * minPullbackAtr
+
+bool pullbackShortOk =
+     minPullbackAtr <= 0 or penShort >= atrCurrent * minPullbackAtr
+
+bool bullRejection = barstate.isconfirmed
+     and cloudBull
+     and low  <= slowEma
+     and close > fastEma
+     and pullbackLongOk
+
+bool bearRejection = barstate.isconfirmed
+     and cloudBear
+     and high  >= slowEma
+     and close <  fastEma
+     and pullbackShortOk
+
+
+// ─── ATR RISK QUANTIFIER ────────────────────────────────────────────────────
+
+atrRaw         = ta.atr(rqLength)
+atrSmoothed    = ta.ema(atrRaw, rqSmooth)
+rqHigh         = ta.highest(atrSmoothed, rqNormLen)
+rqLow          = ta.lowest(atrSmoothed, rqNormLen)
+rqRange        = rqHigh - rqLow
+riskQuantifier = rqRange > 0 ? ((atrSmoothed - rqLow) / rqRange) * 100 : 50.0
+
+rqAllowEntry = riskQuantifier < rqGateOn
+rqSuspended  = riskQuantifier >= rqKillSwitch
+rqEmergency  = riskQuantifier >= rqExitLevel
+
+
+// ─── ATR STOP (full series for exits) ───────────────────────────────────────
+
+stopAtr = ta.atr(stopAtrLen)
+
+
+// ─── STEPPED STRUCTURE ───────────────────────────────────────────────────────
+
+swingLow  = ta.pivotlow(low, swingLen, swingLen)
+swingHigh = ta.pivothigh(high, swingLen, swingLen)
+
+var float stepLongCurrent  = na
+var float stepLongPrior    = na
+var int   stepLongCount    = 0
+var float stepShortCurrent = na
+var float stepShortPrior   = na
+var int   stepShortCount   = 0
+
+if not na(swingLow)
+    newStep = low[swingLen]
+    if na(stepLongCurrent) or newStep > stepLongCurrent
+        stepLongPrior   := stepLongCurrent
+        stepLongCurrent := newStep
+        stepLongCount   += 1
+    else if newStep > stepLongPrior and newStep < stepLongCurrent
+        stepLongPrior := newStep
+
+if not na(swingHigh)
+    newStep = high[swingLen]
+    if na(stepShortCurrent) or newStep < stepShortCurrent
+        stepShortPrior   := stepShortCurrent
+        stepShortCurrent := newStep
+        stepShortCount   += 1
+    else if newStep < stepShortPrior and newStep > stepShortCurrent
+        stepShortPrior := newStep
+
+longStepsReady  = stepLongCount  >= minSteps and not na(stepLongCurrent)
+shortStepsReady = stepShortCount >= minSteps and not na(stepShortCurrent)
+
+// Latest confirmed pivots for proximity gate (aligned with swingLen / pivots above)
+var float proxLastSwingLow     = na
+var int   proxLastSwingLowBar  = na
+var float proxLastSwingHigh    = na
+var int   proxLastSwingHighBar = na
+
+if not na(swingLow)
+    proxLastSwingLow    := low[swingLen]
+    proxLastSwingLowBar := bar_index - swingLen
+
+if not na(swingHigh)
+    proxLastSwingHigh    := high[swingLen]
+    proxLastSwingHighBar := bar_index - swingLen
+
+atrSwingProxScale = swingProxScaleStopAtr ? stopAtr : atrCurrent
+
+swingPivotLowFresh =
+     swingProxMaxPivotAge <= 0 or na(proxLastSwingLowBar) or (bar_index - proxLastSwingLowBar) <= swingProxMaxPivotAge
+
+swingPivotHighFresh =
+     swingProxMaxPivotAge <= 0 or na(proxLastSwingHighBar) or (bar_index - proxLastSwingHighBar) <= swingProxMaxPivotAge
+
+longSwingProxOk =
+     not swingProximityOn
+     or na(proxLastSwingLow)
+     or (swingPivotLowFresh and math.abs(low - proxLastSwingLow) <= atrSwingProxScale * swingProximityMult)
+
+shortSwingProxOk =
+     not swingProximityOn
+     or na(proxLastSwingHigh)
+     or (swingPivotHighFresh and math.abs(high - proxLastSwingHigh) <= atrSwingProxScale * swingProximityMult)
+
+
+// ─── COOLDOWN ───────────────────────────────────────────────────────────────
+
+var int lastExitBar = na
+anyExit = strategy.position_size == 0 and strategy.position_size[1] != 0
+if anyExit
+    lastExitBar := bar_index
+
+cooldownActive = not na(lastExitBar) and (bar_index - lastExitBar) <= cooldownBars
+
+
+// ─── VWAP / SESSION ─────────────────────────────────────────────────────────
+
+bool  isNewDay  = ta.change(time("D")) != 0
+float vwapValue = ta.vwap(close, isNewDay)
+
+vwapBullOk = not vwapFilterOn or close > vwapValue
+vwapBearOk = not vwapFilterOn or close < vwapValue
+
+
+inNy = nySessionOn and not na(time(timeframe.period, sessNy))
+inGlobex = globexAsiaOn and not na(time(timeframe.period, sessGlobexAsia))
+
+inTradeSession =
+     not useSession or (inNy or inGlobex)
+
+
+// ─── ENTRIES ─────────────────────────────────────────────────────────────────
+
+longEntry = bullRejection and not cloudFlipped and longStepsReady
+     and rqAllowEntry and not rqSuspended and atrNormal and vwapBullOk and inTradeSession
+     and longSwingProxOk
+     and not cooldownActive and strategy.position_size == 0
+
+shortEntry = not longOnlyMode and bearRejection and not cloudFlipped and shortStepsReady
+     and rqAllowEntry and not rqSuspended and atrNormal and vwapBearOk and inTradeSession
+     and shortSwingProxOk
+     and not cooldownActive and strategy.position_size == 0
+
+longStopAnchor  = slowEma - stopAtr * stopMult
+longStopCap     = close - stopAtr * maxStopMult
+shortStopAnchor = slowEma + stopAtr * stopMult
+shortStopCap    = close + stopAtr * maxStopMult
+
+if longEntry
+    strategy.entry("Long", strategy.long, comment="CRej_L")
+
+if shortEntry
+    strategy.entry("Short", strategy.short, comment="CRej_S")
+
+
+// ─── TRADE STATE ────────────────────────────────────────────────────────────
+
+var int   longEntryBar    = na
+var float longEntryPrice  = na
+var bool  longAtBE        = false
+var float longInitStop    = na
+var int   shortEntryBar   = na
+var float shortEntryPrice = na
+var bool  shortAtBE       = false
+var float shortInitStop   = na
+
+// Detect new fill from flat (nz handles historical first bar).
+justOpenedLong =
+     strategy.position_size > 0
+     and nz(strategy.position_size[1]) == 0
+
+justOpenedShort =
+     strategy.position_size < 0
+     and nz(strategy.position_size[1]) == 0
+
+if justOpenedLong
+    longEntryBar    := bar_index
+    longEntryPrice  := strategy.position_avg_price
+    longAtBE        := false
+    longInitStop    := math.max(longStopAnchor, longStopCap)
+
+if justOpenedShort
+    shortEntryBar    := bar_index
+    shortEntryPrice  := strategy.position_avg_price
+    shortAtBE        := false
+    shortInitStop    := math.min(shortStopAnchor, shortStopCap)
+
+if strategy.position_size == 0
+    longEntryBar    := na
+    longEntryPrice  := na
+    longAtBE        := false
+    longInitStop    := na
+    shortEntryBar   := na
+    shortEntryPrice := na
+    shortAtBE       := false
+    shortInitStop   := na
+
+// ─── Breakeven flag (sticky) ───────────────────────────────────────────────
+if strategy.position_size > 0 and not na(longEntryPrice) and not longAtBE
+    if high >= longEntryPrice + stopAtr * beAtrMult
+        longAtBE := true
+
+if strategy.position_size < 0 and not na(shortEntryPrice) and not shortAtBE
+    if low <= shortEntryPrice - stopAtr * beAtrMult
+        shortAtBE := true
+
+// ─── Override closes (evaluate before bracket update) ────────────────────────
+if strategy.position_size > 0 and cloudBear
+    strategy.close("Long", comment="CloudFlip")
+
+if strategy.position_size < 0 and cloudBull
+    strategy.close("Short", comment="CloudFlip")
+
+if strategy.position_size != 0 and rqEmergency
+    strategy.close_all(comment="RQ_Emergency")
+
+if strategy.position_size > 0 and not na(longEntryBar) and not longAtBE
+    if (bar_index - longEntryBar) >= staleAfter and close <= longEntryPrice
+        strategy.close("Long", comment="Stale")
+
+if strategy.position_size < 0 and not na(shortEntryBar) and not shortAtBE
+    if (bar_index - shortEntryBar) >= staleAfter and close >= shortEntryPrice
+        strategy.close("Short", comment="Stale")
+
+// ─── Single managed STOP per side (ratchet) ─────────────────────────────────
+calcLongMgmtStop() =>
+    stopPl = longInitStop
+    if rqSuspended and not rqEmergency and not na(stepLongCurrent)
+        rqTight = stepLongCurrent - stopAtr * trailMult
+        stopPl := math.max(stopPl, rqTight)
+    if longAtBE and not na(longEntryPrice)
+        stopPl := math.max(stopPl, longEntryPrice)
+    if longAtBE and not na(stepLongPrior)
+        trailStopLong = stepLongPrior - stopAtr * trailMult
+        if trailStopLong > longEntryPrice
+            stopPl := math.max(stopPl, trailStopLong)
+    stopPl
+
+calcShortMgmtStop() =>
+    stopPl = shortInitStop
+    if rqSuspended and not rqEmergency and not na(stepShortCurrent)
+        rqTightShort = stepShortCurrent + stopAtr * trailMult
+        stopPl := math.min(stopPl, rqTightShort)
+    if shortAtBE and not na(shortEntryPrice)
+        stopPl := math.min(stopPl, shortEntryPrice)
+    if shortAtBE and not na(stepShortPrior)
+        trailStopShort = stepShortPrior + stopAtr * trailMult
+        if trailStopShort < shortEntryPrice
+            stopPl := math.min(stopPl, trailStopShort)
+    stopPl
+
+if strategy.position_size > 0 and not na(longInitStop)
+    ls = calcLongMgmtStop()
+    if not longAtBE and not na(longEntryPrice) and scalpTpAtr > 0
+        lim = longEntryPrice + stopAtr * scalpTpAtr
+        strategy.exit("L_mgmt", "Long", stop=ls, limit=lim)
+    else
+        strategy.exit("L_mgmt", "Long", stop=ls)
+
+if strategy.position_size < 0 and not na(shortInitStop)
+    ss = calcShortMgmtStop()
+    if not shortAtBE and not na(shortEntryPrice) and scalpTpAtr > 0
+        slim = shortEntryPrice - stopAtr * scalpTpAtr
+        strategy.exit("S_mgmt", "Short", stop=ss, limit=slim)
+    else
+        strategy.exit("S_mgmt", "Short", stop=ss)
+
+
+// ─── VISUALS ────────────────────────────────────────────────────────────────
+
+p_fast = plot(fastEma, "Fast EMA", color=color.new(color.white, 70), linewidth=1)
+p_slow = plot(slowEma, "Slow EMA", color=color.new(color.white, 80), linewidth=1)
+plot(smaBase, "SMA Base", color=color.new(color.yellow, 80), linewidth=1)
+
+cloudColor = cloudBull ? color.new(#06d6a0, 75) : cloudBear ? color.new(#ff3860, 75) : color.new(color.gray, 85)
+fill(p_fast, p_slow, color=cloudColor, title="Cloud Fill")
+
+plot(longStepsReady  ? stepLongCurrent  : na, "Step Long",        color=color.new(#f59e0b, 30), style=plot.style_stepline_diamond, linewidth=2)
+plot(longStepsReady  ? stepLongPrior    : na, "Step Long Prior",  color=color.new(#f59e0b, 60), style=plot.style_stepline, linewidth=1)
+plot(shortStepsReady ? stepShortCurrent : na, "Step Short",       color=color.new(#f59e0b, 30), style=plot.style_stepline_diamond, linewidth=2)
+plot(shortStepsReady ? stepShortPrior   : na, "Step Short Prior", color=color.new(#f59e0b, 60), style=plot.style_stepline, linewidth=1)
+
+plot(showVwap ? vwapValue : na, "VWAP", color=color.new(color.gray, 40), linewidth=1, style=plot.style_linebr)
+
+plotshape(longEntry,  "Long Entry",  shape.triangleup,   location.belowbar, color=#06d6a0, size=size.small)
+plotshape(shortEntry, "Short Entry", shape.triangledown, location.abovebar, color=#ff3860, size=size.small)
+
+bgcolor(cooldownActive ? color.new(color.orange, 92) : na, title="Cooldown Period")
+bgcolor(useSession and inTradeSession ? color.new(#3b82f6, 94) : na, title="Session Window (NY ∪ Globex)")
+bgcolor(useSession and inNy ? color.new(#10b981, 97) : na, title="NY Window")
+bgcolor(useSession and inGlobex and not inNy ? color.new(#8b5cf6, 97) : na, title="Overnight Window")
+bgcolor(rqSuspended and not rqEmergency ? color.new(#f59e0b, 93) : na, title="RQ Suspended")
+bgcolor(rqEmergency ? color.new(#ff3860, 90) : na, title="RQ Emergency")
+
+bgcolor(longEntry ? color.new(#06d6a0, 88) : shortEntry ? color.new(#ff3860, 88) : na, title="Entry Bar")
+
+
+// ─── DASHBOARD ──────────────────────────────────────────────────────────────
+
+var table panel = table.new(position.top_right, 2, 12,
+     bgcolor      = color.new(#0a0a0f, 10),
+     border_color = color.new(#06d6a0, 70),
+     border_width = 1,
+     frame_color  = color.new(#06d6a0, 50),
+     frame_width  = 1)
+
+if barstate.islast
+    table.cell(panel, 0, 0, "CLOUD REJECTION", text_color=#06d6a0, text_size=size.small, text_halign=text.align_left, bgcolor=color.new(#0a0a0f, 10))
+    table.cell(panel, 1, 0, "v1.4", text_color=color.new(#8b89a0, 0), text_size=size.small, text_halign=text.align_right, bgcolor=color.new(#0a0a0f, 10))
+
+    regimeText = cloudBull ? "▲ BULL" : cloudBear ? "▼ BEAR" : "◆ NEUTRAL"
+    regimeClr  = cloudBull ? #06d6a0 : cloudBear ? #ff3860 : color.gray
+    table.cell(panel, 0, 1, "Regime", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 1, regimeText, text_color=regimeClr, text_size=size.tiny, text_halign=text.align_right)
+
+    rqText = str.tostring(riskQuantifier, "#.#")
+    rqClr  = riskQuantifier < rqGateOn ? #06d6a0 : riskQuantifier < rqKillSwitch ? #f59e0b : #ff3860
+    table.cell(panel, 0, 2, "Risk Q", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 2, rqText, text_color=rqClr, text_size=size.tiny, text_halign=text.align_right)
+
+    gateText = rqEmergency ? "⊘ EMERGENCY" : rqSuspended ? "⊘ SUSPENDED" : rqAllowEntry ? "✓ ACTIVE" : "⊘ GATED"
+    gateClr  = rqEmergency ? #ff3860 : rqSuspended ? #ff3860 : rqAllowEntry ? #06d6a0 : #f59e0b
+    table.cell(panel, 0, 3, "Gate", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 3, gateText, text_color=gateClr, text_size=size.tiny, text_halign=text.align_right)
+
+    atrStateText = atrNormal ? "NORMAL" : "EXPANDED"
+    atrClr       = atrNormal ? #06d6a0 : #f59e0b
+    table.cell(panel, 0, 4, "ATR State", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 4, atrStateText, text_color=atrClr, text_size=size.tiny, text_halign=text.align_right)
+
+    rejText = cloudBull ? (bullRejection ? "✓ THIS BAR" : "WAITING") : cloudBear ? (bearRejection ? "✓ THIS BAR" : "WAITING") : "—"
+    rejClr  = ((cloudBull and bullRejection) or (cloudBear and bearRejection)) ? #06d6a0 : color.gray
+    table.cell(panel, 0, 5, "Rejection", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 5, rejText, text_color=rejClr, text_size=size.tiny, text_halign=text.align_right)
+
+    stepsOk   = cloudBull ? longStepsReady : shortStepsReady
+    stepCount = cloudBull ? stepLongCount : stepShortCount
+    stepText  = stepsOk ? str.tostring(stepCount) + " ✓" : str.tostring(stepCount) + " / " + str.tostring(minSteps)
+    stepClr   = stepsOk ? #06d6a0 : #f59e0b
+    table.cell(panel, 0, 6, "Steps", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 6, stepText, text_color=stepClr, text_size=size.tiny, text_halign=text.align_right)
+
+    proxText =
+         not swingProximityOn ?
+             "OFF" :
+         cloudBull ?
+             (longSwingProxOk ? "✓ LONG ZONE" : "⊘ FAR") :
+         cloudBear ?
+             (shortSwingProxOk ? "✓ SHORT ZONE" : "⊘ FAR") :
+             "—"
+    proxClr =
+         not swingProximityOn ?
+             #8b89a0 :
+         cloudBull ?
+             (longSwingProxOk ? #06d6a0 : #f59e0b) :
+         cloudBear ?
+             (shortSwingProxOk ? #06d6a0 : #f59e0b) :
+             color.gray
+    table.cell(panel, 0, 7, "Swing prox", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 7, proxText, text_color=proxClr, text_size=size.tiny, text_halign=text.align_right)
+
+    cdText = cooldownActive ? "⊘ " + str.tostring(cooldownBars - (bar_index - lastExitBar)) + " BARS" : "✓ CLEAR"
+    cdClr  = cooldownActive ? #f59e0b : #06d6a0
+    table.cell(panel, 0, 8, "Cooldown", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 8, cdText, text_color=cdClr, text_size=size.tiny, text_halign=text.align_right)
+
+    modeText = longOnlyMode ? "LONG ONLY" : "BOTH SIDES"
+    modeClr  = longOnlyMode ? #f59e0b : #06d6a0
+    table.cell(panel, 0, 9, "Mode", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 9, modeText, text_color=modeClr, text_size=size.tiny, text_halign=text.align_right)
+
+    sessText =
+         not useSession ? "24H" :
+         inNy and inGlobex ? "NY+ETH" :
+         inNy ? "NY" :
+         inGlobex ? "OVERNIGHT" : "CLOSED"
+    sessClr = not useSession ? #06d6a0 : inTradeSession ? #06d6a0 : #8b89a0
+    table.cell(panel, 0, 10, "Session", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 10, sessText, text_color=sessClr, text_size=size.tiny, text_halign=text.align_right)
+
+    posText = strategy.position_size > 0 ? "LONG" : strategy.position_size < 0 ? "SHORT" : "FLAT"
+    posClr  = strategy.position_size > 0 ? #06d6a0 : strategy.position_size < 0 ? #ff3860 : color.gray
+    phaseText =
+         strategy.position_size == 0 ? "—" :
+         (strategy.position_size > 0 ?
+             (longAtBE ? "BE / TRAIL" : "RISK PHASE") :
+             (shortAtBE ? "BE / TRAIL" : "RISK PHASE"))
+    table.cell(panel, 0, 11, "Position", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 11, posText + " · " + phaseText, text_color=posClr, text_size=size.tiny, text_halign=text.align_right)

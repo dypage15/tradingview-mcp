@@ -1,0 +1,56 @@
+{
+  "success": true,
+  "metric_count": 34,
+  "source": "internal_api",
+  "metrics": {
+    "currency": "USD",
+    "settings": {
+      "dateRange": {
+        "backtest": {
+          "from": 1769986800000,
+          "to": 1778878500000
+        },
+        "trade": {
+          "from": 1770043200000,
+          "to": 1778878500000
+        }
+      }
+    },
+    "firstTradeIndex": 0,
+    "avgBarsInLossTrade": 12.26086956521739,
+    "avgBarsInTrade": 12.097826086956522,
+    "avgBarsInWinTrade": 11.934782608695652,
+    "avgLosTrade": 165.2901005,
+    "avgLosTradePercent": 0.0032135248856729943,
+    "avgTrade": -22.39504348,
+    "avgTradePercent": -0.0004167017563362969,
+    "avgWinTrade": 120.5000136,
+    "avgWinTradePercent": 0.0023801213730004,
+    "commissionPaid": 2361.3440000000014,
+    "grossLoss": 7603.3446250000015,
+    "grossLossPercent": 0.07603344625000001,
+    "grossLossWC": 6465.5,
+    "grossProfit": 5543.000625,
+    "grossProfitPercent": 0.05543000625,
+    "grossProfitWC": 6766.5,
+    "largestLosTrade": 330.044,
+    "largestLosTradePercent": 0.006607754195,
+    "largestWinTrade": 434.09774999999996,
+    "largestWinTradePercent": 0.008673886811,
+    "marginCalls": 0,
+    "maxContractsHeld": 1,
+    "netProfit": -2060.344000000002,
+    "netProfitPercent": -0.020603440000000018,
+    "numberOfLosingTrades": 46,
+    "numberOfWiningTrades": 46,
+    "percentProfitable": 0.5,
+    "profitFactor": 0.7290213581499995,
+    "ratioAvgWinAvgLoss": 0.7290213584206757,
+    "totalOpenTrades": 0,
+    "totalTrades": 92
+  },
+  "strategy_name": "ERL IRL Engine v2 Strategy [NLF]",
+  "pick_note": null,
+  "candidate_count": 6,
+  "report_ready": true
+}

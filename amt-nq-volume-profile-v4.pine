@@ -1,0 +1,602 @@
+//@version=5
+// =============================================================================
+// AMT - NQ Volume Profile Strategy  |  v4
+// -----------------------------------------------------------------------------
+// v3 -> v4 changes (driven by 221-trade backtest analysis, Dec 2025 - May 2026):
+//
+//   1. T1 PARTIAL PROFIT  Diagnosis: 60.6% of losers went >5pts in our favor
+//                         before reversing. We were giving back the move.
+//                         Fix:  Trade 2 contracts. Take 1 at T1 (default 50%
+//                         of VA distance). Move runner stop to BE after T1.
+//
+//   2. DAY FILTER         Diagnosis: Fri alone caused -$5,940 of -$5,589 net
+//                         loss. Mon was -$2,460. Tue/Wed/Thu were positive.
+//                         Fix:  Default trades Mon-Thu (Fri/Sat/Sun off).
+//
+//   3. LVN LOOSENING      Diagnosis: Only 14 LVN signals in 5.5 months.
+//                         Can't statistically evaluate (need 30+).
+//                         Fix:  Dropped strict POC trend requirement, widened
+//                         tolerance from 2.0 to 3.5 pts.
+//
+// NOTE ON STATS: With T1 partial, each trade produces 1-2 closure events.
+// The performance table counts per-closure metrics. For true trade-level
+// win rate, look at the Strategy Tester's grouped trade view.
+// =============================================================================
+
+strategy(
+     title              = "AMT - NQ Volume Profile",
+     shorttitle         = "AMT-NQ-VP",
+     overlay            = true,
+     calc_on_every_tick = false,
+     max_bars_back      = 1000,
+     max_lines_count    = 500,
+     default_qty_type   = strategy.fixed,
+     default_qty_value  = 2,
+     commission_type    = strategy.commission.cash_per_contract,
+     commission_value   = 4.50,
+     slippage           = 1)
+
+// -----------------------------------------------------------------------------
+// INPUTS
+// -----------------------------------------------------------------------------
+i_tz       = "America/New_York"
+i_asia     = input.session("2000-0200", "Asia Session",       group="Sessions")
+i_ny       = input.session("0930-1600", "NY RTH Session",     group="Sessions")
+
+// Day filter -- Fri/Sat/Sun OFF by default based on backtest
+i_mon      = input.bool(true,  "Mon", inline="dow1", group="Day Filter")
+i_tue      = input.bool(true,  "Tue", inline="dow1", group="Day Filter")
+i_wed      = input.bool(true,  "Wed", inline="dow1", group="Day Filter")
+i_thu      = input.bool(true,  "Thu", inline="dow1", group="Day Filter")
+i_fri      = input.bool(false, "Fri", inline="dow2", group="Day Filter")
+i_sat      = input.bool(false, "Sat", inline="dow2", group="Day Filter")
+i_sun      = input.bool(false, "Sun", inline="dow2", group="Day Filter")
+
+i_rows     = input.int  (50,    "VP Rows",                    group="Volume Profile", minval=20, maxval=100)
+i_vapct    = input.float(0.682, "Value Area %",               group="Volume Profile", step=0.001, minval=0.5, maxval=0.95)
+i_lvnpct   = input.float(0.25,  "LVN Vol Threshold",          group="Volume Profile", step=0.05, minval=0.05, maxval=0.5)
+i_lvntol   = input.float(3.5, "LVN Touch Tolerance (pts)", group="Volume Profile", step=0.25, minval=0.25, tooltip="v4: widened from 2.0 to 3.5 to fire more LVN signals")
+
+i_va_on    = input.bool(true, "VA Signal (80% Rule)",     group="Signals")
+i_lvn_on   = input.bool(true, "LVN Signal",               group="Signals")
+i_long     = input.bool(true, "Trade Longs",               group="Signals")
+i_short    = input.bool(true, "Trade Shorts",              group="Signals")
+i_cooldown = input.int (10,   "Cooldown Bars After Exit", group="Signals", minval=0, maxval=200)
+
+// Risk management
+i_qty       = input.int(2, "Position Size (contracts)", group="Risk", minval=1, maxval=10, tooltip="Must be >= 2 for T1 partial profit to take effect")
+i_t1_enable = input.bool(true, "Enable T1 Partial Profit",    group="Risk")
+i_t1_pct    = input.float(0.5, "T1 at % of VA Distance", group="Risk", step=0.05, minval=0.1, maxval=0.9, tooltip="0.5 = midpoint between entry and full VA fill")
+i_be_runner = input.bool(true, "Move Runner Stop to BE After T1", group="Risk")
+
+i_show     = input.bool(true, "Show Levels",              group="Display")
+i_show_tbl = input.bool(true, "Show Performance Table",   group="Display")
+i_tbl_pos  = input.string("top_right", "Table Position", group="Display", options=["top_left", "top_right", "bottom_left", "bottom_right", "middle_right"])
+
+// -----------------------------------------------------------------------------
+// SESSION + DAY DETECTION
+// -----------------------------------------------------------------------------
+in_asia    = not na(time("", i_asia, i_tz))
+in_ny      = not na(time("", i_ny,   i_tz))
+in_session = in_asia or in_ny
+
+sess_start = in_session  and not in_session[1]
+sess_end   = not in_session and in_session[1]
+
+dow_now = dayofweek
+day_ok = (dow_now == dayofweek.monday and i_mon) or (dow_now == dayofweek.tuesday and i_tue) or (dow_now == dayofweek.wednesday and i_wed) or (dow_now == dayofweek.thursday and i_thu) or (dow_now == dayofweek.friday and i_fri) or (dow_now == dayofweek.saturday and i_sat) or (dow_now == dayofweek.sunday and i_sun)
+
+// -----------------------------------------------------------------------------
+// BAR ACCUMULATION
+// -----------------------------------------------------------------------------
+var float[] bhi = array.new_float(0)
+var float[] blo = array.new_float(0)
+var float[] bvl = array.new_float(0)
+
+if sess_start
+    array.clear(bhi)
+    array.clear(blo)
+    array.clear(bvl)
+
+if in_session
+    array.push(bhi, high)
+    array.push(blo, low)
+    array.push(bvl, volume)
+
+// -----------------------------------------------------------------------------
+// PRIOR SESSION LEVELS
+// -----------------------------------------------------------------------------
+var float   p_vah  = na
+var float   p_val  = na
+var float   p_poc  = na
+var float[] p_lvns = array.new_float(0)
+var line[]  lvn_lines = array.new<line>()
+
+if sess_end
+    if array.size(lvn_lines) > 0
+        for i = 0 to array.size(lvn_lines) - 1
+            line.delete(array.get(lvn_lines, i))
+        array.clear(lvn_lines)
+
+    _n = array.size(bhi)
+    if _n > 0
+        _sh  = array.max(bhi)
+        _sl  = array.min(blo)
+        _rng = _sh - _sl
+        if _rng > 0
+            _rows = i_rows
+            _rs   = _rng / _rows
+            _vr   = array.new_float(_rows, 0.0)
+            for i = 0 to _n - 1
+                _h  = array.get(bhi, i)
+                _l  = array.get(blo, i)
+                _v  = array.get(bvl, i)
+                _rl = math.max(0, math.min(_rows - 1, int((_l - _sl) / _rs)))
+                _rh = math.max(0, math.min(_rows - 1, int((_h - _sl) / _rs)))
+                _nw = _rh - _rl + 1
+                _ve = _v / _nw
+                for r = _rl to _rh
+                    array.set(_vr, r, array.get(_vr, r) + _ve)
+
+            _mxv  = array.max(_vr)
+            _pocr = 0
+            for r = 0 to _rows - 1
+                if array.get(_vr, r) >= _mxv
+                    _pocr := r
+                    break
+            p_poc := _sl + (_pocr + 0.5) * _rs
+
+            _totv = array.sum(_vr)
+            _tgt  = _totv * i_vapct
+            _vlo  = _pocr
+            _vhi  = _pocr
+            _vv   = array.get(_vr, _pocr)
+            while _vv < _tgt
+                _u = (_vhi < _rows - 1) ? array.get(_vr, _vhi + 1) : -1.0
+                _d = (_vlo > 0)         ? array.get(_vr, _vlo - 1) : -1.0
+                if _u < 0 and _d < 0
+                    break
+                else if _u >= _d
+                    _vhi += 1
+                    _vv  += _u
+                else
+                    _vlo -= 1
+                    _vv  += _d
+            p_vah := _sl + (_vhi + 1) * _rs
+            p_val := _sl + _vlo * _rs
+
+            array.clear(p_lvns)
+            _thr = _mxv * i_lvnpct
+            for r = 1 to _rows - 2
+                if array.get(_vr, r) <= _thr
+                    array.push(p_lvns, _sl + (r + 0.5) * _rs)
+
+            if i_show and array.size(p_lvns) > 0
+                for i = 0 to array.size(p_lvns) - 1
+                    _lp = array.get(p_lvns, i)
+                    _ln = line.new(bar_index, _lp, bar_index + 1, _lp, extend=extend.right, color=color.new(color.orange, 40), width=1, style=line.style_dashed)
+                    array.push(lvn_lines, _ln)
+
+// -----------------------------------------------------------------------------
+// LVN DEDUP
+// -----------------------------------------------------------------------------
+var float[] spent_lvns = array.new_float(0)
+
+if sess_start
+    array.clear(spent_lvns)
+
+// -----------------------------------------------------------------------------
+// VA SIGNAL STATE MACHINE
+// -----------------------------------------------------------------------------
+var int va_st  = 0
+var int va_cnt = 0
+
+if sess_start
+    va_st  := 0
+    va_cnt := 0
+
+bool va_long  = false
+bool va_short = false
+
+if in_session and i_va_on and not na(p_val) and not na(p_vah)
+    if close < p_val
+        va_st  := 1
+        va_cnt := 0
+    else if close > p_vah
+        va_st  := 2
+        va_cnt := 0
+    else
+        if va_st == 1
+            va_cnt += 1
+            if va_cnt >= 2
+                va_long := true
+                va_st   := 0
+                va_cnt  := 0
+        else if va_st == 2
+            va_cnt += 1
+            if va_cnt >= 2
+                va_short := true
+                va_st    := 0
+                va_cnt   := 0
+        else
+            va_cnt := 0
+
+// -----------------------------------------------------------------------------
+// LVN SIGNAL STATE MACHINE (loosened detection in v4)
+// v3 required close[1] > p_poc (strict trend). v4 only requires close[1]
+// be clearly above (long) or below (short) the LVN itself.
+// -----------------------------------------------------------------------------
+var float lvn_w = na
+var int   lvn_d = 0
+var int   lvn_c = 0
+
+if sess_start
+    lvn_w := na
+    lvn_d := 0
+    lvn_c := 0
+
+bool lvn_long  = false
+bool lvn_short = false
+
+if in_session and i_lvn_on and not na(p_poc) and array.size(p_lvns) > 0
+    if not na(lvn_w)
+        if lvn_d == 1
+            if close > lvn_w
+                lvn_c += 1
+                if lvn_c >= 2
+                    lvn_long := true
+                    lvn_w    := na
+                    lvn_d    := 0
+                    lvn_c    := 0
+            else if close < lvn_w - i_lvntol
+                lvn_w := na
+                lvn_d := 0
+                lvn_c := 0
+        else if lvn_d == -1
+            if close < lvn_w
+                lvn_c += 1
+                if lvn_c >= 2
+                    lvn_short := true
+                    lvn_w     := na
+                    lvn_d     := 0
+                    lvn_c     := 0
+            else if close > lvn_w + i_lvntol
+                lvn_w := na
+                lvn_d := 0
+                lvn_c := 0
+    else
+        for i = 0 to array.size(p_lvns) - 1
+            _lp = array.get(p_lvns, i)
+            _spent = false
+            if array.size(spent_lvns) > 0
+                for j = 0 to array.size(spent_lvns) - 1
+                    if array.get(spent_lvns, j) == _lp
+                        _spent := true
+                        break
+            if not _spent
+                // v4: dropped close[1] > p_poc requirement
+                if close[1] > _lp + i_lvntol and low <= _lp + i_lvntol
+                    lvn_w := _lp
+                    lvn_d := 1
+                    lvn_c := 0
+                    array.push(spent_lvns, _lp)
+                    break
+                if close[1] < _lp - i_lvntol and high >= _lp - i_lvntol
+                    lvn_w := _lp
+                    lvn_d := -1
+                    lvn_c := 0
+                    array.push(spent_lvns, _lp)
+                    break
+
+// -----------------------------------------------------------------------------
+// COOLDOWN (v4: only triggers on full flat, not partial T1 close)
+// -----------------------------------------------------------------------------
+var int last_exit_bar  = -1000
+var float prev_pos_size  = 0.0
+
+if prev_pos_size != 0 and strategy.position_size == 0
+    last_exit_bar := bar_index
+
+bars_since_exit = bar_index - last_exit_bar
+cooldown_ok     = bars_since_exit >= i_cooldown
+
+// -----------------------------------------------------------------------------
+// ENTRIES + EXITS (v4: T1 partial + T2 runner, or single exit if T1 disabled)
+// -----------------------------------------------------------------------------
+_tick = syminfo.mintick
+_buf  = _tick * 4
+bool flat     = strategy.position_size == 0
+bool _entered = false
+
+var float pending_stop   = na
+var float pending_target = na
+var float pending_t1     = na
+
+f_place_long_exits(string id, float sl, float tgt, float t1) =>
+    if i_t1_enable and i_qty >= 2
+        _t1qty = math.max(1, math.floor(i_qty / 2))
+        strategy.exit(id + " T1", from_entry=id, qty=_t1qty, limit=t1, stop=sl)
+        strategy.exit(id + " T2", from_entry=id, limit=tgt, stop=sl)
+    else
+        strategy.exit(id + " X", from_entry=id, limit=tgt, stop=sl)
+
+f_place_short_exits(string id, float sl, float tgt, float t1) =>
+    if i_t1_enable and i_qty >= 2
+        _t1qty = math.max(1, math.floor(i_qty / 2))
+        strategy.exit(id + " T1", from_entry=id, qty=_t1qty, limit=t1, stop=sl)
+        strategy.exit(id + " T2", from_entry=id, limit=tgt, stop=sl)
+    else
+        strategy.exit(id + " X", from_entry=id, limit=tgt, stop=sl)
+
+// VA Long
+if not _entered and flat and day_ok and cooldown_ok and i_long and va_long and not na(p_val) and not na(p_vah)
+    _sl  = p_val - _buf
+    _tgt = p_vah
+    _t1  = close + (_tgt - close) * i_t1_pct
+    if _tgt - close > _buf
+        strategy.entry("VA Long", strategy.long, qty=i_qty, comment="VA Long")
+        f_place_long_exits("VA Long", _sl, _tgt, _t1)
+        pending_stop   := _sl
+        pending_target := _tgt
+        pending_t1     := _t1
+        _entered := true
+
+// VA Short
+if not _entered and flat and day_ok and cooldown_ok and i_short and va_short and not na(p_val) and not na(p_vah)
+    _sl  = p_vah + _buf
+    _tgt = p_val
+    _t1  = close + (_tgt - close) * i_t1_pct
+    if close - _tgt > _buf
+        strategy.entry("VA Short", strategy.short, qty=i_qty, comment="VA Short")
+        f_place_short_exits("VA Short", _sl, _tgt, _t1)
+        pending_stop   := _sl
+        pending_target := _tgt
+        pending_t1     := _t1
+        _entered := true
+
+// LVN Long
+if not _entered and flat and day_ok and cooldown_ok and i_long and lvn_long and not na(p_val) and not na(p_vah)
+    _sl  = p_val - _buf
+    _tgt = p_vah
+    _t1  = close + (_tgt - close) * i_t1_pct
+    if _tgt - close > _buf
+        strategy.entry("LVN Long", strategy.long, qty=i_qty, comment="LVN Long")
+        f_place_long_exits("LVN Long", _sl, _tgt, _t1)
+        pending_stop   := _sl
+        pending_target := _tgt
+        pending_t1     := _t1
+        _entered := true
+
+// LVN Short
+if not _entered and flat and day_ok and cooldown_ok and i_short and lvn_short and not na(p_val) and not na(p_vah)
+    _sl  = p_vah + _buf
+    _tgt = p_val
+    _t1  = close + (_tgt - close) * i_t1_pct
+    if close - _tgt > _buf
+        strategy.entry("LVN Short", strategy.short, qty=i_qty, comment="LVN Short")
+        f_place_short_exits("LVN Short", _sl, _tgt, _t1)
+        pending_stop   := _sl
+        pending_target := _tgt
+        pending_t1     := _t1
+        _entered := true
+
+if sess_end and strategy.position_size != 0
+    strategy.close_all(comment="Session End")
+
+// -----------------------------------------------------------------------------
+// ENTRY FILL DETECTION + MAE/MFE + T1 FIRE DETECTION + BE STOP UPDATE
+// -----------------------------------------------------------------------------
+var int prev_open = 0
+
+just_entered  = strategy.opentrades > prev_open
+last_entry_id = just_entered ? strategy.opentrades.entry_id(strategy.opentrades - 1) : ""
+
+bool mark_va_long   = just_entered and last_entry_id == "VA Long"
+bool mark_va_short  = just_entered and last_entry_id == "VA Short"
+bool mark_lvn_long  = just_entered and last_entry_id == "LVN Long"
+bool mark_lvn_short = just_entered and last_entry_id == "LVN Short"
+
+var float trade_entry_px   = na
+var float trade_stop       = na
+var float trade_target     = na
+var float trade_t1         = na
+var float trade_worst      = na
+var float trade_best       = na
+var bool  trade_is_long    = false
+var int   initial_pos_size = 0
+var bool  t1_fired         = false
+
+if just_entered
+    trade_entry_px   := strategy.opentrades.entry_price(strategy.opentrades - 1)
+    trade_stop       := pending_stop
+    trade_target     := pending_target
+    trade_t1         := pending_t1
+    trade_is_long    := strategy.opentrades.size(strategy.opentrades - 1) > 0
+    initial_pos_size := int(math.abs(strategy.opentrades.size(strategy.opentrades - 1)))
+    t1_fired         := false
+    trade_worst      := trade_is_long ? low  : high
+    trade_best       := trade_is_long ? high : low
+
+if strategy.position_size != 0 and not just_entered
+    if trade_is_long
+        trade_worst := math.min(trade_worst, low)
+        trade_best  := math.max(trade_best,  high)
+    else
+        trade_worst := math.max(trade_worst, high)
+        trade_best  := math.min(trade_best,  low)
+
+    // Detect T1 fire by position size shrinkage
+    if not t1_fired and initial_pos_size > 0 and not na(trade_t1)
+        current_size = int(math.abs(strategy.position_size))
+        if current_size < initial_pos_size
+            t1_fired := true
+
+    // After T1 fires, move runner stop to BE
+    if t1_fired and i_be_runner and not na(trade_target) and not na(trade_entry_px)
+        _eid = strategy.opentrades.entry_id(strategy.opentrades - 1)
+        strategy.exit(_eid + " T2", from_entry=_eid, limit=trade_target, stop=trade_entry_px)
+
+prev_open      := strategy.opentrades
+prev_pos_size  := strategy.position_size
+
+// -----------------------------------------------------------------------------
+// PER-SIGNAL PERFORMANCE TRACKING
+// -----------------------------------------------------------------------------
+var int[]   sig_n   = array.new_int  (4, 0)
+var int[]   sig_w   = array.new_int  (4, 0)
+var float[] sig_r   = array.new_float(4, 0.0)
+var float[] sig_gp  = array.new_float(4, 0.0)
+var float[] sig_gl  = array.new_float(4, 0.0)
+var float[] sig_mae = array.new_float(4, 0.0)
+var float[] sig_mfe = array.new_float(4, 0.0)
+
+var int prev_closed = 0
+var string alert_msg = ""
+
+trade_just_closed = strategy.closedtrades > prev_closed
+
+if trade_just_closed
+    closed_idx = strategy.closedtrades - 1
+    sig_id     = strategy.closedtrades.entry_id(closed_idx)
+    exit_px    = strategy.closedtrades.exit_price(closed_idx)
+    exit_bar   = strategy.closedtrades.exit_bar_index(closed_idx)
+    entry_bar  = strategy.closedtrades.entry_bar_index(closed_idx)
+    is_long_t  = strategy.closedtrades.size(closed_idx) > 0
+
+    risk_pts   = math.abs(trade_entry_px - trade_stop)
+    profit_pts = is_long_t ? (exit_px - trade_entry_px) : (trade_entry_px - exit_px)
+    r_value    = risk_pts > 0 ? profit_pts / risk_pts : 0.0
+
+    mae_pts = is_long_t ? (trade_worst - trade_entry_px) : (trade_entry_px - trade_worst)
+    mfe_pts = is_long_t ? (trade_best  - trade_entry_px) : (trade_entry_px - trade_best)
+    mae_r   = risk_pts > 0 ? mae_pts / risk_pts : 0.0
+    mfe_r   = risk_pts > 0 ? mfe_pts / risk_pts : 0.0
+
+    sig_idx = sig_id == "VA Long" ? 0 : sig_id == "VA Short" ? 1 : sig_id == "LVN Long" ? 2 : sig_id == "LVN Short" ? 3 : -1
+
+    if sig_idx >= 0
+        array.set(sig_n,   sig_idx, array.get(sig_n,   sig_idx) + 1)
+        if r_value > 0
+            array.set(sig_w,  sig_idx, array.get(sig_w,  sig_idx) + 1)
+            array.set(sig_gp, sig_idx, array.get(sig_gp, sig_idx) + r_value)
+        else
+            array.set(sig_gl, sig_idx, array.get(sig_gl, sig_idx) + r_value)
+        array.set(sig_r,   sig_idx, array.get(sig_r,   sig_idx) + r_value)
+        array.set(sig_mae, sig_idx, array.get(sig_mae, sig_idx) + mae_r)
+        array.set(sig_mfe, sig_idx, array.get(sig_mfe, sig_idx) + mfe_r)
+
+    sess_label = in_asia ? "ASIA" : in_ny ? "NY" : "GAP"
+    alert_msg := str.format("{0},{1},{2},{3},{4,number,#.##},{5,number,#.##},{6,number,#.##},{7,number,#.##},{8,number,+#.00;-#.00},{9,number,+#.00;-#.00},{10,number,+#.00;-#.00},{11}", str.tostring(time, "yyyy-MM-dd HH:mm"), sig_id, sess_label, is_long_t ? "LONG" : "SHORT", trade_entry_px, trade_stop, trade_target, exit_px, r_value, mae_r, mfe_r, exit_bar - entry_bar)
+    alert(alert_msg, alert.freq_once_per_bar)
+
+    prev_closed := strategy.closedtrades
+
+// -----------------------------------------------------------------------------
+// VISUALS
+// -----------------------------------------------------------------------------
+p_vah_plot = plot(i_show ? p_vah : na, "VAH", color=color.new(color.lime,   20), linewidth=2, style=plot.style_linebr)
+p_val_plot = plot(i_show ? p_val : na, "VAL", color=color.new(color.red,    20), linewidth=2, style=plot.style_linebr)
+plot(i_show ? p_poc : na, "POC", color=color.new(color.yellow, 0), linewidth=2, style=plot.style_linebr)
+
+fill(p_vah_plot, p_val_plot, color=color.new(color.blue, 92), title="Value Area Band")
+
+plotshape(mark_va_long,   "VA Long Entry",   shape.triangleup,   location.belowbar, color=color.lime,    size=size.normal)
+plotshape(mark_va_short,  "VA Short Entry",  shape.triangledown, location.abovebar, color=color.red,     size=size.normal)
+plotshape(mark_lvn_long,  "LVN Long Entry",  shape.diamond,      location.belowbar, color=color.aqua,    size=size.normal)
+plotshape(mark_lvn_short, "LVN Short Entry", shape.diamond,      location.abovebar, color=color.fuchsia, size=size.normal)
+
+bgcolor(in_asia ? color.new(color.navy, 95) : na, title="Asia Session BG")
+bgcolor(in_ny   ? color.new(color.teal, 95) : na, title="NY Session BG")
+
+// -----------------------------------------------------------------------------
+// PERFORMANCE TABLE
+// -----------------------------------------------------------------------------
+tbl_pos = i_tbl_pos == "top_left" ? position.top_left : i_tbl_pos == "top_right" ? position.top_right : i_tbl_pos == "bottom_left" ? position.bottom_left : i_tbl_pos == "bottom_right" ? position.bottom_right : position.middle_right
+
+var table perf_tbl = table.new(tbl_pos, columns=7, rows=6, border_width=1, border_color=color.new(color.gray, 50), bgcolor=color.new(color.black, 70))
+
+f_fmt_pct(v) => str.tostring(v, "#.0") + "%"
+f_fmt_r(v)   => str.tostring(v, "+#.00;-#.00")
+f_fmt_pf(v)  => v >= 99 ? "inf" : str.tostring(v, "#.00")
+f_color_winpct(v, n) => n < 30 ? color.gray : (v >= 50 ? color.lime : color.red)
+f_color_r(v) => v > 0 ? color.lime : color.red
+f_color_pf(v) => v > 1 ? color.lime : color.red
+
+if i_show_tbl and barstate.islast
+    table.cell(perf_tbl, 0, 0, "Signal",  text_color=color.white, bgcolor=color.new(color.gray, 30), text_size=size.small)
+    table.cell(perf_tbl, 1, 0, "N",       text_color=color.white, bgcolor=color.new(color.gray, 30), text_size=size.small)
+    table.cell(perf_tbl, 2, 0, "Win%",    text_color=color.white, bgcolor=color.new(color.gray, 30), text_size=size.small)
+    table.cell(perf_tbl, 3, 0, "Avg R",   text_color=color.white, bgcolor=color.new(color.gray, 30), text_size=size.small)
+    table.cell(perf_tbl, 4, 0, "PF",      text_color=color.white, bgcolor=color.new(color.gray, 30), text_size=size.small)
+    table.cell(perf_tbl, 5, 0, "AvgMAE",  text_color=color.white, bgcolor=color.new(color.gray, 30), text_size=size.small)
+    table.cell(perf_tbl, 6, 0, "AvgMFE",  text_color=color.white, bgcolor=color.new(color.gray, 30), text_size=size.small)
+
+    sig_labels = array.from("VA Long", "VA Short", "LVN Long", "LVN Short", "TOTAL")
+
+    tot_n = 0
+    tot_w = 0
+    tot_r = 0.0
+    tot_gp = 0.0
+    tot_gl = 0.0
+    tot_mae = 0.0
+    tot_mfe = 0.0
+
+    for i = 0 to 3
+        n_i   = array.get(sig_n, i)
+        w_i   = array.get(sig_w, i)
+        r_i   = array.get(sig_r, i)
+        gp_i  = array.get(sig_gp, i)
+        gl_i  = array.get(sig_gl, i)
+        mae_i = array.get(sig_mae, i)
+        mfe_i = array.get(sig_mfe, i)
+
+        win_pct  = n_i > 0 ? (w_i * 100.0 / n_i) : 0.0
+        avg_r    = n_i > 0 ? (r_i / n_i)         : 0.0
+        pf       = gl_i < 0 ? (gp_i / -gl_i) : (gp_i > 0 ? 99.0 : 0.0)
+        avg_mae  = n_i > 0 ? (mae_i / n_i)       : 0.0
+        avg_mfe  = n_i > 0 ? (mfe_i / n_i)       : 0.0
+
+        row = i + 1
+        table.cell(perf_tbl, 0, row, array.get(sig_labels, i),
+                   text_color=color.white, bgcolor=color.new(color.black, 70), text_size=size.small)
+        table.cell(perf_tbl, 1, row, str.tostring(n_i),
+                   text_color=color.white, bgcolor=color.new(color.black, 70), text_size=size.small)
+        table.cell(perf_tbl, 2, row, f_fmt_pct(win_pct),
+                   text_color=f_color_winpct(win_pct, n_i), bgcolor=color.new(color.black, 70), text_size=size.small)
+        table.cell(perf_tbl, 3, row, f_fmt_r(avg_r),
+                   text_color=f_color_r(avg_r), bgcolor=color.new(color.black, 70), text_size=size.small)
+        table.cell(perf_tbl, 4, row, f_fmt_pf(pf),
+                   text_color=f_color_pf(pf), bgcolor=color.new(color.black, 70), text_size=size.small)
+        table.cell(perf_tbl, 5, row, f_fmt_r(avg_mae),
+                   text_color=color.orange, bgcolor=color.new(color.black, 70), text_size=size.small)
+        table.cell(perf_tbl, 6, row, f_fmt_r(avg_mfe),
+                   text_color=color.aqua, bgcolor=color.new(color.black, 70), text_size=size.small)
+
+        tot_n   += n_i
+        tot_w   += w_i
+        tot_r   += r_i
+        tot_gp  += gp_i
+        tot_gl  += gl_i
+        tot_mae += mae_i
+        tot_mfe += mfe_i
+
+    tot_winpct = tot_n > 0 ? (tot_w * 100.0 / tot_n) : 0.0
+    tot_avgr   = tot_n > 0 ? (tot_r / tot_n)         : 0.0
+    tot_pf     = tot_gl < 0 ? (tot_gp / -tot_gl) : (tot_gp > 0 ? 99.0 : 0.0)
+    tot_avgmae = tot_n > 0 ? (tot_mae / tot_n)       : 0.0
+    tot_avgmfe = tot_n > 0 ? (tot_mfe / tot_n)       : 0.0
+
+    table.cell(perf_tbl, 0, 5, "TOTAL",
+               text_color=color.yellow, bgcolor=color.new(color.gray, 50), text_size=size.small)
+    table.cell(perf_tbl, 1, 5, str.tostring(tot_n),
+               text_color=color.yellow, bgcolor=color.new(color.gray, 50), text_size=size.small)
+    table.cell(perf_tbl, 2, 5, f_fmt_pct(tot_winpct),
+               text_color=f_color_winpct(tot_winpct, tot_n), bgcolor=color.new(color.gray, 50), text_size=size.small)
+    table.cell(perf_tbl, 3, 5, f_fmt_r(tot_avgr),
+               text_color=f_color_r(tot_avgr), bgcolor=color.new(color.gray, 50), text_size=size.small)
+    table.cell(perf_tbl, 4, 5, f_fmt_pf(tot_pf),
+               text_color=f_color_pf(tot_pf), bgcolor=color.new(color.gray, 50), text_size=size.small)
+    table.cell(perf_tbl, 5, 5, f_fmt_r(tot_avgmae),
+               text_color=color.orange, bgcolor=color.new(color.gray, 50), text_size=size.small)
+    table.cell(perf_tbl, 6, 5, f_fmt_r(tot_avgmfe),
+               text_color=color.aqua, bgcolor=color.new(color.gray, 50), text_size=size.small)

@@ -1,0 +1,135 @@
+{
+  "success": true,
+  "generatedAt": "2026-04-19T21:39:29.028Z",
+  "entityId": "nKCpfi",
+  "advisorSubstring": "CBC LIQUIDITY PRO V6",
+  "gridSlice": "0:5",
+  "grid": {
+    "in_2_atrRatioMin": [
+      1,
+      1.2,
+      1.4,
+      1.6,
+      1.8
+    ],
+    "in_3_moveCountMin": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "in_4_moveThresholdPts": [
+      35,
+      45,
+      55,
+      65
+    ],
+    "in_12_sweepThPts": [
+      0.3,
+      0.5,
+      0.7
+    ]
+  },
+  "countOk": 0,
+  "countFail": 5,
+  "top25": [],
+  "failedSample": [
+    {
+      "scenarioId": 0,
+      "in_2": 1,
+      "in_3": 2,
+      "in_4": 35,
+      "in_12": 0.3,
+      "reason": "metrics missing or tester not ready",
+      "raw": {
+        "success": true,
+        "metric_count": 0,
+        "source": "internal_api",
+        "metrics": {},
+        "strategy_name": "CBC LIQUIDITY PRO V6",
+        "pick_note": null,
+        "candidate_count": 8,
+        "report_ready": false,
+        "hint": "Strategy Tester has no report yet for the selected study (reportData is empty). Open Strategy Tester, wait for the backtest to finish, fix compile/runtime errors, or run a deep backtest. Charts with only a loading strategy show zero metrics until calculation completes."
+      }
+    },
+    {
+      "scenarioId": 1,
+      "in_2": 1,
+      "in_3": 2,
+      "in_4": 35,
+      "in_12": 0.5,
+      "reason": "metrics missing or tester not ready",
+      "raw": {
+        "success": true,
+        "metric_count": 0,
+        "source": "internal_api",
+        "metrics": {},
+        "strategy_name": "CBC LIQUIDITY PRO V6",
+        "pick_note": null,
+        "candidate_count": 8,
+        "report_ready": false,
+        "hint": "Strategy Tester has no report yet for the selected study (reportData is empty). Open Strategy Tester, wait for the backtest to finish, fix compile/runtime errors, or run a deep backtest. Charts with only a loading strategy show zero metrics until calculation completes."
+      }
+    },
+    {
+      "scenarioId": 2,
+      "in_2": 1,
+      "in_3": 2,
+      "in_4": 35,
+      "in_12": 0.7,
+      "reason": "metrics missing or tester not ready",
+      "raw": {
+        "success": true,
+        "metric_count": 0,
+        "source": "internal_api",
+        "metrics": {},
+        "strategy_name": "CBC LIQUIDITY PRO V6",
+        "pick_note": null,
+        "candidate_count": 8,
+        "report_ready": false,
+        "hint": "Strategy Tester has no report yet for the selected study (reportData is empty). Open Strategy Tester, wait for the backtest to finish, fix compile/runtime errors, or run a deep backtest. Charts with only a loading strategy show zero metrics until calculation completes."
+      }
+    },
+    {
+      "scenarioId": 3,
+      "in_2": 1,
+      "in_3": 2,
+      "in_4": 45,
+      "in_12": 0.3,
+      "reason": "metrics missing or tester not ready",
+      "raw": {
+        "success": true,
+        "metric_count": 0,
+        "source": "internal_api",
+        "metrics": {},
+        "strategy_name": "CBC LIQUIDITY PRO V6",
+        "pick_note": null,
+        "candidate_count": 8,
+        "report_ready": false,
+        "hint": "Strategy Tester has no report yet for the selected study (reportData is empty). Open Strategy Tester, wait for the backtest to finish, fix compile/runtime errors, or run a deep backtest. Charts with only a loading strategy show zero metrics until calculation completes."
+      }
+    },
+    {
+      "scenarioId": 4,
+      "in_2": 1,
+      "in_3": 2,
+      "in_4": 45,
+      "in_12": 0.5,
+      "reason": "metrics missing or tester not ready",
+      "raw": {
+        "success": true,
+        "metric_count": 0,
+        "source": "internal_api",
+        "metrics": {},
+        "strategy_name": "CBC LIQUIDITY PRO V6",
+        "pick_note": null,
+        "candidate_count": 8,
+        "report_ready": false,
+        "hint": "Strategy Tester has no report yet for the selected study (reportData is empty). Open Strategy Tester, wait for the backtest to finish, fix compile/runtime errors, or run a deep backtest. Charts with only a loading strategy show zero metrics until calculation completes."
+      }
+    }
+  ],
+  "all": []
+}

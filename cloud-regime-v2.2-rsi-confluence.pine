@@ -1,0 +1,656 @@
+// ══════════════════════════════════════════════════════════════════════════════
+// CLOUD REGIME v2.3 — RSI CONFLUENCE (quality filters + ATR risk)
+// EMA Cloud flip + RSI — Next Level Foundry
+// ══════════════════════════════════════════════════════════════════════════════
+// v2.3: cooldown between entries, min cloud width, optional ATR-scaled TP/SL.
+
+//@version=6
+strategy("Cloud Regime v2.3 — RSI Confluence",
+     shorttitle="ClReg2.3",
+     overlay=true,
+     pyramiding=0,
+     default_qty_type=strategy.fixed,
+     default_qty_value=1,
+     initial_capital=100000,
+     commission_type=strategy.commission.cash_per_contract,
+     commission_value=0.62,
+     slippage=1,
+     calc_on_every_tick=true,
+     margin_long=25,
+     margin_short=25,
+     max_bars_back=500)
+
+
+grp_cloud = "═══ EMA CLOUD ═══"
+grp_rsi = "═══ RSI ═══"
+grp_risk = "═══ RISK MANAGEMENT ═══"
+grp_sess = "═══ SESSION ═══"
+grp_exec = "═══ STRATEGY ═══"
+grp_conf = "═══ CONFLUENCE ═══"
+grp_bb = "═══ BOLLINGER BANDS ═══"
+grp_filt = "═══ QUALITY FILTERS ═══"
+grp_data = "═══ DATA COLLECTION ═══"
+
+fastEmaLen = input.int(9, "Fast EMA Length", minval=2, group=grp_cloud)
+slowEmaLen = input.int(21, "Slow EMA Length", minval=2, group=grp_cloud)
+smaLen = input.int(50, "SMA Baseline", minval=5, group=grp_cloud)
+cloudSmooth = input.int(3, "Cloud Smoothing", minval=1, group=grp_cloud, tooltip="Grid best on MNQ 5m: 3")
+
+rsiLen = input.int(6, "RSI Length", minval=2, group=grp_rsi, tooltip="Grid best: 6. 14 = TV default.")
+rsiSrc = input.source(close, "RSI Source", group=grp_rsi)
+rsiMode = input.string("Combined", "RSI Mode", options=["Trend", "Combined", "Exhaustion", "Momentum", "Curl"], group=grp_rsi, tooltip="Grid best on MNQ 5m: Combined. Trend similar. Momentum = high PF but ~15 trades.")
+rsiOversold = input.int(30, "Oversold level", minval=10, maxval=49, group=grp_rsi)
+rsiOverbought = input.int(70, "Overbought level", minval=51, maxval=90, group=grp_rsi)
+rsiSlopeLen = input.int(5, "RSI slope lookback (Curl)", minval=2, group=grp_rsi)
+
+tpPoints = input.float(30.0, "Take Profit (points)", minval=1.0, step=0.5, group=grp_risk, tooltip="Used when Risk mode = Points. Grid best MNQ 5m: 30")
+slPoints = input.float(15.0, "Stop Loss (points)", minval=1.0, step=0.5, group=grp_risk, tooltip="Used when Risk mode = Points. Grid best: 15")
+
+useSession = input.bool(false, "Enable Session Filter", group=grp_sess, tooltip="Turn on to restrict entries to session windows below.")
+sessStart = input.session("0930-1600", "Custom window", group=grp_sess, tooltip="Used when Session preset = Custom.")
+
+confLookback = input.int(3, "Confluence Lookback (bars)", minval=0, maxval=10, group=grp_conf, tooltip="0 = pillar true on flip bar only. N = enabled RSI/BB pillars valid up to N bars before flip.")
+
+minBarsBetween = input.int(0, "Min bars between entries", minval=0, maxval=30, group=grp_filt, tooltip="Cooldown — cuts overtrading. 0 = off (v2.2 grid baseline).")
+minCloudSep = input.float(0.0, "Min cloud width (points)", minval=0.0, step=0.5, group=grp_filt, tooltip="0 = off. Wider cloud = stronger trend at flip.")
+
+showDataTable = input.bool(true, "Show execution summary table", group=grp_data)
+dataTblPos = input.string("Bottom Right", "Summary table position", options=["Top Right", "Top Left", "Bottom Right", "Bottom Left", "Middle Right", "Middle Left"], group=grp_data)
+
+showTradeLog = input.bool(true, "Show trade log table", group=grp_data)
+tradeLogRows = input.int(12, "Trade log rows on chart", minval=4, maxval=20, group=grp_data)
+tradeLogMax = input.int(150, "Max trades stored in memory", minval=20, maxval=500, group=grp_data)
+tradeLogPos = input.string("Middle Left", "Trade log position", options=["Top Right", "Top Left", "Bottom Right", "Bottom Left", "Middle Right", "Middle Left"], group=grp_data)
+logCsvAlerts = input.bool(false, "Alert CSV row on each closed trade", group=grp_data, tooltip="Enable alerts on chart; each close emits one comma-separated row for export.")
+
+riskMode = input.string("Points", "Risk mode", options=["Points", "ATR Multiple"], group=grp_risk, tooltip="ATR scales TP/SL to volatility.")
+atrLen = input.int(14, "ATR length", minval=5, group=grp_risk)
+tpAtrMult = input.float(2.0, "TP × ATR", minval=0.5, step=0.1, group=grp_risk)
+slAtrMult = input.float(1.0, "SL × ATR", minval=0.25, step=0.1, group=grp_risk)
+
+sessionPreset = input.string("Off", "Session preset", options=["Off", "Asia + NY", "Custom"], group=grp_sess, tooltip="Asia + NY tuned for Arizona (MST). Chart times are CME Chicago — AZ is 1h behind Chicago year-round (no DST). Gap blocks ~11pm–7:30am AZ (London).")
+sessAsia = input.session("1800-0100", "Asia window (Chicago TZ)", group=grp_sess, tooltip="≈ 5:00pm–12:00am Arizona. Evening globex / Asia liquidity.")
+sessNy = input.session("0830-1500", "NY window (Chicago TZ)", group=grp_sess, tooltip="≈ 7:30am–2:00pm Arizona. US cash (RTH).")
+
+strategyEnabled = input.bool(true, "Enable strategy entries", group=grp_exec, tooltip="Off = no new trades (exits on opposite flip still run).")
+enableLongs = input.bool(true, "Allow long entries", group=grp_exec)
+enableShorts = input.bool(true, "Allow short entries", group=grp_exec)
+useRsiConfluence = input.bool(true, "Require RSI confluence", group=grp_conf, tooltip="Off = ignore RSI on entries (cloud flip only for RSI pillar).")
+useBbConfluence = input.bool(false, "Require BB confluence", group=grp_bb, tooltip="Off = ignore Bollinger pillar. Both on = RSI and BB must pass on flip.")
+bbLen = input.int(20, "BB Length", minval=1, group=grp_bb)
+bbMult = input.float(2.0, "BB Std Dev", minval=0.5, step=0.1, group=grp_bb)
+bbMode = input.string("Proximity", "BB Entry Trigger", options=["Proximity", "Crossover"], group=grp_bb)
+bbBufferMult = input.float(1.5, "Proximity Buffer (ATR mult)", minval=0.0, step=0.25, group=grp_bb)
+bbAtrLen = input.int(14, "ATR Length for buffer", minval=2, group=grp_bb)
+showBB = input.bool(true, "Show upper/lower bands only", group=grp_bb)
+showBBProxLines = input.bool(true, "Show proximity zones", group=grp_bb, tooltip="Tinted band around upper/lower line only (± ATR×buffer). No midline.")
+
+
+fastEma = ta.ema(close, fastEmaLen)
+slowEma = ta.ema(close, slowEmaLen)
+smaBase = ta.sma(close, smaLen)
+
+rawBull = fastEma > slowEma and slowEma > smaBase
+rawBear = fastEma < slowEma and slowEma < smaBase
+bullCount = math.sum(rawBull ? 1 : 0, cloudSmooth)
+bearCount = math.sum(rawBear ? 1 : 0, cloudSmooth)
+cloudBull = bullCount == cloudSmooth
+cloudBear = bearCount == cloudSmooth
+
+flipToBull = cloudBull and not cloudBull[1]
+flipToBear = cloudBear and not cloudBear[1]
+
+f_rsi_wilder(float src, int len) =>
+    float chg = ta.change(src)
+    float up = ta.rma(math.max(chg, 0), len)
+    float dn = ta.rma(-math.min(chg, 0), len)
+    dn == 0 ? 100.0 : up == 0 ? 0.0 : 100.0 - (100.0 / (1.0 + up / dn))
+
+vrsi = f_rsi_wilder(rsiSrc, rsiLen)
+
+rsiExhLong = vrsi <= rsiOversold
+rsiExhShort = vrsi >= rsiOverbought
+rsiMomLong = ta.crossover(vrsi, 50)
+rsiMomShort = ta.crossunder(vrsi, 50)
+
+rsiSlopeRaw = ta.linreg(vrsi, rsiSlopeLen, 0) - ta.linreg(vrsi, rsiSlopeLen, 1)
+rsiSlopePrev = ta.linreg(vrsi, rsiSlopeLen, 1) - ta.linreg(vrsi, rsiSlopeLen, 2)
+rsiCurlLong = rsiExhLong and rsiSlopeRaw > 0 and rsiSlopePrev <= 0
+rsiCurlShort = rsiExhShort and rsiSlopeRaw < 0 and rsiSlopePrev >= 0
+
+rsiTrendLong = vrsi >= 50
+rsiTrendShort = vrsi <= 50
+rsiSigLong = rsiMode == "Trend" ? rsiTrendLong : rsiMode == "Exhaustion" ? rsiExhLong : rsiMode == "Momentum" ? rsiMomLong : rsiMode == "Curl" ? rsiCurlLong : (rsiTrendLong or rsiExhLong or rsiMomLong or rsiCurlLong)
+rsiSigShort = rsiMode == "Trend" ? rsiTrendShort : rsiMode == "Exhaustion" ? rsiExhShort : rsiMode == "Momentum" ? rsiMomShort : rsiMode == "Curl" ? rsiCurlShort : (rsiTrendShort or rsiExhShort or rsiMomShort or rsiCurlShort)
+
+inAsia = not na(time(timeframe.period, sessAsia))
+inNy = not na(time(timeframe.period, sessNy))
+inCustom = not na(time(timeframe.period, sessStart))
+sessionFilterOn = useSession and sessionPreset != "Off"
+inSession = not sessionFilterOn ? true : sessionPreset == "Asia + NY" ? (inAsia or inNy) : inCustom
+sessionLabel = sessionPreset == "Asia + NY" ? (inAsia ? "Asia" : inNy ? "NY" : "OUT") : inSession ? "IN" : "OUT"
+
+f_recent_true(bool cond, int lb) =>
+    bool ok = cond
+    if lb > 0
+        for i = 1 to lb
+            ok := ok or cond[i]
+    ok
+
+rsiLongOk = confLookback == 0 ? rsiSigLong : f_recent_true(rsiSigLong, confLookback)
+rsiShortOk = confLookback == 0 ? rsiSigShort : f_recent_true(rsiSigShort, confLookback)
+
+bbBasis = ta.sma(close, bbLen)
+bbDev = bbMult * ta.stdev(close, bbLen)
+bbUpper = bbBasis + bbDev
+bbLower = bbBasis - bbDev
+bbAtrBuf = ta.atr(bbAtrLen) * bbBufferMult
+// Proximity = within buffer of outer band only (not the whole half-channel to midline)
+bbProxLong = math.abs(close - bbLower) <= bbAtrBuf
+bbProxShort = math.abs(close - bbUpper) <= bbAtrBuf
+bbCrossLong = ta.crossover(close, bbLower)
+bbCrossShort = ta.crossunder(close, bbUpper)
+bbCondLong = bbMode == "Proximity" ? bbProxLong : bbCrossLong
+bbCondShort = bbMode == "Proximity" ? bbProxShort : bbCrossShort
+bbProxLowerOuter = bbLower - bbAtrBuf
+bbProxLowerInner = bbLower + bbAtrBuf
+bbProxUpperInner = bbUpper - bbAtrBuf
+bbProxUpperOuter = bbUpper + bbAtrBuf
+bbLongOk = confLookback == 0 ? bbCondLong : f_recent_true(bbCondLong, confLookback)
+bbShortOk = confLookback == 0 ? bbCondShort : f_recent_true(bbCondShort, confLookback)
+
+confLongOk = (not useRsiConfluence or rsiLongOk) and (not useBbConfluence or bbLongOk)
+confShortOk = (not useRsiConfluence or rsiShortOk) and (not useBbConfluence or bbShortOk)
+
+cloudOnlyMode = not useRsiConfluence and not useBbConfluence
+bothConfMode = useRsiConfluence and useBbConfluence
+
+cloudWidth = math.abs(fastEma - slowEma)
+cloudWideOk = minCloudSep <= 0 or cloudWidth >= minCloudSep
+
+var int lastEntryBar = na
+barsSinceEntry = na(lastEntryBar) ? 100000 : bar_index - lastEntryBar
+cooldownOk = minBarsBetween <= 0 or barsSinceEntry >= minBarsBetween
+
+longSignal = strategyEnabled and enableLongs and flipToBull and confLongOk and inSession and cloudWideOk and cooldownOk
+shortSignal = strategyEnabled and enableShorts and flipToBear and confShortOk and inSession and cloudWideOk and cooldownOk
+
+longEntry = longSignal
+shortEntry = shortSignal
+
+entLongCmt = cloudOnlyMode ? "Flip_L" : bothConfMode ? "Flip+RSI+BB_L" : useBbConfluence ? "Flip+BB_L" : "Flip+RSI_L"
+entShortCmt = cloudOnlyMode ? "Flip_S" : bothConfMode ? "Flip+RSI+BB_S" : useBbConfluence ? "Flip+BB_S" : "Flip+RSI_S"
+pendModeTxt = cloudOnlyMode ? "Cloud" : bothConfMode ? "RSI+BB" : useBbConfluence ? "BB" : rsiMode
+
+atrVal = ta.atr(atrLen)
+tpTicks = riskMode == "ATR Multiple" ? math.max(1, int(math.round(atrVal * tpAtrMult / syminfo.mintick))) : int(tpPoints / syminfo.mintick)
+slTicks = riskMode == "ATR Multiple" ? math.max(1, int(math.round(atrVal * slAtrMult / syminfo.mintick))) : int(slPoints / syminfo.mintick)
+
+// v2.1 order: flip close first, entry on signal bar, TP/SL placed once position is open.
+var bool longExitPlaced = false
+var bool shortExitPlaced = false
+
+if barstate.isconfirmed and strategy.position_size == 0
+    longExitPlaced := false
+    shortExitPlaced := false
+
+if barstate.isconfirmed and strategy.position_size > 0 and flipToBear
+    strategy.close("Long", comment="FlipExit_L")
+    longExitPlaced := false
+
+if barstate.isconfirmed and strategy.position_size < 0 and flipToBull
+    strategy.close("Short", comment="FlipExit_S")
+    shortExitPlaced := false
+
+if longEntry and barstate.isconfirmed
+    strategy.entry("Long", strategy.long, comment=entLongCmt)
+    lastEntryBar := bar_index
+
+if shortEntry and barstate.isconfirmed
+    strategy.entry("Short", strategy.short, comment=entShortCmt)
+    lastEntryBar := bar_index
+
+if barstate.isconfirmed and strategy.position_size > 0 and not longExitPlaced
+    strategy.exit("Long_Exit", "Long", profit=tpTicks, loss=slTicks)
+    longExitPlaced := true
+
+if barstate.isconfirmed and strategy.position_size < 0 and not shortExitPlaced
+    strategy.exit("Short_Exit", "Short", profit=tpTicks, loss=slTicks)
+    shortExitPlaced := true
+
+missedL = flipToBull and not longEntry
+missedS = flipToBear and not shortEntry
+
+
+// ─── TRADE LOG (conditions + performance per closed trade) ───────────────────
+
+var int sigLongCnt = 0
+var int sigShortCnt = 0
+var int fillLongCnt = 0
+var int fillShortCnt = 0
+var int missLongCnt = 0
+var int missShortCnt = 0
+var int bullFlipCnt = 0
+var int bearFlipCnt = 0
+var int lastClosedSeen = 0
+var int logSeq = 0
+var float lastTradePnL = 0.0
+var string lastExitTxt = "—"
+var string lastEntryTxt = "—"
+
+var array<int> logNum = array.new_int(0)
+var array<int> logDir = array.new_int(0)
+var array<float> logRsiEnt = array.new_float(0)
+var array<int> logFlip = array.new_int(0)
+var array<float> logEntryPx = array.new_float(0)
+var array<float> logExitPx = array.new_float(0)
+var array<float> logPts = array.new_float(0)
+var array<int> logWin = array.new_int(0)
+var array<string> logExit = array.new_string(0)
+var array<int> logBars = array.new_int(0)
+var array<float> logMfe = array.new_float(0)
+var array<float> logMae = array.new_float(0)
+var array<int> logEntTime = array.new_int(0)
+var array<int> logExtTime = array.new_int(0)
+var array<float> logTp = array.new_float(0)
+var array<float> logSl = array.new_float(0)
+var array<int> logConfLb = array.new_int(0)
+var array<int> logSess = array.new_int(0)
+var array<string> logMode = array.new_string(0)
+var array<string> logEntCmt = array.new_string(0)
+var array<string> logSrc = array.new_string(0)
+
+var float pendEntryPx = na
+var int pendDir = 0
+var float pendRsi = na
+var int pendFlip = 0
+var int pendEntBar = 0
+var int pendEntTime = 0
+var float pendTp = na
+var float pendSl = na
+var int pendConfLb = 0
+var int pendSess = 0
+var string pendMode = ""
+var string pendEntCmt = ""
+
+var float trkEntryPx = na
+var int trkDir = 0
+var int trkEntBar = 0
+var float trkHigh = na
+var float trkLow = na
+var int recClosed = 0
+var int recWins = 0
+var int recLoss = 0
+var float recNetPts = 0.0
+var float recGrossWin = 0.0
+var float recGrossLoss = 0.0
+
+f_log_trim() =>
+    while array.size(logNum) > tradeLogMax
+        array.shift(logNum)
+        array.shift(logDir)
+        array.shift(logRsiEnt)
+        array.shift(logFlip)
+        array.shift(logEntryPx)
+        array.shift(logExitPx)
+        array.shift(logPts)
+        array.shift(logWin)
+        array.shift(logExit)
+        array.shift(logBars)
+        array.shift(logMfe)
+        array.shift(logMae)
+        array.shift(logEntTime)
+        array.shift(logExtTime)
+        array.shift(logTp)
+        array.shift(logSl)
+        array.shift(logConfLb)
+        array.shift(logSess)
+        array.shift(logMode)
+        array.shift(logEntCmt)
+        array.shift(logSrc)
+
+f_log_push(int seqId, int dir, float rsiE, int flipCd, float entPx, float extPx, float pts, string exitTxt, int barsH, float mfe, float mae, int entT, int extT, float tpV, float slV, int confLb, int sessV, string modeV, string entCmt, string srcV) =>
+    array.push(logNum, seqId)
+    array.push(logDir, dir)
+    array.push(logRsiEnt, rsiE)
+    array.push(logFlip, flipCd)
+    array.push(logEntryPx, entPx)
+    array.push(logExitPx, extPx)
+    array.push(logPts, pts)
+    array.push(logWin, pts > 0 ? 1 : pts < 0 ? 0 : -1)
+    array.push(logExit, exitTxt)
+    array.push(logBars, barsH)
+    array.push(logMfe, mfe)
+    array.push(logMae, mae)
+    array.push(logEntTime, entT)
+    array.push(logExtTime, extT)
+    array.push(logTp, tpV)
+    array.push(logSl, slV)
+    array.push(logConfLb, confLb)
+    array.push(logSess, sessV)
+    array.push(logMode, modeV)
+    array.push(logEntCmt, entCmt)
+    array.push(logSrc, srcV)
+    f_log_trim()
+
+f_exit_short(string raw) =>
+    string s = raw
+    if str.contains(s, "FlipExit")
+        "Flip"
+    else if str.contains(s, "Long_Exit") or str.contains(s, "Short_Exit")
+        str.contains(s, "profit") ? "TP" : str.contains(s, "stop") ? "SL" : "Exit"
+    else if str.contains(s, "rec")
+        "Rec"
+    else
+        str.length(s) > 10 ? str.substring(s, 0, 10) : s
+
+bool wasInPos = strategy.position_size[1] != 0
+bool nowFlat = strategy.position_size == 0
+
+if barstate.isconfirmed
+    if longEntry
+        sigLongCnt += 1
+        lastEntryTxt := entLongCmt
+        if strategy.position_size[1] <= 0
+            pendDir := 1
+            pendEntryPx := close
+            pendRsi := vrsi
+            pendFlip := 1
+            pendEntBar := bar_index
+            pendEntTime := time
+            pendTp := tpPoints
+            pendSl := slPoints
+            pendConfLb := confLookback
+            pendSess := inSession ? 1 : 0
+            pendMode := pendModeTxt
+            pendEntCmt := entLongCmt
+            trkEntryPx := close
+            trkDir := 1
+            trkEntBar := bar_index
+            trkHigh := high
+            trkLow := low
+    if barstate.isconfirmed and longEntry and strategy.position_size > 0 and strategy.position_size[1] <= 0
+        fillLongCnt += 1
+    if barstate.isconfirmed and shortEntry and strategy.position_size < 0 and strategy.position_size[1] >= 0
+        fillShortCnt += 1
+    if shortEntry
+        sigShortCnt += 1
+        lastEntryTxt := entShortCmt
+        if strategy.position_size[1] >= 0
+            pendDir := -1
+            pendEntryPx := close
+            pendRsi := vrsi
+            pendFlip := -1
+            pendEntBar := bar_index
+            pendEntTime := time
+            pendTp := tpPoints
+            pendSl := slPoints
+            pendConfLb := confLookback
+            pendSess := inSession ? 1 : 0
+            pendMode := pendModeTxt
+            pendEntCmt := entShortCmt
+            trkEntryPx := close
+            trkDir := -1
+            trkEntBar := bar_index
+            trkHigh := high
+            trkLow := low
+    if missedL
+        missLongCnt += 1
+    if missedS
+        missShortCnt += 1
+    if flipToBull
+        bullFlipCnt += 1
+    if flipToBear
+        bearFlipCnt += 1
+
+if strategy.position_size != 0
+    trkHigh := na(trkHigh) ? high : math.max(trkHigh, high)
+    trkLow := na(trkLow) ? low : math.min(trkLow, low)
+
+if barstate.isconfirmed
+    if strategy.closedtrades > lastClosedSeen
+        lastClosedSeen := strategy.closedtrades
+        int tix = strategy.closedtrades - 1
+        float engPnl = strategy.closedtrades.profit(tix)
+        float entPx = strategy.closedtrades.entry_price(tix)
+        float extPx = strategy.closedtrades.exit_price(tix)
+        int entT = strategy.closedtrades.entry_time(tix)
+        int extT = strategy.closedtrades.exit_time(tix)
+        string exCmt = strategy.closedtrades.exit_comment(tix)
+        float tradeSize = strategy.closedtrades.size(tix)
+        int dir = tradeSize > 0 ? 1 : -1
+        float pts = dir == 1 ? extPx - entPx : entPx - extPx
+        int barsH = not na(pendEntBar) ? bar_index - pendEntBar : 0
+        float mfe = dir == 1 ? trkHigh - entPx : entPx - trkLow
+        float mae = dir == 1 ? entPx - trkLow : trkHigh - entPx
+        mfe := na(mfe) ? 0.0 : mfe
+        mae := na(mae) ? 0.0 : mae
+        float rsiE = na(pendRsi) ? vrsi : pendRsi
+        int flipCd = pendFlip != 0 ? pendFlip : dir == 1 ? 1 : -1
+        logSeq += 1
+        f_log_push(logSeq, dir, rsiE, flipCd, entPx, extPx, pts, f_exit_short(exCmt), barsH, mfe, mae, entT, extT, pendTp, pendSl, pendConfLb, pendSess, pendMode, pendEntCmt, "engine")
+        lastTradePnL := pts
+        lastExitTxt := exCmt
+        recNetPts += engPnl
+        if engPnl > 0
+            recWins += 1
+            recGrossWin += engPnl
+        else if engPnl < 0
+            recLoss += 1
+            recGrossLoss += math.abs(engPnl)
+        pendDir := 0
+        pendEntryPx := na
+        trkEntryPx := na
+        trkDir := 0
+        trkHigh := na
+        trkLow := na
+        if logCsvAlerts
+            alert("CLREG22," + str.tostring(logSeq) + ",engine," + (dir == 1 ? "L" : "S") + "," + str.tostring(rsiE, "#.##") + "," + (flipCd == 1 ? "Bull" : "Bear") + "," + str.tostring(entPx, "#.##") + "," + str.tostring(extPx, "#.##") + "," + str.tostring(pts, "#.##") + "," + f_exit_short(exCmt) + "," + str.tostring(barsH) + "," + str.tostring(mfe, "#.##") + "," + str.tostring(mae, "#.##") + "," + pendMode + "," + str.tostring(pendConfLb) + "," + str.tostring(pendTp, "#.#") + "/" + str.tostring(pendSl, "#.#"), alert.freq_once_per_bar_close)
+
+    if nowFlat and wasInPos and not na(trkEntryPx) and strategy.closedtrades == lastClosedSeen
+        float pnlPts = trkDir == 1 ? close - trkEntryPx : trkEntryPx - close
+        int barsH = bar_index - trkEntBar
+        float mfe = trkDir == 1 ? trkHigh - trkEntryPx : trkEntryPx - trkLow
+        float mae = trkDir == 1 ? trkEntryPx - trkLow : trkHigh - trkEntryPx
+        mfe := na(mfe) ? 0.0 : mfe
+        mae := na(mae) ? 0.0 : mae
+        string exTxt = pnlPts > 0 ? "rec win" : pnlPts < 0 ? "rec loss" : "rec flat"
+        recClosed += 1
+        recNetPts += pnlPts
+        lastTradePnL := pnlPts
+        lastExitTxt := exTxt
+        if pnlPts > 0
+            recWins += 1
+            recGrossWin += pnlPts
+        else if pnlPts < 0
+            recLoss += 1
+            recGrossLoss += math.abs(pnlPts)
+        logSeq += 1
+        f_log_push(logSeq, trkDir, pendRsi, pendFlip, trkEntryPx, close, pnlPts, exTxt, barsH, mfe, mae, pendEntTime, time, pendTp, pendSl, pendConfLb, pendSess, pendMode, pendEntCmt, "recorded")
+        if logCsvAlerts
+            alert("CLREG22," + str.tostring(logSeq) + ",recorded," + (trkDir == 1 ? "L" : "S") + "," + str.tostring(pendRsi, "#.##") + "," + str.tostring(pnlPts, "#.##") + "," + exTxt, alert.freq_once_per_bar_close)
+        pendDir := 0
+        pendEntryPx := na
+        trkEntryPx := na
+        trkDir := 0
+        trkHigh := na
+        trkLow := na
+
+logCount = array.size(logNum)
+closedTrades = math.max(strategy.closedtrades, recClosed, logCount)
+winTrades = math.max(strategy.wintrades, recWins)
+lossTrades = math.max(strategy.losstrades, recLoss)
+winPct = closedTrades > 0 ? winTrades / closedTrades * 100.0 : 0.0
+float grossWin = strategy.grossprofit != 0 ? strategy.grossprofit : recGrossWin
+float grossLossAmt = strategy.grossloss != 0 ? math.abs(strategy.grossloss) : recGrossLoss
+profitFactor = grossLossAmt > 0 ? grossWin / grossLossAmt : 0.0
+netDisplay = strategy.closedtrades > 0 ? strategy.netprofit : recNetPts
+posText = strategy.position_size > 0 ? "LONG " + str.tostring(strategy.position_size) : strategy.position_size < 0 ? "SHORT " + str.tostring(math.abs(strategy.position_size)) : "flat"
+openPnL = strategy.position_size != 0 ? strategy.openprofit : 0.0
+
+p_fast = plot(fastEma, "Fast EMA", color=color.new(color.white, 70), linewidth=1)
+p_slow = plot(slowEma, "Slow EMA", color=color.new(color.white, 80), linewidth=1)
+plot(smaBase, "SMA Baseline", color=color.new(color.yellow, 80), linewidth=1)
+cloudColor = cloudBull ? color.new(#06d6a0, 75) : cloudBear ? color.new(#ff3860, 75) : color.new(color.gray, 85)
+fill(p_fast, p_slow, color=cloudColor, title="Cloud Fill")
+
+bbShow = showBB or useBbConfluence
+p_bbUpper = plot(bbShow ? bbUpper : na, "BB Upper", color=color.new(color.silver, 15), linewidth=2)
+p_bbLower = plot(bbShow ? bbLower : na, "BB Lower", color=color.new(color.silver, 15), linewidth=2)
+p_bbLoOut = plot(bbShow and showBBProxLines and bbMode == "Proximity" ? bbProxLowerOuter : na, "BB lower prox outer", color=color.new(#06d6a0, 50), linewidth=1, style=plot.style_linebr)
+p_bbLoIn = plot(bbShow and showBBProxLines and bbMode == "Proximity" ? bbProxLowerInner : na, "BB lower prox inner", color=color.new(#06d6a0, 50), linewidth=1, style=plot.style_linebr)
+p_bbUpIn = plot(bbShow and showBBProxLines and bbMode == "Proximity" ? bbProxUpperInner : na, "BB upper prox inner", color=color.new(#ff3860, 50), linewidth=1, style=plot.style_linebr)
+p_bbUpOut = plot(bbShow and showBBProxLines and bbMode == "Proximity" ? bbProxUpperOuter : na, "BB upper prox outer", color=color.new(#ff3860, 50), linewidth=1, style=plot.style_linebr)
+fill(p_bbLoOut, p_bbLoIn, color=bbShow and showBBProxLines and bbMode == "Proximity" ? color.new(#06d6a0, 88) : na, title="Long zone (lower band only)")
+fill(p_bbUpIn, p_bbUpOut, color=bbShow and showBBProxLines and bbMode == "Proximity" ? color.new(#ff3860, 88) : na, title="Short zone (upper band only)")
+
+bgcolor(inSession and sessionFilterOn ? color.new(#3b82f6, 96) : na, title="Session Window")
+bgcolor(inAsia and sessionFilterOn and sessionPreset == "Asia + NY" ? color.new(#8b5cf6, 94) : na, title="Asia Window")
+bgcolor(inNy and sessionFilterOn and sessionPreset == "Asia + NY" ? color.new(#f59e0b, 94) : na, title="NY Window")
+bgcolor(flipToBull and barstate.isconfirmed ? color.new(#06d6a0, 88) : na, title="Bull Flip Bar")
+bgcolor(flipToBear and barstate.isconfirmed ? color.new(#ff3860, 88) : na, title="Bear Flip Bar")
+
+longClr = useBbConfluence and not useRsiConfluence ? #f59e0b : #06d6a0
+shortClr = useBbConfluence and not useRsiConfluence ? #a855f7 : #ff3860
+plotshape(longEntry and barstate.isconfirmed, "Long Signal", shape.triangleup, location.belowbar, color=longClr, size=size.small)
+plotshape(shortEntry and barstate.isconfirmed, "Short Signal", shape.triangledown, location.abovebar, color=shortClr, size=size.small)
+plotshape(longEntry and barstate.isconfirmed and useBbConfluence, "BB Long", shape.labelup, location.belowbar, color=#f59e0b, textcolor=color.white, text="BB", size=size.tiny)
+plotshape(shortEntry and barstate.isconfirmed and useBbConfluence, "BB Short", shape.labeldown, location.abovebar, color=#a855f7, textcolor=color.white, text="BB", size=size.tiny)
+
+plotshape(missedL and barstate.isconfirmed, "Flip miss — long", shape.circle, location.belowbar, color=color.new(#06d6a0, 60), size=size.tiny)
+plotshape(missedS and barstate.isconfirmed, "Flip miss — short", shape.circle, location.abovebar, color=color.new(#ff3860, 60), size=size.tiny)
+
+var table panel = table.new(position.top_right, 2, 8, bgcolor=color.new(#0a0a0f, 10), border_color=color.new(#a855f7, 70), border_width=1, frame_color=color.new(#a855f7, 50), frame_width=1)
+
+dataPos = dataTblPos == "Top Left" ? position.top_left : dataTblPos == "Bottom Right" ? position.bottom_right : dataTblPos == "Bottom Left" ? position.bottom_left : dataTblPos == "Middle Right" ? position.middle_right : dataTblPos == "Middle Left" ? position.middle_left : position.top_right
+
+var table dataPanel = table.new(dataPos, 2, 17, bgcolor=color.new(#0a0a0f, 8), border_color=color.new(#3b82f6, 60), border_width=1, frame_color=color.new(#3b82f6, 40), frame_width=1)
+
+logPosSel = tradeLogPos == "Top Left" ? position.top_left : tradeLogPos == "Bottom Right" ? position.bottom_right : tradeLogPos == "Bottom Left" ? position.bottom_left : tradeLogPos == "Middle Right" ? position.middle_right : tradeLogPos == "Middle Left" ? position.middle_left : position.top_right
+
+var table tlogPanel = table.new(logPosSel, 11, 22, bgcolor=color.new(#0a0a0f, 6), border_color=color.new(#f59e0b, 55), border_width=1, frame_color=color.new(#f59e0b, 35), frame_width=1)
+
+var color D_LBL = color.new(#8b89a0, 0)
+var color D_VAL = color.new(#e8e6f0, 0)
+var color D_HDR = color.new(#3b82f6, 0)
+var color D_BG = color.new(#12121e, 8)
+
+f_row(table tbl, int row, string lbl, string val, color valClr) =>
+    table.cell(tbl, 0, row, lbl, text_color=D_LBL, text_size=size.tiny, text_halign=text.align_left, bgcolor=D_BG)
+    table.cell(tbl, 1, row, val, text_color=valClr, text_size=size.tiny, text_halign=text.align_right, bgcolor=D_BG)
+
+f_tcell(table tbl, int col, int row, string txt, color clr, bool hdr=false) =>
+    table.cell(tbl, col, row, txt, text_color=clr, text_size=hdr ? size.small : size.tiny, text_halign=col == 0 ? text.align_left : text.align_center, bgcolor=D_BG)
+
+if barstate.islast
+    regimeText = cloudBull ? "▲ BULLISH" : cloudBear ? "▼ BEARISH" : "◆ NEUTRAL"
+    regimeClr = cloudBull ? color.new(#06d6a0, 0) : cloudBear ? color.new(#ff3860, 0) : color.gray
+    flipText = flipToBull ? "→ BULL" : flipToBear ? "→ BEAR" : "—"
+    flipClr = flipToBull ? color.new(#06d6a0, 0) : flipToBear ? color.new(#ff3860, 0) : color.gray
+    rsiStatus = useBbConfluence and not useRsiConfluence ? (bbProxLong ? "at lower" : bbProxShort ? "at upper" : "—") : useRsiConfluence ? (rsiLongOk ? "long OK" : rsiShortOk ? "short OK" : str.tostring(vrsi, "#.#")) : str.tostring(vrsi, "#.#")
+    longReady = flipToBull and confLongOk
+    shortReady = flipToBear and confShortOk
+    confText = longReady ? "▲ LONG" : shortReady ? "▼ SHORT" : "watching"
+    confClr = longReady ? color.new(#06d6a0, 0) : shortReady ? color.new(#ff3860, 0) : color.gray
+    modeTxt = not strategyEnabled ? "OFF" : cloudOnlyMode ? "Cloud" : bothConfMode ? "RSI+BB" : useBbConfluence ? "BB" : "RSI"
+    confHdr = useBbConfluence and not useRsiConfluence ? "BB" : useRsiConfluence ? "RSI" : "Cloud"
+    lbTag = bothConfMode ? "RSI+BB " : useBbConfluence ? "BB " : useRsiConfluence ? "RSI " : "Cloud "
+    lbText = lbTag + (confLookback == 0 ? "flip bar" : str.tostring(confLookback) + " bars")
+    hdrTitle = "CLOUD REGIME"
+
+    table.cell(panel, 0, 0, hdrTitle, text_color=color.new(#a855f7, 0), text_size=size.small, text_halign=text.align_left, bgcolor=color.new(#12121e, 10))
+    table.cell(panel, 1, 0, modeTxt, text_color=strategyEnabled ? color.new(#8b89a0, 0) : color.new(#ff3860, 0), text_size=size.small, text_halign=text.align_right, bgcolor=color.new(#12121e, 10))
+    table.cell(panel, 0, 1, "Regime", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 1, regimeText, text_color=regimeClr, text_size=size.tiny, text_halign=text.align_right)
+    table.cell(panel, 0, 2, "Flip", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 2, flipText, text_color=flipClr, text_size=size.tiny, text_halign=text.align_right)
+    table.cell(panel, 0, 3, confHdr, text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 3, rsiStatus, text_color=color.new(#e8e6f0, 0), text_size=size.tiny, text_halign=text.align_right)
+    table.cell(panel, 0, 4, "TP / SL", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 4, str.tostring(tpPoints, "#.#") + " / " + str.tostring(slPoints, "#.#"), text_color=color.new(#e8e6f0, 0), text_size=size.tiny, text_halign=text.align_right)
+    table.cell(panel, 0, 5, "Session", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    sessDisp = sessionFilterOn ? (sessionPreset == "Asia + NY" ? sessionLabel : inSession ? "IN" : "OUT") : "ALL"
+    table.cell(panel, 1, 5, sessDisp, text_color=inSession ? color.new(#06d6a0, 0) : color.gray, text_size=size.tiny, text_halign=text.align_right)
+    table.cell(panel, 0, 6, "Confluence", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 6, confText, text_color=confClr, text_size=size.tiny, text_halign=text.align_right)
+    table.cell(panel, 0, 7, "Conf lookback", text_color=color.new(#8b89a0, 0), text_size=size.tiny, text_halign=text.align_left)
+    table.cell(panel, 1, 7, lbText, text_color=color.new(#e8e6f0, 0), text_size=size.tiny, text_halign=text.align_right)
+
+    if showDataTable
+        pfClr = profitFactor >= 1.75 ? color.new(#06d6a0, 0) : profitFactor >= 1.0 ? color.new(#f59e0b, 0) : color.new(#ff3860, 0)
+        netClr = netDisplay >= 0 ? color.new(#06d6a0, 0) : color.new(#ff3860, 0)
+        lastClr = lastTradePnL >= 0 ? color.new(#06d6a0, 0) : color.new(#ff3860, 0)
+        srcTag = strategy.closedtrades > 0 ? "engine" : "recorded"
+        table.cell(dataPanel, 0, 0, "EXECUTION DATA", text_color=D_HDR, text_size=size.small, text_halign=text.align_left, bgcolor=D_BG)
+        table.cell(dataPanel, 1, 0, srcTag, text_color=D_LBL, text_size=size.tiny, text_halign=text.align_right, bgcolor=D_BG)
+        f_row(dataPanel, 1, "Signals L / S", str.tostring(sigLongCnt) + " / " + str.tostring(sigShortCnt), D_VAL)
+        f_row(dataPanel, 2, "Fills L / S", str.tostring(fillLongCnt) + " / " + str.tostring(fillShortCnt), fillLongCnt + fillShortCnt > 0 ? color.new(#06d6a0, 0) : color.new(#ff3860, 0))
+        f_row(dataPanel, 3, "Closed trades", str.tostring(closedTrades), D_VAL)
+        f_row(dataPanel, 4, "Recorded W / L", str.tostring(recWins) + " / " + str.tostring(recLoss), D_VAL)
+        f_row(dataPanel, 5, "Open position", posText, strategy.position_size > 0 ? color.new(#06d6a0, 0) : strategy.position_size < 0 ? color.new(#ff3860, 0) : D_LBL)
+        f_row(dataPanel, 6, "Win %", closedTrades > 0 ? str.tostring(winPct, "#.#") + "%" : "—", winPct >= 50 ? color.new(#06d6a0, 0) : color.new(#ff3860, 0))
+        f_row(dataPanel, 7, "Net pts", str.tostring(netDisplay, "#.##"), netClr)
+        f_row(dataPanel, 8, "Profit factor", closedTrades > 0 ? str.tostring(profitFactor, "#.##") : "—", pfClr)
+        f_row(dataPanel, 9, "Open P&L", str.tostring(openPnL, "#.##"), openPnL >= 0 ? color.new(#06d6a0, 0) : color.new(#ff3860, 0))
+        f_row(dataPanel, 10, "Last trade pts", str.tostring(lastTradePnL, "#.##"), lastClr)
+        f_row(dataPanel, 11, "Last entry", lastEntryTxt, D_VAL)
+        f_row(dataPanel, 12, "Last exit", lastExitTxt, D_VAL)
+        f_row(dataPanel, 13, "Engine closed", str.tostring(strategy.closedtrades), D_LBL)
+        f_row(dataPanel, 14, "Flips bull / bear", str.tostring(bullFlipCnt) + " / " + str.tostring(bearFlipCnt), D_VAL)
+        f_row(dataPanel, 15, "Missed L / S", str.tostring(missLongCnt) + " / " + str.tostring(missShortCnt), color.new(#f59e0b, 0))
+        f_row(dataPanel, 16, "Trade log rows", str.tostring(logCount) + " stored", D_VAL)
+
+    if showTradeLog
+        int logWins = 0
+        int logLoss = 0
+        for li = 0 to array.size(logWin) - 1
+            if array.get(logWin, li) == 1
+                logWins += 1
+            else if array.get(logWin, li) == 0
+                logLoss += 1
+        table.cell(tlogPanel, 0, 0, "TRADE LOG", text_color=color.new(#f59e0b, 0), text_size=size.small, text_halign=text.align_left, bgcolor=D_BG)
+        table.merge_cells(tlogPanel, 0, 0, 10, 0)
+        f_tcell(tlogPanel, 0, 1, "#", D_LBL, true)
+        f_tcell(tlogPanel, 1, 1, "Side", D_LBL, true)
+        f_tcell(tlogPanel, 2, 1, "RSI", D_LBL, true)
+        f_tcell(tlogPanel, 3, 1, "Flip", D_LBL, true)
+        f_tcell(tlogPanel, 4, 1, "Entry", D_LBL, true)
+        f_tcell(tlogPanel, 5, 1, "Exit", D_LBL, true)
+        f_tcell(tlogPanel, 6, 1, "Pts", D_LBL, true)
+        f_tcell(tlogPanel, 7, 1, "R", D_LBL, true)
+        f_tcell(tlogPanel, 8, 1, "Exit", D_LBL, true)
+        f_tcell(tlogPanel, 9, 1, "Br", D_LBL, true)
+        f_tcell(tlogPanel, 10, 1, "MFE/MAE", D_LBL, true)
+        int nLog = array.size(logNum)
+        int showN = math.min(tradeLogRows, nLog)
+        if showN == 0
+            table.merge_cells(tlogPanel, 0, 2, 10, 2)
+            f_tcell(tlogPanel, 0, 2, "No closed trades logged yet", D_LBL, false)
+        else
+            for ri = 0 to showN - 1
+                int ix = nLog - 1 - ri
+                int trow = ri + 2
+                int tnum = array.get(logNum, ix)
+                int tdir = array.get(logDir, ix)
+                float tpts = array.get(logPts, ix)
+                int twin = array.get(logWin, ix)
+                color rClr = twin == 1 ? color.new(#06d6a0, 0) : twin == 0 ? color.new(#ff3860, 0) : D_LBL
+                string side = tdir == 1 ? "L" : "S"
+                string flipT = array.get(logFlip, ix) == 1 ? "Bull" : "Bear"
+                string res = twin == 1 ? "W" : twin == 0 ? "L" : "—"
+                string mfeMae = str.tostring(array.get(logMfe, ix), "#.#") + "/" + str.tostring(array.get(logMae, ix), "#.#")
+                f_tcell(tlogPanel, 0, trow, str.tostring(tnum), D_VAL)
+                f_tcell(tlogPanel, 1, trow, side, tdir == 1 ? color.new(#06d6a0, 0) : color.new(#ff3860, 0))
+                f_tcell(tlogPanel, 2, trow, str.tostring(array.get(logRsiEnt, ix), "#.#"), D_VAL)
+                f_tcell(tlogPanel, 3, trow, flipT, D_VAL)
+                f_tcell(tlogPanel, 4, trow, str.tostring(array.get(logEntryPx, ix), "#.##"), D_VAL)
+                f_tcell(tlogPanel, 5, trow, str.tostring(array.get(logExitPx, ix), "#.##"), D_VAL)
+                f_tcell(tlogPanel, 6, trow, str.tostring(tpts, "#.##"), rClr)
+                f_tcell(tlogPanel, 7, trow, res, rClr)
+                f_tcell(tlogPanel, 8, trow, array.get(logExit, ix), D_VAL)
+                f_tcell(tlogPanel, 9, trow, str.tostring(array.get(logBars, ix)), D_VAL)
+                f_tcell(tlogPanel, 10, trow, mfeMae, D_VAL)
+        int footRow = tradeLogRows + 1
+        string footTxt = "Log " + str.tostring(nLog) + " | W " + str.tostring(logWins) + " L " + str.tostring(logLoss) + " | " + rsiMode + " lb" + str.tostring(confLookback)
+        table.cell(tlogPanel, 0, footRow, footTxt, text_color=D_LBL, text_size=size.tiny, text_halign=text.align_left, bgcolor=D_BG)
+        table.merge_cells(tlogPanel, 0, footRow, 10, footRow)

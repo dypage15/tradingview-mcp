@@ -1,0 +1,76 @@
+{
+  "run_directory": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\clreg23_bb_2026-05-22T06-17-01",
+  "session": "Asia + NY",
+  "rsi_baseline": {
+    "label": "Cloud+RSI ref",
+    "net": 0.78,
+    "pf": 1,
+    "trades": 353
+  },
+  "profitable_count": 1,
+  "best": {
+    "scenarioId": 3,
+    "bbMode": "Proximity",
+    "bbBufferMult": 3,
+    "totalTrades": 233,
+    "percentProfitable": 40.343347639484975,
+    "profitFactor": 1.0490060791407207,
+    "netProfit": 289.08000000003176,
+    "expectancy": 1.2406866952791062,
+    "execution_table": {
+      "parsed": true,
+      "dataSource": "engine",
+      "signalsLong": 114,
+      "signalsShort": 121,
+      "fillsLong": 0,
+      "fillsShort": 0,
+      "closedTrades": 233,
+      "engineClosed": 233,
+      "recordedWins": 94,
+      "recordedLosses": 139,
+      "winPct": 40.3,
+      "netPts": 289.08,
+      "profitFactor": 1.05,
+      "bullFlips": 303,
+      "bearFlips": 309,
+      "missedLong": 189,
+      "missedShort": 188
+    },
+    "metrics_source": "tester_or_engine",
+    "metConstraint": false
+  },
+  "top_all": [
+    {
+      "mode": "Proximity",
+      "buffer": 3,
+      "net": 289.08000000003176,
+      "pf": 1.0490060791407207,
+      "wr": 40.343347639484975,
+      "trades": 233
+    },
+    {
+      "mode": "Proximity",
+      "buffer": 2.5,
+      "net": 264.1600000000217,
+      "pf": 1.0549319381308715,
+      "wr": 40.31413612565445,
+      "trades": 191
+    },
+    {
+      "mode": "Proximity",
+      "buffer": 2,
+      "net": 92.72000000001299,
+      "pf": 1.0250130838499467,
+      "wr": 39.455782312925166,
+      "trades": 147
+    },
+    {
+      "mode": "Proximity",
+      "buffer": 1.5,
+      "net": -106.51999999999771,
+      "pf": 0.9595657455208025,
+      "wr": 38.775510204081634,
+      "trades": 98
+    }
+  ]
+}

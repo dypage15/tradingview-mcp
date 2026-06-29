@@ -1,0 +1,1 @@
+{"scenarioId":0,"spec":{"scenarioId":0,"minBarsBetween":0,"minScoreCont":52,"minScoreRev":50},"error":"rewrite: Pine source missing expected tuner line (/^(\\s*minScoreRev = input\\.int\\()\\d+/m) — confirm data/erl-irl-engine-strategy.pine minBars/minScore inputs.","at":"2026-05-17T20:16:30.403Z","grid_source_mode":"rewrite"}

@@ -1,0 +1,79 @@
+{
+  "entity": "EsK4XV",
+  "scenarios": 4,
+  "top": [
+    {
+      "n": 0,
+      "chartTf": "1",
+      "overrides": {
+        "in_3": true,
+        "in_6": "5",
+        "in_7": "30",
+        "in_29": 0.35,
+        "in_31": 2
+      },
+      "netProfit": 0,
+      "metrics": {
+        "netProfit": 0,
+        "netProfitPercent": 0,
+        "totalTrades": 0
+      }
+    },
+    {
+      "n": 1,
+      "chartTf": "1",
+      "overrides": {
+        "in_3": true,
+        "in_6": "5",
+        "in_7": "30",
+        "in_29": 0.35,
+        "in_31": 3
+      },
+      "netProfit": 0,
+      "metrics": {
+        "netProfit": 0,
+        "netProfitPercent": 0,
+        "totalTrades": 0
+      }
+    },
+    {
+      "n": 2,
+      "chartTf": "1",
+      "overrides": {
+        "in_3": true,
+        "in_6": "5",
+        "in_7": "30",
+        "in_29": 0.5,
+        "in_31": 2
+      },
+      "netProfit": 0,
+      "metrics": {
+        "netProfit": 0,
+        "netProfitPercent": 0,
+        "totalTrades": 0
+      }
+    },
+    {
+      "n": 3,
+      "chartTf": "1",
+      "overrides": {
+        "in_3": true,
+        "in_6": "5",
+        "in_7": "30",
+        "in_29": 0.5,
+        "in_31": 3
+      },
+      "netProfit": 0,
+      "metrics": {
+        "netProfit": 0,
+        "netProfitPercent": 0,
+        "totalTrades": 0
+      }
+    }
+  ],
+  "chart_tfs": [
+    "1",
+    "5",
+    "10"
+  ]
+}

@@ -1,0 +1,1396 @@
+// ----------------------------------------------------------------------------
+//  ERL IRL LIQUIDITY ENGINE v2.6 - STRATEGY + EVALUATOR
+//  Next Level Foundry
+//
+//  Latency telemetry: playbook anchor (sweep-close vs BwD-close) -> MU (path to
+//  draw-target consumed at entry-close) and R-rem (estimated TP - entry in R units).
+//  Pair overlap: pairwise ON both / OFF both / split counts expose redundant confluences.
+//
+//  The evaluator treats every filter as a falsifiable hypothesis.
+//  It captures entry-time state for each trade, then on the last bar
+//  computes bucketed conditional distributions:
+//    - For each filter: N and win rate when ON vs OFF, with delta
+//    - Score buckets: performance distribution by confidence band
+//    - Signal funnel: raw signals vs filtered vs executed
+//    - Baseline: trades, WR, avg W/L, PF, expectancy
+//
+//  Fix data-capture bugs before concluding anything about edge.
+//  NOT financial advice.
+// ----------------------------------------------------------------------------
+//@version=6
+strategy(
+     title                   = "ERL IRL Evaluator [NLF]",
+     shorttitle              = "ERL-EVAL",
+     overlay                 = true,
+     pyramiding              = 0,
+     calc_on_every_tick      = false,
+     process_orders_on_close = true,
+     initial_capital         = 100000,
+     default_qty_type        = strategy.fixed,
+     default_qty_value       = 1,
+     commission_type         = strategy.commission.percent,
+     commission_value        = 0.025,
+     slippage                = 3,
+     max_lines_count         = 500,
+     max_labels_count        = 500,
+     max_boxes_count         = 500,
+     max_bars_back           = 5000,
+     margin_long             = 100,
+     margin_short            = 100)
+
+// ----------------------------------------------------------------------------
+//  INPUTS
+// ----------------------------------------------------------------------------
+gRange      = "RANGE DETECTION"
+swingLen    = input.int(15,   "Swing Strength", minval = 3, group = gRange)
+maxLookback = input.int(300,  "Max Lookback (bars)", minval = 50, group = gRange)
+
+gPD         = "PREVIOUS DAY HIGH / LOW"
+showPD      = input.bool(true, "Show PDH / PDL", group = gPD)
+
+gBwD        = "BREAK WITH DISPLACEMENT"
+bwdATRMult  = input.float(1.2, "Min Body Size (x ATR)", minval = 0.3, step = 0.1, group = gBwD)
+bwdBodyPct  = input.int(55,    "Min Body %", minval = 30, maxval = 90, group = gBwD)
+showBwDZone = input.bool(true, "Show Displacement Zone", group = gBwD)
+showFlipped = input.bool(true, "Show Flipped Level", group = gBwD)
+bwdZoneExt  = input.int(40,    "Extend Zone (bars)", minval = 5, group = gBwD)
+
+gSweep      = "SWEEP LOGIC"
+sweepCool   = input.int(20,  "Sweep Cooldown", minval = 0, group = gSweep)
+sweepLock   = input.bool(true, "Lock Sweep to Level", group = gSweep)
+
+gFVG        = "IRL INEFFICIENCIES"
+fvgOn       = input.bool(true, "Detect FVG", group = gFVG)
+fvgMinATR   = input.float(0.4, "Min Size (x ATR)", minval = 0.1, step = 0.1, group = gFVG)
+fvgMax      = input.int(8,     "Max Active FVGs", minval = 1, group = gFVG)
+
+gSR         = "SR TREND CONFIRMATION"
+srLen       = input.int(21,    "SR Lookback Length", minval = 5, group = gSR)
+showSR      = input.bool(false, "Show SR zones", group = gSR)
+showBarClr  = input.bool(true,  "SR candle colors", group = gSR)
+
+gSession    = "SESSION FILTER"
+sessionOn   = input.bool(true, "Apply Session Scoring", group = gSession)
+sessionTZ   = input.string("America/New_York", "Timezone", group = gSession)
+
+gStrat      = "STRATEGY ENTRIES"
+entryOpenHm   = input.int(930,  "Earliest entry HHMM", minval = 0, maxval = 2359, group = gStrat)
+entryCutoffHm = input.int(1530, "Last entry HHMM", minval = 0, maxval = 2359, group = gStrat)
+nycFlatHm     = input.int(1600, "Session end flat HHMM", minval = 0, maxval = 2359, group = gStrat)
+minBarsBetween = input.int(48,  "Min bars between entries", minval = 0, group = gStrat)
+tradeCont    = input.bool(true, "Allow continuation (BwD zone)", group = gStrat)
+tradeRevSr   = input.bool(true, "Allow reversal (SR align)", group = gStrat)
+minScoreCont = input.int(72, "Min confidence (continuation)", minval = 0, maxval = 100, group = gStrat)
+minScoreRev  = input.int(82, "Min confidence (reversal)", minval = 0, maxval = 100, group = gStrat)
+entryFreshMaxBars = input.int(36, "Max bars since anchor for entry (0=off)", minval = 0, maxval = 500, group = gStrat)
+shortScoreExtra   = input.int(5, "Extra min score for short entries", minval = 0, maxval = 30, group = gStrat)
+nearPdScoreAdj    = input.int(-12, "Near PD level score adjustment", minval = -35, maxval = 25, group = gStrat)
+revModeScorePen   = input.int(10, "Score penalty in reversal mode", minval = 0, maxval = 35, group = gStrat)
+
+gExit       = "STRATEGY EXITS"
+slATRmult     = input.float(1.95, "Stop x ATR", minval = 0.2, step = 0.1, group = gExit)
+useEngineTp   = input.bool(true, "TP at engine draw target", group = gExit)
+atrTpFallback = input.float(3.2, "Fallback TP x ATR", minval = 0.25, step = 0.25, group = gExit)
+tpFloorATR    = input.float(1.28, "Min TP distance x ATR", minval = 0.05, step = 0.05, group = gExit)
+
+gEval       = "EVALUATOR (logic)"
+evalScoreSp = input.int(80, "Score split threshold", minval = 50, maxval = 100, group = gEval)
+evalFreshSp = input.int(30, "Freshness split (bars)", minval = 5, maxval = 200, group = gEval)
+evalMuSplit = input.float(0.5, "MU split, frac anchor to draw target", minval = 0.05, maxval = 0.95, step = 0.05, group = gEval)
+evalLagBarsSp = input.int(12, "Bars from anchor to entry split", minval = 0, maxval = 200, group = gEval)
+
+gTbl = "TABLES (HUD)"
+showEval = input.bool(true, "Show evaluator table", group = gTbl)
+evalTblPos = input.string("Bottom right", "Evaluator corner", options = ["Top left", "Top center", "Top right", "Middle left", "Middle center", "Middle right", "Bottom left", "Bottom center", "Bottom right"], group = gTbl)
+showPanel = input.bool(true, "Show advisor table", group = gTbl)
+advTblPos = input.string("Top right", "Advisor corner", options = ["Top left", "Top center", "Top right", "Middle left", "Middle center", "Middle right", "Bottom left", "Bottom center", "Bottom right"], group = gTbl)
+
+gVis        = "VISUALS"
+showERL     = input.bool(true, "Show ERL Levels", group = gVis)
+showIRL     = input.bool(true, "Show IRL Equilibrium", group = gVis)
+showFVGVis  = input.bool(true, "Show FVG boxes", group = gVis)
+showMarkers = input.bool(true, "Show Event Markers", group = gVis)
+extR        = input.int(25,    "Extend Lines Right", minval = 5, group = gVis)
+shadePos    = input.bool(true, "Background tint in position", group = gVis)
+
+gClr        = "COLORS"
+cERLHi      = input.color(#f87171, "ERL High", group = gClr)
+cERLLo      = input.color(#4ade80, "ERL Low", group = gClr)
+cIRL        = input.color(#22d3ee, "IRL EQ", group = gClr)
+cFVGClr     = input.color(#a855f7, "FVG", group = gClr)
+cPDH        = input.color(#fb923c, "PDH", group = gClr)
+cPDL        = input.color(#facc15, "PDL", group = gClr)
+cBwDBull    = input.color(#4ade80, "BwD Bull", group = gClr)
+cBwDBear    = input.color(#f87171, "BwD Bear", group = gClr)
+cFlipClr    = input.color(#c084fc, "Flipped", group = gClr)
+cSRRes      = input.color(#f472b6, "SR Resistance", group = gClr)
+cSRSup      = input.color(#818cf8, "SR Support", group = gClr)
+
+cPurple = #a855f7
+cCyan   = #22d3ee
+cBgDeep = #07060b
+cBgPanel = #100e1a
+cBgRow  = #15132a
+cTextPri = #e8e4f0
+cTextMute = #9f97b8
+cAmber  = #facc15
+cGreen  = #4ade80
+cRed    = #f87171
+cDim    = #3d3a52
+
+// ----------------------------------------------------------------------------
+//  HELPERS
+// ----------------------------------------------------------------------------
+safeBar(int b) =>
+    math.max(b, bar_index - 4990)
+
+minsFromHm(int hm) =>
+    math.floor(hm / 100) * 60 + hm % 100
+
+tableCorner(string s) =>
+    s == "Top left" ? position.top_left :
+     s == "Top center" ? position.top_center :
+     s == "Top right" ? position.top_right :
+     s == "Middle left" ? position.middle_left :
+     s == "Middle center" ? position.middle_center :
+     s == "Middle right" ? position.middle_right :
+     s == "Bottom left" ? position.bottom_left :
+     s == "Bottom center" ? position.bottom_center :
+     position.bottom_right
+
+wrPct(int n, int w) =>
+    n > 0 ? math.round(w * 100.0 / n, 1) : 0.0
+
+wrCell(int n, int w) =>
+    n > 0 ? str.tostring(math.round(w * 100.0 / n)) + "% (" + str.tostring(n) + ")" : "-- (0)"
+
+deltaCell(int n1, int w1, int n2, int w2) =>
+    wr1 = n1 > 0 ? w1 * 100.0 / n1 : 0.0
+    wr2 = n2 > 0 ? w2 * 100.0 / n2 : 0.0
+    d = wr1 - wr2
+    (d >= 0 ? "+" : "") + str.tostring(math.round(d)) + "%"
+
+// frac of anchor->drawTarget path consumed at entry; rem = est TP - entry in stop-R (process_orders_on_close fill ~ close)
+lagMetricsAtEntry(bool lng, float anchPx, float tgtPx, float entryPx, float atrv, float slMult, float tpFb, float tpFl, bool useTp) =>
+    mic = syminfo.mintick
+    minSpan = mic * 4.0
+    rp = math.max(atrv * slMult, mic)
+    float muF = na
+    float rmR = na
+    if not na(anchPx) and not na(tgtPx) and not na(entryPx)
+        span = lng ? tgtPx - anchPx : anchPx - tgtPx
+        prog = lng ? entryPx - anchPx : anchPx - entryPx
+        muF := span >= minSpan ? prog / span : na
+        tpRaw = useTp and ((lng and tgtPx > entryPx) or (not lng and tgtPx < entryPx)) ? tgtPx : lng ? entryPx + atrv * tpFb : entryPx - atrv * tpFb
+        tpEst = lng ? math.max(tpRaw, entryPx + atrv * tpFl) : math.min(tpRaw, entryPx - atrv * tpFl)
+        rem = lng ? tpEst - entryPx : entryPx - tpEst
+        rmR := rem / rp
+    [muF, rmR]
+
+// ----------------------------------------------------------------------------
+//  ATR + PRICE DATA
+// ----------------------------------------------------------------------------
+atr        = ta.atr(14)
+bodySize   = math.abs(close - open)
+candleRng  = high - low
+bodyRatio  = candleRng > 0 ? bodySize / candleRng : 0.0
+
+// ----------------------------------------------------------------------------
+//  PDH / PDL
+// ----------------------------------------------------------------------------
+pdh = request.security(syminfo.tickerid, "D", high[1], lookahead = barmerge.lookahead_on)
+pdl = request.security(syminfo.tickerid, "D", low[1],  lookahead = barmerge.lookahead_on)
+
+var int dayStartBar = 0
+if ta.change(time("D")) != 0
+    dayStartBar := bar_index
+
+// ----------------------------------------------------------------------------
+//  SR TREND
+// ----------------------------------------------------------------------------
+srH    = bar_index > 5 and high[5] < high[4] and high[4] < high[3] and high[3] > high[2] and high[2] > high[1] ? 1 : 0
+srL    = bar_index > 5 and low[5] > low[4] and low[4] > low[3] and low[3] < low[2] and low[2] < low[1] ? 1 : 0
+srHn   = math.sum(srH, srLen)
+srLn   = math.sum(srL, srLen)
+srHval = srH > 0 ? high[3] : 0.0
+srLval = srL > 0 ? low[3]  : 0.0
+srHsum = math.sum(srHval, srLen)
+srLsum = math.sum(srLval, srLen)
+srR    = srLn > 0 and srHn > 0 ? math.abs(srHsum / srHn - srLsum / srLn) : 0.0
+
+var float hvalc = na
+var float lvalc = na
+var float hvalr = na
+var float lvalr = na
+hvalc := srHval > 0 and srR > 0 ? srHval : hvalc[1]
+lvalc := srLval > 0 and srR > 0 ? srLval : lvalc[1]
+hvalr := srHval > 0 and srR > 0 ? srHval - srR : hvalr[1]
+lvalr := srLval > 0 and srR > 0 ? srLval + srR : lvalr[1]
+
+var int srTrend = 0
+srTrend := close > lvalr and close > hvalr ? 1 : close < lvalr and close < hvalr ? -1 : srTrend[1]
+srLongEntry  = srTrend == 1  and close > hvalc
+srShortEntry = srTrend == -1 and close < lvalc
+
+var int srLong  = 0
+var int srShort = 0
+srLong  := srTrend == 1  and close > hvalc ? 1 : srTrend == -1 ? -1 : srLong[1]
+srShort := srTrend == -1 and close < lvalc ? 1 : srTrend == 1  ? -1 : srShort[1]
+
+// ----------------------------------------------------------------------------
+//  SWING RANGE — ERL
+// ----------------------------------------------------------------------------
+ph = ta.pivothigh(swingLen, swingLen)
+pl = ta.pivotlow(swingLen, swingLen)
+
+var array<float> phPx  = array.new<float>()
+var array<int>   phBar = array.new<int>()
+var array<float> plPx  = array.new<float>()
+var array<int>   plBar = array.new<int>()
+
+if not na(ph)
+    array.push(phPx, ph)
+    array.push(phBar, bar_index - swingLen)
+if not na(pl)
+    array.push(plPx, pl)
+    array.push(plBar, bar_index - swingLen)
+
+cutoff = bar_index - maxLookback
+while array.size(phBar) > 0 and array.get(phBar, 0) < cutoff
+    array.shift(phBar)
+    array.shift(phPx)
+while array.size(plBar) > 0 and array.get(plBar, 0) < cutoff
+    array.shift(plBar)
+    array.shift(plPx)
+
+float rangeHi = na
+int rangeHiBar = na
+float rangeLo = na
+int rangeLoBar = na
+
+if array.size(phPx) > 0
+    for i = 0 to array.size(phPx) - 1
+        v = array.get(phPx, i)
+        if na(rangeHi) or v > rangeHi
+            rangeHi    := v
+            rangeHiBar := array.get(phBar, i)
+
+if array.size(plPx) > 0
+    for i = 0 to array.size(plPx) - 1
+        v = array.get(plPx, i)
+        if na(rangeLo) or v < rangeLo
+            rangeLo    := v
+            rangeLoBar := array.get(plBar, i)
+
+eq = na(rangeHi) or na(rangeLo) ? na : (rangeHi + rangeLo) / 2.0
+
+// ----------------------------------------------------------------------------
+//  SESSION + STRATEGY CLOCK
+// ----------------------------------------------------------------------------
+hh = hour(time, sessionTZ)
+mm = minute(time, sessionTZ)
+tVal = hh * 100 + mm
+inLon  = tVal >= 300 and tVal < 1200
+inNY   = tVal >= 930 and tVal < 1600
+inSess = inLon or inNY
+
+mnNow    = hh * 60 + mm
+mnEnterO = minsFromHm(entryOpenHm)
+mnEnterX = minsFromHm(entryCutoffHm)
+mnFlatNY = minsFromHm(nycFlatHm)
+nyEntryWin  = mnNow >= mnEnterO and mnNow < mnEnterX
+nyPastClose = mnNow >= mnFlatNY
+
+// ----------------------------------------------------------------------------
+//  SWEEP DETECTION
+// ----------------------------------------------------------------------------
+var string lastSweepType = "NONE"
+var int    lastSweepBar  = na
+var float  bslSweptLvl   = na
+var float  sslSweptLvl   = na
+var int    lastBSLBar    = na
+var int    lastSSLBar    = na
+var float  anchorSweepClose = na
+var float  anchorBwDClose = na
+
+bslERL = not na(rangeHi) and high > rangeHi and close < rangeHi
+sslERL = not na(rangeLo) and low  < rangeLo and close > rangeLo
+bslPDH = not na(pdh) and high > pdh and close < pdh
+sslPDL = not na(pdl) and low  < pdl and close > pdl
+
+bslNewLvl = not sweepLock or na(bslSweptLvl) or (rangeHi != bslSweptLvl and pdh != bslSweptLvl)
+sslNewLvl = not sweepLock or na(sslSweptLvl) or (rangeLo != sslSweptLvl and pdl != sslSweptLvl)
+bslCool = na(lastBSLBar) or bar_index - lastBSLBar >= sweepCool
+sslCool = na(lastSSLBar) or bar_index - lastSSLBar >= sweepCool
+
+bslSweep = (bslERL or bslPDH) and bslNewLvl and bslCool
+sslSweep = (sslERL or sslPDL) and sslNewLvl and sslCool
+
+if bslSweep
+    lastSweepType := "BSL"
+    lastSweepBar  := bar_index
+    bslSweptLvl   := bslPDH ? pdh : rangeHi
+    lastBSLBar    := bar_index
+if sslSweep
+    lastSweepType := "SSL"
+    lastSweepBar  := bar_index
+    sslSweptLvl   := sslPDL ? pdl : rangeLo
+    lastSSLBar    := bar_index
+if bslSweep or sslSweep
+    anchorSweepClose := close
+
+// ----------------------------------------------------------------------------
+//  BREAK WITH DISPLACEMENT
+// ----------------------------------------------------------------------------
+bwdSizeOK = bodySize >= atr * bwdATRMult
+bwdBodyOK = bodyRatio >= bwdBodyPct / 100.0
+
+bullBwD_ERL = not na(rangeHi) and close > rangeHi and open <= rangeHi and bwdSizeOK and bwdBodyOK
+bearBwD_ERL = not na(rangeLo) and close < rangeLo and open >= rangeLo and bwdSizeOK and bwdBodyOK
+bullBwD_PDH = not na(pdh) and close > pdh and open <= pdh and bwdSizeOK and bwdBodyOK
+bearBwD_PDL = not na(pdl) and close < pdl and open >= pdl and bwdSizeOK and bwdBodyOK
+
+bullBwD = (bullBwD_ERL or bullBwD_PDH) and not bearBwD_ERL and not bearBwD_PDL
+bearBwD = (bearBwD_ERL or bearBwD_PDL) and not bullBwD_ERL and not bullBwD_PDH
+
+var string lastBwDType = "NONE"
+var int    lastBwDBar  = na
+var float  bwdZoneTop  = na
+var float  bwdZoneBot  = na
+var float  flippedLvl  = na
+var bool   flippedBull = false
+var float  extensionHi = na
+var float  extensionLo = na
+
+if bullBwD or bearBwD
+    anchorBwDClose := close
+
+if bullBwD
+    lastBwDType := "BULL"
+    lastBwDBar  := bar_index
+    bwdZoneTop  := math.max(open, close)
+    bwdZoneBot  := math.min(open, close)
+    flippedLvl  := bullBwD_PDH ? pdh : rangeHi
+    flippedBull := true
+    extensionHi := high
+    extensionLo := na
+    bslSweptLvl := bullBwD_PDH ? pdh : rangeHi
+    lastBSLBar  := bar_index
+
+if bearBwD
+    lastBwDType := "BEAR"
+    lastBwDBar  := bar_index
+    bwdZoneTop  := math.max(open, close)
+    bwdZoneBot  := math.min(open, close)
+    flippedLvl  := bearBwD_PDL ? pdl : rangeLo
+    flippedBull := false
+    extensionLo := low
+    extensionHi := na
+    sslSweptLvl := bearBwD_PDL ? pdl : rangeLo
+    lastSSLBar  := bar_index
+
+if lastBwDType == "BULL" and not na(extensionHi)
+    extensionHi := math.max(extensionHi, high)
+if lastBwDType == "BEAR" and not na(extensionLo)
+    extensionLo := math.min(extensionLo, low)
+
+inBwDZone = lastBwDType != "NONE" and not na(bwdZoneTop) and not na(lastBwDBar) and bar_index > lastBwDBar and high >= bwdZoneBot and low <= bwdZoneTop
+
+if not na(flippedLvl) and not na(lastBwDBar)
+    barsSinceFlip = bar_index - lastBwDBar
+    farFromFlip = math.abs(close - flippedLvl) > atr * 10
+    if (barsSinceFlip > 200 and not inBwDZone) or farFromFlip
+        flippedLvl  := na
+        flippedBull := false
+
+// ----------------------------------------------------------------------------
+//  MODE + BIAS + DRAW TARGET
+// ----------------------------------------------------------------------------
+barsSweep = na(lastSweepBar) ? 99999 : bar_index - lastSweepBar
+barsBwD   = na(lastBwDBar)   ? 99999 : bar_index - lastBwDBar
+
+string mode = "WAIT"
+string bias = "NEUTRAL"
+
+if lastSweepType == "NONE" and lastBwDType == "NONE"
+    mode := "WAIT"
+    bias := "NEUTRAL"
+else if barsSweep <= barsBwD and lastSweepType != "NONE"
+    if lastSweepType == "BSL"
+        mode := "REVERSAL"
+        bias := "SHORT"
+    else if lastSweepType == "SSL"
+        mode := "REVERSAL"
+        bias := "LONG"
+else if lastBwDType != "NONE"
+    if lastBwDType == "BULL"
+        mode := "CONTINUATION"
+        bias := "LONG"
+    else if lastBwDType == "BEAR"
+        mode := "CONTINUATION"
+        bias := "SHORT"
+
+aboveEq = not na(eq) and close > eq
+belowEq = not na(eq) and close <= eq
+
+string drawTarget   = "---"
+float  drawTargetPx = na
+
+if mode == "REVERSAL"
+    if bias == "SHORT"
+        drawTarget   := aboveEq ? "IRL EQ 50%" : "ERL Low SSL"
+        drawTargetPx := aboveEq ? eq : rangeLo
+    else
+        drawTarget   := belowEq ? "IRL EQ 50%" : "ERL High BSL"
+        drawTargetPx := belowEq ? eq : rangeHi
+else if mode == "CONTINUATION"
+    if inBwDZone
+        drawTarget   := "BwD Zone Entry"
+        drawTargetPx := (bwdZoneTop + bwdZoneBot) / 2.0
+    else if bias == "LONG"
+        drawTarget   := "Extension High"
+        drawTargetPx := extensionHi
+    else
+        drawTarget   := "Extension Low"
+        drawTargetPx := extensionLo
+
+// ----------------------------------------------------------------------------
+//  CONFIDENCE SCORE
+// ----------------------------------------------------------------------------
+int score = 0
+
+if mode == "REVERSAL" and lastSweepType != "NONE"
+    score += 35
+if mode == "CONTINUATION" and lastBwDType != "NONE"
+    score += 35
+
+// PDH/PDL confluence — extract boolean for evaluator
+evLvl = mode == "REVERSAL" ? (lastSweepType == "BSL" ? bslSweptLvl : sslSweptLvl) : (lastBwDType == "BULL" ? bwdZoneTop : bwdZoneBot)
+kLvl  = mode == "REVERSAL" ? (lastSweepType == "BSL" ? pdh : pdl) : (lastBwDType == "BULL" ? pdh : pdl)
+nearPDNow = not na(pdh) and not na(pdl) and not na(evLvl) and not na(kLvl) and math.abs(evLvl - kLvl) < atr * 1.5
+
+if nearPDNow and nearPdScoreAdj != 0
+    score += nearPdScoreAdj
+
+if sessionOn
+    score += inSess ? 20 : -10
+
+srAgNow = (srTrend == 1 and bias == "LONG") or (srTrend == -1 and bias == "SHORT")
+if srTrend == 1 and bias == "LONG"
+    score += 15
+else if srTrend == -1 and bias == "SHORT"
+    score += 15
+else if (srTrend == 1 and bias == "SHORT") or (srTrend == -1 and bias == "LONG")
+    score -= 10
+
+if mode == "CONTINUATION" and inBwDZone
+    score += 20
+
+freshBars = mode == "REVERSAL" ? barsSweep : barsBwD
+score += freshBars < 20 ? 20 : freshBars < 50 ? 12 : freshBars < 100 ? 6 : 0
+
+if not na(rangeHi) and not na(rangeLo)
+    score += 10
+
+if mode == "REVERSAL" and revModeScorePen > 0
+    score -= revModeScorePen
+
+score := math.max(0, math.min(score, 100))
+
+// ----------------------------------------------------------------------------
+//  SIGNAL DEFINITIONS + FUNNEL COUNTERS
+// ----------------------------------------------------------------------------
+bwdZoneEntry  = mode == "CONTINUATION" and inBwDZone and not inBwDZone[1]
+highScoreEdge = score >= 75 and not (score[1] >= 75)
+alignScoreBase = math.min(minScoreCont, minScoreRev)
+srLongAlign   = srLongEntry and not srLongEntry[1] and bias == "LONG" and score >= alignScoreBase
+srShortAlign  = srShortEntry and not srShortEntry[1] and bias == "SHORT" and score >= alignScoreBase + shortScoreExtra
+
+freshOk = entryFreshMaxBars <= 0 or freshBars <= entryFreshMaxBars
+minShortCont = minScoreCont + shortScoreExtra
+minShortRev  = minScoreRev + shortScoreExtra
+
+longCont  = tradeCont and mode == "CONTINUATION" and bias == "LONG" and bwdZoneEntry and freshOk and score >= minScoreCont
+shortCont = tradeCont and mode == "CONTINUATION" and bias == "SHORT" and bwdZoneEntry and freshOk and score >= minShortCont
+longRev   = tradeRevSr and mode == "REVERSAL" and bias == "LONG" and srLongAlign and freshOk and score >= minScoreRev
+shortRev  = tradeRevSr and mode == "REVERSAL" and bias == "SHORT" and srShortAlign and freshOk and score >= minShortRev
+
+longRaw  = longCont or longRev
+shortRaw = shortCont or shortRev
+
+var int lastEntryBi = na
+enteredBar = strategy.position_size != 0 and strategy.position_size[1] == 0
+if enteredBar
+    lastEntryBi := bar_index
+
+betweenOk = minBarsBetween <= 0 or na(lastEntryBi) or bar_index - lastEntryBi >= minBarsBetween
+
+longSig  = longRaw and nyEntryWin and betweenOk
+shortSig = shortRaw and nyEntryWin and betweenOk
+
+// Signal funnel counters
+var int rawLN = 0
+var int rawSN = 0
+var int sigLN = 0
+var int sigSN = 0
+if longRaw
+    rawLN += 1
+if shortRaw
+    rawSN += 1
+
+// ----------------------------------------------------------------------------
+//  EVALUATOR — ENTRY METADATA ARRAYS
+//  Snapshot the state at the moment each entry decision is made.
+//  Arrays stay 1:1 with closed trades (pyramiding = 0).
+// ----------------------------------------------------------------------------
+var array<int>    ev_score  = array.new<int>()
+var array<bool>   ev_srAg   = array.new<bool>()
+var array<bool>   ev_sess   = array.new<bool>()
+var array<bool>   ev_pd     = array.new<bool>()
+var array<bool>   ev_isCont = array.new<bool>()
+var array<int>    ev_fresh  = array.new<int>()
+var array<bool>   ev_isLong = array.new<bool>()
+var array<float>  ev_mu     = array.new<float>()
+var array<float>  ev_rRem   = array.new<float>()
+var array<int>    ev_aLag   = array.new<int>()
+
+// ----------------------------------------------------------------------------
+//  STRATEGY ENTRIES (+ metadata push)
+// ----------------------------------------------------------------------------
+if longSig and strategy.position_size < 0
+    strategy.close("S", comment = "flip to long")
+if shortSig and strategy.position_size > 0
+    strategy.close("L", comment = "flip to short")
+
+if strategy.position_size == 0 and longSig and not shortSig
+    float anchPxL = na
+    int anchBiL = na
+    if mode == "REVERSAL" and not na(lastSweepBar)
+        anchPxL := anchorSweepClose
+        anchBiL := lastSweepBar
+    else if mode == "CONTINUATION" and not na(lastBwDBar)
+        anchPxL := anchorBwDClose
+        anchBiL := lastBwDBar
+    [muL, rrL] = lagMetricsAtEntry(true, anchPxL, drawTargetPx, close, atr, slATRmult, atrTpFallback, tpFloorATR, useEngineTp)
+    lagLB = na(anchBiL) ? -1 : bar_index - anchBiL
+
+    array.push(ev_score, score)
+    array.push(ev_srAg, srAgNow)
+    array.push(ev_sess, inSess)
+    array.push(ev_pd, nearPDNow)
+    array.push(ev_isCont, longCont)
+    array.push(ev_fresh, freshBars)
+    array.push(ev_isLong, true)
+    array.push(ev_mu, muL)
+    array.push(ev_rRem, rrL)
+    array.push(ev_aLag, lagLB)
+    sigLN += 1
+    strategy.entry("L", strategy.long)
+
+if strategy.position_size == 0 and shortSig and not longSig
+    float anchPxS = na
+    int anchBiS = na
+    if mode == "REVERSAL" and not na(lastSweepBar)
+        anchPxS := anchorSweepClose
+        anchBiS := lastSweepBar
+    else if mode == "CONTINUATION" and not na(lastBwDBar)
+        anchPxS := anchorBwDClose
+        anchBiS := lastBwDBar
+    [muS, rrS] = lagMetricsAtEntry(false, anchPxS, drawTargetPx, close, atr, slATRmult, atrTpFallback, tpFloorATR, useEngineTp)
+    lagSB = na(anchBiS) ? -1 : bar_index - anchBiS
+
+    array.push(ev_score, score)
+    array.push(ev_srAg, srAgNow)
+    array.push(ev_sess, inSess)
+    array.push(ev_pd, nearPDNow)
+    array.push(ev_isCont, shortCont)
+    array.push(ev_fresh, freshBars)
+    array.push(ev_isLong, false)
+    array.push(ev_mu, muS)
+    array.push(ev_rRem, rrS)
+    array.push(ev_aLag, lagSB)
+    sigSN += 1
+    strategy.entry("S", strategy.short)
+
+// ----------------------------------------------------------------------------
+//  STRATEGY EXITS
+// ----------------------------------------------------------------------------
+avgAll = strategy.position_avg_price
+stpLong  = avgAll - atr * slATRmult
+stpShort = avgAll + atr * slATRmult
+
+tpLngRaw = strategy.position_size > 0 ? (useEngineTp and not na(drawTargetPx) and drawTargetPx > avgAll ? drawTargetPx : avgAll + atr * atrTpFallback) : na
+tpShRaw  = strategy.position_size < 0 ? (useEngineTp and not na(drawTargetPx) and drawTargetPx < avgAll ? drawTargetPx : avgAll - atr * atrTpFallback) : na
+tpLng = strategy.position_size > 0 and not na(tpLngRaw) ? math.max(tpLngRaw, avgAll + atr * tpFloorATR) : na
+tpSh  = strategy.position_size < 0 and not na(tpShRaw)  ? math.min(tpShRaw,  avgAll - atr * tpFloorATR) : na
+
+if strategy.position_size > 0 and not na(tpLng)
+    strategy.exit("XL", from_entry = "L", limit = tpLng, stop = stpLong)
+if strategy.position_size < 0 and not na(tpSh)
+    strategy.exit("XS", from_entry = "S", limit = tpSh, stop = stpShort)
+
+if barstate.isconfirmed and nyPastClose
+    strategy.cancel_all()
+    strategy.close_all(comment = "Session flat")
+
+// ----------------------------------------------------------------------------
+//  FVG
+// ----------------------------------------------------------------------------
+type FVG
+    float top
+    float bot
+    int   barIdx
+    bool  bullish
+    bool  mitigated
+    box   bx
+    label lbl
+
+var array<FVG> fvgs = array.new<FVG>()
+
+if fvgOn and barstate.isconfirmed
+    bullGap = low > high[2] and (low - high[2]) > atr * fvgMinATR
+    bearGap = high < low[2] and (low[2] - high) > atr * fvgMinATR
+    if bullGap
+        array.push(fvgs, FVG.new(low, high[2], bar_index, true, false, na, na))
+    if bearGap
+        array.push(fvgs, FVG.new(low[2], high, bar_index, false, false, na, na))
+
+if array.size(fvgs) > 0
+    for i = 0 to array.size(fvgs) - 1
+        f = array.get(fvgs, i)
+        if not f.mitigated
+            if f.bullish and low <= f.bot
+                f.mitigated := true
+            if not f.bullish and high >= f.top
+                f.mitigated := true
+
+if array.size(fvgs) > 0
+    for i = array.size(fvgs) - 1 to 0
+        f = array.get(fvgs, i)
+        if f.mitigated or (bar_index - f.barIdx) > maxLookback
+            if not na(f.bx)
+                box.delete(f.bx)
+            if not na(f.lbl)
+                label.delete(f.lbl)
+            array.remove(fvgs, i)
+
+while array.size(fvgs) > fvgMax
+    old = array.shift(fvgs)
+    if not na(old.bx)
+        box.delete(old.bx)
+    if not na(old.lbl)
+        label.delete(old.lbl)
+
+// ----------------------------------------------------------------------------
+//  DRAW — all chart visuals (ERL/IRL/PDH/PDL/BwD/Flip/FVG)
+// ----------------------------------------------------------------------------
+var line lnHi = na
+var line lnLo = na
+var line lnEq = na
+var label lbHi = na
+var label lbLo = na
+var label lbEq = na
+
+if barstate.islast
+    line.delete(lnHi)
+    line.delete(lnLo)
+    line.delete(lnEq)
+    label.delete(lbHi)
+    label.delete(lbLo)
+    label.delete(lbEq)
+    if showERL and not na(rangeHi) and not na(rangeHiBar)
+        lnHi := line.new(safeBar(rangeHiBar), rangeHi, bar_index + extR, rangeHi, color = cERLHi, width = 2)
+        lbHi := label.new(bar_index + extR, rangeHi, "ERL HIGH BSL " + str.tostring(rangeHi, format.mintick), color = color.new(cERLHi, 85), textcolor = cERLHi, style = label.style_label_left, size = size.small)
+    if showERL and not na(rangeLo) and not na(rangeLoBar)
+        lnLo := line.new(safeBar(rangeLoBar), rangeLo, bar_index + extR, rangeLo, color = cERLLo, width = 2)
+        lbLo := label.new(bar_index + extR, rangeLo, "ERL LOW SSL " + str.tostring(rangeLo, format.mintick), color = color.new(cERLLo, 85), textcolor = cERLLo, style = label.style_label_left, size = size.small)
+    if showIRL and not na(eq) and not na(rangeHiBar) and not na(rangeLoBar)
+        lnEq := line.new(safeBar(math.min(rangeHiBar, rangeLoBar)), eq, bar_index + extR, eq, color = cIRL, width = 1, style = line.style_dashed)
+        lbEq := label.new(bar_index + extR, eq, "IRL EQ " + str.tostring(eq, format.mintick), color = color.new(cIRL, 85), textcolor = cIRL, style = label.style_label_left, size = size.small)
+
+var line lnPDH = na
+var line lnPDL = na
+var label lbPDH = na
+var label lbPDL = na
+if showPD and barstate.islast
+    line.delete(lnPDH)
+    line.delete(lnPDL)
+    label.delete(lbPDH)
+    label.delete(lbPDL)
+    if not na(pdh)
+        lnPDH := line.new(safeBar(dayStartBar), pdh, bar_index + extR, pdh, color = cPDH, width = 1, style = line.style_dotted)
+        lbPDH := label.new(bar_index + extR, pdh, "PDH " + str.tostring(pdh, format.mintick), color = color.new(cPDH, 85), textcolor = cPDH, style = label.style_label_left, size = size.small)
+    if not na(pdl)
+        lnPDL := line.new(safeBar(dayStartBar), pdl, bar_index + extR, pdl, color = cPDL, width = 1, style = line.style_dotted)
+        lbPDL := label.new(bar_index + extR, pdl, "PDL " + str.tostring(pdl, format.mintick), color = color.new(cPDL, 85), textcolor = cPDL, style = label.style_label_left, size = size.small)
+
+var box bwdBox = na
+var label bwdLbl = na
+if showBwDZone
+    if bullBwD or bearBwD
+        box.delete(bwdBox)
+        label.delete(bwdLbl)
+        zClr   = bullBwD ? cBwDBull : cBwDBear
+        zDir   = bullBwD ? "BULL BwD" : "BEAR BwD"
+        zStyle = bullBwD ? label.style_label_lower_right : label.style_label_upper_right
+        bwdBox := box.new(bar_index, bwdZoneTop, bar_index + bwdZoneExt, bwdZoneBot, border_color = color.new(zClr, 20), bgcolor = color.new(zClr, 78), border_width = 2)
+        bwdLbl := label.new(bar_index, bullBwD ? bwdZoneTop : bwdZoneBot, zDir + " RETRACE", color = color.new(zClr, 75), textcolor = zClr, style = zStyle, size = size.small)
+    else if not na(bwdBox)
+        box.set_right(bwdBox, bar_index + bwdZoneExt)
+
+var line lnFlip = na
+var label lbFlip = na
+if showFlipped and barstate.islast
+    line.delete(lnFlip)
+    label.delete(lbFlip)
+    if not na(flippedLvl) and not na(lastBwDBar)
+        flipRole = flippedBull ? "SUPPORT" : "RESISTANCE"
+        lnFlip := line.new(safeBar(lastBwDBar), flippedLvl, bar_index + extR + 15, flippedLvl, color = cFlipClr, width = 1, style = line.style_dashed)
+        lbFlip := label.new(bar_index + extR + 15, flippedLvl, "FLIP " + flipRole + " " + str.tostring(flippedLvl, format.mintick), color = color.new(cFlipClr, 82), textcolor = cFlipClr, style = label.style_label_left, size = size.tiny)
+
+if showFVGVis and array.size(fvgs) > 0
+    for i = 0 to array.size(fvgs) - 1
+        f = array.get(fvgs, i)
+        if na(f.bx)
+            f.bx  := box.new(safeBar(f.barIdx - 1), f.top, bar_index + 5, f.bot, border_color = color.new(cFVGClr, 40), bgcolor = color.new(cFVGClr, 82), border_width = 1)
+            f.lbl := label.new(safeBar(f.barIdx), f.bullish ? f.top : f.bot, "FVG", color = color.new(cFVGClr, 80), textcolor = cFVGClr, style = label.style_label_right, size = size.tiny)
+        else
+            box.set_right(f.bx, bar_index + 5)
+
+// SR plots
+srResC = plot(showSR ? hvalc : na, "SR Res", color = color.new(cSRRes, 20), linewidth = 1)
+srSupC = plot(showSR ? lvalc : na, "SR Sup", color = color.new(cSRSup, 20), linewidth = 1)
+srResX = plot(showSR ? hvalr : na, "SR Res Ext", color = color.new(cSRRes, 55), linewidth = 1, style = plot.style_linebr)
+srSupX = plot(showSR ? lvalr : na, "SR Sup Ext", color = color.new(cSRSup, 55), linewidth = 1, style = plot.style_linebr)
+fill(srResC, srResX, title = "SR Res Zone", color = showSR ? color.new(cSRRes, 88) : na)
+fill(srSupC, srSupX, title = "SR Sup Zone", color = showSR ? color.new(cSRSup, 88) : na)
+
+srCandleClr = srLong > 0 ? color.new(cSRSup, 25) : srShort > 0 ? color.new(cSRRes, 25) : srTrend > 0 ? color.new(cSRSup, 70) : srTrend < 0 ? color.new(cSRRes, 70) : na
+barcolor(showBarClr ? srCandleClr : na)
+
+posBg = shadePos and strategy.position_size > 0 ? color.new(#4ade80, 93) : shadePos and strategy.position_size < 0 ? color.new(#f87171, 93) : na
+bgcolor(posBg)
+
+// Chart markers
+plotshape(showMarkers and bslSweep, title = "BSL", style = shape.triangledown, location = location.abovebar, color = cERLHi, size = size.small, text = "BSL")
+plotshape(showMarkers and sslSweep, title = "SSL", style = shape.triangleup, location = location.belowbar, color = cERLLo, size = size.small, text = "SSL")
+plotshape(showMarkers and bullBwD, title = "BwD Up", style = shape.arrowup, location = location.belowbar, color = cBwDBull, size = size.normal, text = "BwD")
+plotshape(showMarkers and bearBwD, title = "BwD Dn", style = shape.arrowdown, location = location.abovebar, color = cBwDBear, size = size.normal, text = "BwD")
+
+var table tbEvalHud = na
+var string tbEvalCornerKey = ""
+var table tbAdvHud = na
+var string tbAdvCornerKey = ""
+
+// HUD tables removed when toggled off (avoids orphaned panels)
+if barstate.islast and not showEval and not na(tbEvalHud)
+    table.delete(tbEvalHud)
+    tbEvalHud := na
+
+if barstate.islast and not showPanel and not na(tbAdvHud)
+    table.delete(tbAdvHud)
+    tbAdvHud := na
+
+// ============================================================================
+//  EVALUATOR — compute bucketed hypothesis tests on last bar
+// ============================================================================
+if showEval and barstate.islast
+    cornerEv = evalTblPos
+    if tbEvalCornerKey != cornerEv
+        tbEvalCornerKey := cornerEv
+        if not na(tbEvalHud)
+            table.delete(tbEvalHud)
+            tbEvalHud := na
+    if na(tbEvalHud)
+        tbEvalHud := table.new(tableCorner(cornerEv), 4, 34, bgcolor = cBgDeep, border_color = #22d3ee, border_width = 1, frame_color = #22d3ee, frame_width = 2)
+    nClosed = strategy.closedtrades
+    szScr = array.size(ev_score)
+    szMu = array.size(ev_mu)
+    szRm = array.size(ev_rRem)
+    szLag = array.size(ev_aLag)
+    nArr = szScr
+    pairSzAB = math.min(szScr, szMu)
+    pairSzCD = math.min(szRm, szLag)
+    nMatchSZ = math.min(pairSzAB, pairSzCD)
+    nMatch = math.min(nClosed, nMatchSZ)
+
+    // -- BASELINE accumulators --
+    int totW = 0
+    int totL = 0
+    float sumW = 0.0
+    float sumL = 0.0
+    float sumAll = 0.0
+
+    // -- PER-FILTER accumulators: [filter]_[on/off]_[n/w] --
+    int sr1n = 0
+    int sr1w = 0
+    int sr0n = 0
+    int sr0w = 0
+    int ss1n = 0
+    int ss1w = 0
+    int ss0n = 0
+    int ss0w = 0
+    int pd1n = 0
+    int pd1w = 0
+    int pd0n = 0
+    int pd0w = 0
+    int co1n = 0
+    int co1w = 0
+    int co0n = 0
+    int co0w = 0
+    int fr1n = 0
+    int fr1w = 0
+    int fr0n = 0
+    int fr0w = 0
+    int scHn = 0
+    int scHw = 0
+    int scLn = 0
+    int scLw = 0
+    int lgN  = 0
+    int lgW  = 0
+    int shN  = 0
+    int shW  = 0
+    int muLoN = 0
+    int muLoW = 0
+    int muHiN = 0
+    int muHiW = 0
+    int laLoN = 0
+    int laLoW = 0
+    int laHiN = 0
+    int laHiW = 0
+    int rGeN = 0
+    int rGeW = 0
+    int rLtN = 0
+    int rLtW = 0
+
+    int pSs_bbN = 0
+    int pSs_bbW = 0
+    int pSs_ffN = 0
+    int pSs_ffW = 0
+    int pSs_xrN = 0
+    int pSs_xrW = 0
+    int pSp_bbN = 0
+    int pSp_bbW = 0
+    int pSp_ffN = 0
+    int pSp_ffW = 0
+    int pSp_xrN = 0
+    int pSp_xrW = 0
+    int pSe_bbN = 0
+    int pSe_bbW = 0
+    int pSe_ffN = 0
+    int pSe_ffW = 0
+    int pSe_xrN = 0
+    int pSe_xrW = 0
+    int pSf_bbN = 0
+    int pSf_bbW = 0
+    int pSf_ffN = 0
+    int pSf_ffW = 0
+    int pSf_xrN = 0
+    int pSf_xrW = 0
+    int pRf_bbN = 0
+    int pRf_bbW = 0
+    int pRf_ffN = 0
+    int pRf_ffW = 0
+    int pRf_xrN = 0
+    int pRf_xrW = 0
+    int pPf_bbN = 0
+    int pPf_bbW = 0
+    int pPf_ffN = 0
+    int pPf_ffW = 0
+    int pPf_xrN = 0
+    int pPf_xrW = 0
+
+    // -- SCORE BUCKET accumulators (4 bands) --
+    int sb1n = 0
+    int sb1w = 0
+    int sb2n = 0
+    int sb2w = 0
+    int sb3n = 0
+    int sb3w = 0
+    int sb4n = 0
+    int sb4w = 0
+
+    for i = 0 to nMatch - 1
+        pnl = strategy.closedtrades.profit(i)
+        isW = pnl > 0
+        if isW
+            totW += 1
+            sumW += pnl
+        else
+            totL += 1
+            sumL += pnl
+        sumAll += pnl
+
+        // SR agree
+        if array.get(ev_srAg, i)
+            sr1n += 1
+            if isW
+                sr1w += 1
+        else
+            sr0n += 1
+            if isW
+                sr0w += 1
+
+        // Session
+        if array.get(ev_sess, i)
+            ss1n += 1
+            if isW
+                ss1w += 1
+        else
+            ss0n += 1
+            if isW
+                ss0w += 1
+
+        // PDH/PDL
+        if array.get(ev_pd, i)
+            pd1n += 1
+            if isW
+                pd1w += 1
+        else
+            pd0n += 1
+            if isW
+                pd0w += 1
+
+        // Continuation vs Reversal
+        if array.get(ev_isCont, i)
+            co1n += 1
+            if isW
+                co1w += 1
+        else
+            co0n += 1
+            if isW
+                co0w += 1
+
+        // Freshness
+        if array.get(ev_fresh, i) < evalFreshSp
+            fr1n += 1
+            if isW
+                fr1w += 1
+        else
+            fr0n += 1
+            if isW
+                fr0w += 1
+
+        // Score split
+        sc = array.get(ev_score, i)
+        if sc >= evalScoreSp
+            scHn += 1
+            if isW
+                scHw += 1
+        else
+            scLn += 1
+            if isW
+                scLw += 1
+
+        // Long vs Short
+        if array.get(ev_isLong, i)
+            lgN += 1
+            if isW
+                lgW += 1
+        else
+            shN += 1
+            if isW
+                shW += 1
+
+        // Latency / move consumption (anchors: sweep-close vs BwD-close)
+        float mf = array.get(ev_mu, i)
+        float rf = array.get(ev_rRem, i)
+        int lb = array.get(ev_aLag, i)
+        if not na(mf)
+            if mf < evalMuSplit
+                muLoN += 1
+                if isW
+                    muLoW += 1
+            else
+                muHiN += 1
+                if isW
+                    muHiW += 1
+        if lb >= 0
+            if lb <= evalLagBarsSp
+                laLoN += 1
+                if isW
+                    laLoW += 1
+            else
+                laHiN += 1
+                if isW
+                    laHiW += 1
+        if not na(rf)
+            if rf >= 1.0
+                rGeN += 1
+                if isW
+                    rGeW += 1
+            else
+                rLtN += 1
+                if isW
+                    rLtW += 1
+
+        bool vSr = array.get(ev_srAg, i)
+        bool vSs = array.get(ev_sess, i)
+        bool vPd = array.get(ev_pd, i)
+        bool vFr = array.get(ev_fresh, i) < evalFreshSp
+
+        if vSr and vSs
+            pSs_bbN += 1
+            if isW
+                pSs_bbW += 1
+        else if not vSr and not vSs
+            pSs_ffN += 1
+            if isW
+                pSs_ffW += 1
+        else
+            pSs_xrN += 1
+            if isW
+                pSs_xrW += 1
+
+        if vSr and vPd
+            pSp_bbN += 1
+            if isW
+                pSp_bbW += 1
+        else if not vSr and not vPd
+            pSp_ffN += 1
+            if isW
+                pSp_ffW += 1
+        else
+            pSp_xrN += 1
+            if isW
+                pSp_xrW += 1
+
+        if vSs and vPd
+            pSe_bbN += 1
+            if isW
+                pSe_bbW += 1
+        else if not vSs and not vPd
+            pSe_ffN += 1
+            if isW
+                pSe_ffW += 1
+        else
+            pSe_xrN += 1
+            if isW
+                pSe_xrW += 1
+
+        if vSs and vFr
+            pSf_bbN += 1
+            if isW
+                pSf_bbW += 1
+        else if not vSs and not vFr
+            pSf_ffN += 1
+            if isW
+                pSf_ffW += 1
+        else
+            pSf_xrN += 1
+            if isW
+                pSf_xrW += 1
+
+        if vSr and vFr
+            pRf_bbN += 1
+            if isW
+                pRf_bbW += 1
+        else if not vSr and not vFr
+            pRf_ffN += 1
+            if isW
+                pRf_ffW += 1
+        else
+            pRf_xrN += 1
+            if isW
+                pRf_xrW += 1
+
+        if vPd and vFr
+            pPf_bbN += 1
+            if isW
+                pPf_bbW += 1
+        else if not vPd and not vFr
+            pPf_ffN += 1
+            if isW
+                pPf_ffW += 1
+        else
+            pPf_xrN += 1
+            if isW
+                pPf_xrW += 1
+
+        // Score buckets: <75, 75-84, 85-94, 95+
+        if sc < 75
+            sb1n += 1
+            if isW
+                sb1w += 1
+        else if sc < 85
+            sb2n += 1
+            if isW
+                sb2w += 1
+        else if sc < 95
+            sb3n += 1
+            if isW
+                sb3w += 1
+        else
+            sb4n += 1
+            if isW
+                sb4w += 1
+
+    // -- DERIVED STATS --
+    wr   = nMatch > 0 ? totW * 100.0 / nMatch : 0.0
+    avgW = totW > 0 ? sumW / totW : 0.0
+    avgL = totL > 0 ? sumL / totL : 0.0
+    pf   = sumL != 0 ? math.abs(sumW / sumL) : 0.0
+    expT = nMatch > 0 ? sumAll / nMatch : 0.0
+
+    arrOk = szScr == nClosed and szScr == szMu and szScr == szRm and szScr == szLag ? "OK" : "MISMATCH"
+
+    // -- EVALUATOR TABLE (4 columns, corner from TABLES input) --
+    // Row 0: Header
+    table.cell(tbEvalHud, 0, 0, "  EVALUATOR  ", text_color = cBgDeep, text_size = size.normal, bgcolor = #22d3ee)
+    table.merge_cells(tbEvalHud, 0, 0, 3, 0)
+
+    // Row 1: Baseline header
+    table.cell(tbEvalHud, 0, 1, "  BASELINE", text_color = cCyan, text_size = size.small, bgcolor = color.new(cCyan, 80))
+    table.merge_cells(tbEvalHud, 0, 1, 3, 1)
+
+    // Row 2: Trades / WR
+    table.cell(tbEvalHud, 0, 2, " Closed", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 2, str.tostring(nMatch), text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 2, "Win Rate", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    wrClr = wr >= 55 ? cGreen : wr >= 45 ? cAmber : cRed
+    table.cell(tbEvalHud, 3, 2, str.tostring(math.round(wr, 1)) + "%", text_color = wrClr, text_size = size.tiny, bgcolor = cBgPanel)
+
+    // Row 3: Avg W / Avg L
+    table.cell(tbEvalHud, 0, 3, " Avg Win", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 1, 3, str.tostring(math.round(avgW, 2)), text_color = cGreen, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 3, "Avg Loss", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 3, str.tostring(math.round(avgL, 2)), text_color = cRed, text_size = size.tiny, bgcolor = cBgRow)
+
+    // Row 4: PF / Expectancy
+    table.cell(tbEvalHud, 0, 4, " PF", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    pfClr = pf >= 1.5 ? cGreen : pf >= 1.0 ? cAmber : cRed
+    table.cell(tbEvalHud, 1, 4, str.tostring(math.round(pf, 2)), text_color = pfClr, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 4, "Expect", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    expClr = expT > 0 ? cGreen : cRed
+    table.cell(tbEvalHud, 3, 4, str.tostring(math.round(expT, 2)), text_color = expClr, text_size = size.tiny, bgcolor = cBgPanel)
+
+    // Row 5: Gross
+    table.cell(tbEvalHud, 0, 5, " Gross P&L", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgRow)
+    grossClr = sumAll > 0 ? cGreen : cRed
+    table.cell(tbEvalHud, 1, 5, str.tostring(math.round(sumAll, 2)), text_color = grossClr, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 5, "W / L", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 5, str.tostring(totW) + " / " + str.tostring(totL), text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+
+    // Row 6: Hypothesis header
+    table.cell(tbEvalHud, 0, 6, "  HYPOTHESIS TESTS", text_color = cCyan, text_size = size.small, bgcolor = color.new(cCyan, 80))
+    table.merge_cells(tbEvalHud, 0, 6, 3, 6)
+
+    // Row 7: Column labels
+    table.cell(tbEvalHud, 0, 7, " Filter", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 7, "ON (N WR)", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 7, "OFF (N WR)", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 7, "Delta", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+
+    // Row 8-14: Filter hypothesis rows
+    table.cell(tbEvalHud, 0, 8, " SR Agree", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 1, 8, wrCell(sr1n, sr1w), text_color = cGreen, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 8, wrCell(sr0n, sr0w), text_color = cRed, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 8, deltaCell(sr1n, sr1w, sr0n, sr0w), text_color = cAmber, text_size = size.tiny, bgcolor = cBgRow)
+
+    table.cell(tbEvalHud, 0, 9, " Session", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 9, wrCell(ss1n, ss1w), text_color = cGreen, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 9, wrCell(ss0n, ss0w), text_color = cRed, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 9, deltaCell(ss1n, ss1w, ss0n, ss0w), text_color = cAmber, text_size = size.tiny, bgcolor = cBgPanel)
+
+    table.cell(tbEvalHud, 0, 10, " PDH/PDL", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 1, 10, wrCell(pd1n, pd1w), text_color = cGreen, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 10, wrCell(pd0n, pd0w), text_color = cRed, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 10, deltaCell(pd1n, pd1w, pd0n, pd0w), text_color = cAmber, text_size = size.tiny, bgcolor = cBgRow)
+
+    table.cell(tbEvalHud, 0, 11, " Cont vs Rev", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 11, wrCell(co1n, co1w) + " C", text_color = cCyan, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 11, wrCell(co0n, co0w) + " R", text_color = cAmber, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 11, deltaCell(co1n, co1w, co0n, co0w), text_color = cAmber, text_size = size.tiny, bgcolor = cBgPanel)
+
+    table.cell(tbEvalHud, 0, 12, " Fresh<" + str.tostring(evalFreshSp), text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 1, 12, wrCell(fr1n, fr1w), text_color = cGreen, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 12, wrCell(fr0n, fr0w), text_color = cRed, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 12, deltaCell(fr1n, fr1w, fr0n, fr0w), text_color = cAmber, text_size = size.tiny, bgcolor = cBgRow)
+
+    table.cell(tbEvalHud, 0, 13, " Score>=" + str.tostring(evalScoreSp), text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 13, wrCell(scHn, scHw), text_color = cGreen, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 13, wrCell(scLn, scLw), text_color = cRed, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 13, deltaCell(scHn, scHw, scLn, scLw), text_color = cAmber, text_size = size.tiny, bgcolor = cBgPanel)
+
+    table.cell(tbEvalHud, 0, 14, " Long vs Short", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 1, 14, wrCell(lgN, lgW) + " L", text_color = cGreen, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 14, wrCell(shN, shW) + " S", text_color = cRed, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 14, deltaCell(lgN, lgW, shN, shW), text_color = cAmber, text_size = size.tiny, bgcolor = cBgRow)
+
+    // Row 15-22: pairwise overlap redundancy (heavy AND => double-count risk in confidence)
+    table.cell(tbEvalHud, 0, 15, "  PAIR OVERLAP", text_color = cCyan, text_size = size.small, bgcolor = color.new(cCyan, 80))
+    table.merge_cells(tbEvalHud, 0, 15, 3, 15)
+    table.cell(tbEvalHud, 0, 16, " Pair", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 16, "Both ON", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 16, "Both OFF", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 16, "Split 1=ON", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+
+    table.cell(tbEvalHud, 0, 17, " SR & Ses", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 1, 17, wrCell(pSs_bbN, pSs_bbW), text_color = cGreen, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 17, wrCell(pSs_ffN, pSs_ffW), text_color = cRed, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 17, wrCell(pSs_xrN, pSs_xrW), text_color = cAmber, text_size = size.tiny, bgcolor = cBgRow)
+
+    table.cell(tbEvalHud, 0, 18, " SR & PD", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 18, wrCell(pSp_bbN, pSp_bbW), text_color = cGreen, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 18, wrCell(pSp_ffN, pSp_ffW), text_color = cRed, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 18, wrCell(pSp_xrN, pSp_xrW), text_color = cAmber, text_size = size.tiny, bgcolor = cBgPanel)
+
+    table.cell(tbEvalHud, 0, 19, " Ses & PD", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 1, 19, wrCell(pSe_bbN, pSe_bbW), text_color = cGreen, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 19, wrCell(pSe_ffN, pSe_ffW), text_color = cRed, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 19, wrCell(pSe_xrN, pSe_xrW), text_color = cAmber, text_size = size.tiny, bgcolor = cBgRow)
+
+    table.cell(tbEvalHud, 0, 20, " Ses & Fresh", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 20, wrCell(pSf_bbN, pSf_bbW), text_color = cGreen, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 20, wrCell(pSf_ffN, pSf_ffW), text_color = cRed, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 20, wrCell(pSf_xrN, pSf_xrW), text_color = cAmber, text_size = size.tiny, bgcolor = cBgPanel)
+
+    table.cell(tbEvalHud, 0, 21, " SR & Fresh", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 1, 21, wrCell(pRf_bbN, pRf_bbW), text_color = cGreen, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 21, wrCell(pRf_ffN, pRf_ffW), text_color = cRed, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 21, wrCell(pRf_xrN, pRf_xrW), text_color = cAmber, text_size = size.tiny, bgcolor = cBgRow)
+
+    table.cell(tbEvalHud, 0, 22, " PD & Fresh", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 22, wrCell(pPf_bbN, pPf_bbW), text_color = cGreen, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 22, wrCell(pPf_ffN, pPf_ffW), text_color = cRed, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 22, wrCell(pPf_xrN, pPf_xrW), text_color = cAmber, text_size = size.tiny, bgcolor = cBgPanel)
+
+    // Row 23-26: Latency vs move hypothesis (MU = path to engine draw-target consumed at entry-close)
+    table.cell(tbEvalHud, 0, 23, "  LATENCY VS MOVE", text_color = cCyan, text_size = size.small, bgcolor = color.new(cCyan, 80))
+    table.merge_cells(tbEvalHud, 0, 23, 3, 23)
+
+    table.cell(tbEvalHud, 0, 24, " MU<" + str.tostring(evalMuSplit), text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 24, wrCell(muLoN, muLoW), text_color = cGreen, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 24, wrCell(muHiN, muHiW), text_color = cRed, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 24, deltaCell(muLoN, muLoW, muHiN, muHiW), text_color = cAmber, text_size = size.tiny, bgcolor = cBgPanel)
+
+    table.cell(tbEvalHud, 0, 25, " Lag<=" + str.tostring(evalLagBarsSp) + "b", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 1, 25, wrCell(laLoN, laLoW), text_color = cGreen, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 25, wrCell(laHiN, laHiW), text_color = cRed, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 25, deltaCell(laLoN, laLoW, laHiN, laHiW), text_color = cAmber, text_size = size.tiny, bgcolor = cBgRow)
+
+    table.cell(tbEvalHud, 0, 26, " R_rem>=1", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 26, wrCell(rGeN, rGeW), text_color = cGreen, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 26, wrCell(rLtN, rLtW), text_color = cRed, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 26, deltaCell(rGeN, rGeW, rLtN, rLtW), text_color = cAmber, text_size = size.tiny, bgcolor = cBgPanel)
+
+    // Row 27: Score buckets header
+    table.cell(tbEvalHud, 0, 27, "  SCORE DISTRIBUTION", text_color = cCyan, text_size = size.small, bgcolor = color.new(cCyan, 80))
+    table.merge_cells(tbEvalHud, 0, 27, 3, 27)
+
+    // Row 28-31: Score bands
+    table.cell(tbEvalHud, 0, 28, " <75", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 28, str.tostring(sb1n) + " trades", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 28, "WR", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 28, wrCell(sb1n, sb1w), text_color = sb1n > 0 ? cAmber : cDim, text_size = size.tiny, bgcolor = cBgPanel)
+
+    table.cell(tbEvalHud, 0, 29, " 75-84", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 1, 29, str.tostring(sb2n) + " trades", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 29, "WR", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 29, wrCell(sb2n, sb2w), text_color = sb2n > 0 ? cAmber : cDim, text_size = size.tiny, bgcolor = cBgRow)
+
+    table.cell(tbEvalHud, 0, 30, " 85-94", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 30, str.tostring(sb3n) + " trades", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 2, 30, "WR", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 3, 30, wrCell(sb3n, sb3w), text_color = sb3n > 0 ? cGreen : cDim, text_size = size.tiny, bgcolor = cBgPanel)
+
+    table.cell(tbEvalHud, 0, 31, " 95+", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 1, 31, str.tostring(sb4n) + " trades", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 2, 31, "WR", text_color = cTextMute, text_size = size.tiny, bgcolor = cBgRow)
+    table.cell(tbEvalHud, 3, 31, wrCell(sb4n, sb4w), text_color = sb4n > 0 ? cGreen : cDim, text_size = size.tiny, bgcolor = cBgRow)
+
+    // Row 32: Signal funnel
+    table.cell(tbEvalHud, 0, 32, "  SIGNAL FUNNEL", text_color = cCyan, text_size = size.small, bgcolor = color.new(cCyan, 80))
+    table.merge_cells(tbEvalHud, 0, 32, 3, 32)
+
+    // Row 33: Funnel data + array check
+    table.cell(tbEvalHud, 0, 33, " Raw " + str.tostring(rawLN) + "L " + str.tostring(rawSN) + "S", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    table.cell(tbEvalHud, 1, 33, "Exec " + str.tostring(sigLN) + "L " + str.tostring(sigSN) + "S", text_color = cTextPri, text_size = size.tiny, bgcolor = cBgPanel)
+    passRate = (rawLN + rawSN) > 0 ? math.round((sigLN + sigSN) * 100.0 / (rawLN + rawSN)) : 0
+    table.cell(tbEvalHud, 2, 33, "Pass " + str.tostring(passRate) + "%", text_color = cAmber, text_size = size.tiny, bgcolor = cBgPanel)
+    arrClr = arrOk == "OK" ? cGreen : cRed
+    table.cell(tbEvalHud, 3, 33, "Arr:" + arrOk + " " + str.tostring(nArr) + "/" + str.tostring(nClosed), text_color = arrClr, text_size = size.tiny, bgcolor = cBgPanel)
+
+// ----------------------------------------------------------------------------
+// ADVISOR PANEL — corner / visibility via TABLES inputs
+// ----------------------------------------------------------------------------
+if showPanel and barstate.islast
+    cornerAd = advTblPos
+    if tbAdvCornerKey != cornerAd
+        tbAdvCornerKey := cornerAd
+        if not na(tbAdvHud)
+            table.delete(tbAdvHud)
+            tbAdvHud := na
+    if na(tbAdvHud)
+        tbAdvHud := table.new(tableCorner(cornerAd), 2, 17, bgcolor = cBgDeep, border_color = cPurple, border_width = 1, frame_color = cPurple, frame_width = 2)
+
+    table.cell(tbAdvHud, 0, 0, "  ERL IRL ENGINE v2.6  ", text_color = cCyan, text_size = size.normal, bgcolor = color.new(cPurple, 60))
+    table.merge_cells(tbAdvHud, 0, 0, 1, 0)
+
+    modeClr = mode == "REVERSAL" ? cAmber : mode == "CONTINUATION" ? cCyan : cDim
+    table.cell(tbAdvHud, 0, 1, "  MODE", text_color = cTextMute, text_size = size.small, text_halign = text.align_left, bgcolor = cBgPanel)
+    table.cell(tbAdvHud, 1, 1, mode + "  ", text_color = modeClr, text_size = size.normal, text_halign = text.align_right, bgcolor = cBgPanel)
+
+    biasClr = bias == "LONG" ? cGreen : bias == "SHORT" ? cRed : cDim
+    table.cell(tbAdvHud, 0, 2, "  BIAS", text_color = cTextMute, text_size = size.small, text_halign = text.align_left, bgcolor = cBgRow)
+    table.cell(tbAdvHud, 1, 2, bias + "  ", text_color = biasClr, text_size = size.normal, text_halign = text.align_right, bgcolor = cBgRow)
+
+    evtStr = mode == "REVERSAL" ? (lastSweepType == "BSL" ? "BSL Raided" : "SSL Raided") : mode == "CONTINUATION" ? (lastBwDType == "BULL" ? "Bull BwD" : "Bear BwD") : "None"
+    table.cell(tbAdvHud, 0, 3, "  LAST EVENT", text_color = cTextMute, text_size = size.small, text_halign = text.align_left, bgcolor = cBgPanel)
+    table.cell(tbAdvHud, 1, 3, evtStr + "  ", text_color = cAmber, text_size = size.small, text_halign = text.align_right, bgcolor = cBgPanel)
+
+    table.cell(tbAdvHud, 0, 4, "  DRAW TARGET", text_color = cTextMute, text_size = size.small, text_halign = text.align_left, bgcolor = cBgRow)
+    table.cell(tbAdvHud, 1, 4, drawTarget + "  ", text_color = cCyan, text_size = size.small, text_halign = text.align_right, bgcolor = cBgRow)
+
+    tgtStr = na(drawTargetPx) ? "---" : str.tostring(drawTargetPx, format.mintick)
+    table.cell(tbAdvHud, 0, 5, "  TARGET PX", text_color = cTextMute, text_size = size.small, text_halign = text.align_left, bgcolor = cBgPanel)
+    table.cell(tbAdvHud, 1, 5, tgtStr + "  ", text_color = cCyan, text_size = size.small, text_halign = text.align_right, bgcolor = cBgPanel)
+
+    scoreClr = score >= 75 ? cGreen : score >= 50 ? cAmber : cRed
+    table.cell(tbAdvHud, 0, 6, "  CONFIDENCE", text_color = cTextMute, text_size = size.small, text_halign = text.align_left, bgcolor = cBgRow)
+    table.cell(tbAdvHud, 1, 6, str.tostring(score) + " / 100  ", text_color = scoreClr, text_size = size.normal, text_halign = text.align_right, bgcolor = cBgRow)
+
+    srTrendStr = srTrend == 1 ? "BULL" : srTrend == -1 ? "BEAR" : "---"
+    srTrendClr = srTrend == 1 ? cGreen : srTrend == -1 ? cRed : cDim
+    srTag = srAgNow ? " OK" : ""
+    table.cell(tbAdvHud, 0, 7, "  SR TREND", text_color = cTextMute, text_size = size.small, text_halign = text.align_left, bgcolor = cBgPanel)
+    table.cell(tbAdvHud, 1, 7, srTrendStr + srTag + "  ", text_color = srTrendClr, text_size = size.small, text_halign = text.align_right, bgcolor = cBgPanel)
+
+    sessStr = inSess ? (inLon and inNY ? "London+NY" : inLon ? "London" : "NY") : "Off"
+    sessClr = inSess ? cGreen : cDim
+    table.cell(tbAdvHud, 0, 8, "  SESSION", text_color = cTextMute, text_size = size.small, text_halign = text.align_left, bgcolor = cBgRow)
+    table.cell(tbAdvHud, 1, 8, sessStr + "  ", text_color = sessClr, text_size = size.small, text_halign = text.align_right, bgcolor = cBgRow)
+
+    string action = "WAIT"
+    color  actClr = cDim
+    if score >= 75
+        if mode == "REVERSAL"
+            action := bias == "LONG" ? "HUNT LONGS" : "HUNT SHORTS"
+            actClr := bias == "LONG" ? cGreen : cRed
+        else if mode == "CONTINUATION"
+            if inBwDZone
+                action := bias == "LONG" ? "ENTER LONG" : "ENTER SHORT"
+                actClr := bias == "LONG" ? cGreen : cRed
+            else
+                action := "WAIT RETRACE"
+                actClr := cAmber
+    else if score >= 50
+        action := "MONITOR"
+        actClr := cAmber
+    table.cell(tbAdvHud, 0, 9, "  ACTION", text_color = cTextMute, text_size = size.small, text_halign = text.align_left, bgcolor = cBgPanel)
+    table.cell(tbAdvHud, 1, 9, action + "  ", text_color = actClr, text_size = size.normal, text_halign = text.align_right, bgcolor = cBgPanel)
+
+    table.cell(tbAdvHud, 0, 10, "NLF // v2.6 OV", text_color = cPurple, text_size = size.tiny, bgcolor = cBgDeep)
+    table.merge_cells(tbAdvHud, 0, 10, 1, 10)
+
+// ----------------------------------------------------------------------------
+//  ALERTS
+// ----------------------------------------------------------------------------
+alertcondition(bslSweep, "BSL Swept", "Buy-side stops taken.")
+alertcondition(sslSweep, "SSL Swept", "Sell-side stops taken.")
+alertcondition(bullBwD, "Bull BwD", "Bullish displacement.")
+alertcondition(bearBwD, "Bear BwD", "Bearish displacement.")
+alertcondition(bwdZoneEntry, "BwD Retrace", "Price entered BwD zone.")
+alertcondition(highScoreEdge, "Score 75+", "Confidence crossed 75.")
+alertcondition(srLongAlign, "SR Long Align", "SR + ERL/IRL long confluence.")
+alertcondition(srShortAlign, "SR Short Align", "SR + ERL/IRL short confluence.")

@@ -1,0 +1,287 @@
+{
+  "timestamp": "2026-05-30T00:14:51.987Z",
+  "runDir": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\cr3_prod_compare_2026-05-30T00-14-49",
+  "baselineDir": "C:\\Users\\dypag\\tradingview-mcp\\data\\grid_runs\\cr3_trade_review_2026-05-30T00-00-54",
+  "chart": {
+    "symbol": "CME_MINI:MNQ1!",
+    "timeframe": "5",
+    "entity_id": "sMhEyg"
+  },
+  "strategy_tester": {
+    "totalTrades": 108,
+    "netProfit": 715.080000000002,
+    "profitFactor": 1.3739566990900542,
+    "percentProfitable": 0.49074074074074076
+  },
+  "baseline": {
+    "label": "baseline_1m_wick_loose",
+    "n": 250,
+    "net": 2114.5,
+    "wr": 44.8,
+    "pf": 1.42,
+    "avg_win": 63.43,
+    "avg_loss": -36.16,
+    "with_label_snap": 250,
+    "entry_types": {
+      "CR3_WL": {
+        "n": 144,
+        "pnl": 1018.4399999999989
+      },
+      "CR3_WU": {
+        "n": 106,
+        "pnl": 1096.0599999999995
+      }
+    },
+    "exit_breakdown": {
+      "TP_40": {
+        "n": 78,
+        "pnl": 6143.280000000011
+      },
+      "SL_20": {
+        "n": 96,
+        "pnl": -4009.03999999999
+      },
+      "ADX_Block": {
+        "n": 64,
+        "pnl": 173.13999999999982
+      },
+      "Other": {
+        "n": 12,
+        "pnl": -192.88000000000005
+      }
+    },
+    "top_buckets": [
+      {
+        "bucket": "W_L_2",
+        "n": 37,
+        "pnl": 837.62,
+        "wr": 59.5
+      },
+      {
+        "bucket": "W_U_2",
+        "n": 36,
+        "pnl": 539.86,
+        "wr": 44.4
+      },
+      {
+        "bucket": "W_U_OB",
+        "n": 12,
+        "pnl": 314.12,
+        "wr": 58.3
+      },
+      {
+        "bucket": "W_U_1",
+        "n": 17,
+        "pnl": 182.92,
+        "wr": 41.2
+      },
+      {
+        "bucket": "W_L_3+",
+        "n": 73,
+        "pnl": 151.98,
+        "wr": 38.4
+      },
+      {
+        "bucket": "W_U_3+",
+        "n": 41,
+        "pnl": 59.16,
+        "wr": 41.5
+      },
+      {
+        "bucket": "W_L_1",
+        "n": 25,
+        "pnl": 24.5,
+        "wr": 48
+      },
+      {
+        "bucket": "W_L_OS",
+        "n": 9,
+        "pnl": 4.34,
+        "wr": 33.3
+      }
+    ]
+  },
+  "prod": {
+    "label": "prod_preset_5m",
+    "n": 107,
+    "net": 0,
+    "wr": 0,
+    "pf": null,
+    "avg_win": 0,
+    "avg_loss": 0,
+    "with_label_snap": 97,
+    "entry_types": {
+      "CR3_WL": {
+        "n": 84,
+        "pnl": 0
+      },
+      "CR3_L": {
+        "n": 5,
+        "pnl": 0
+      },
+      "CR3_WU": {
+        "n": 13,
+        "pnl": 0
+      },
+      "CR3_S": {
+        "n": 5,
+        "pnl": 0
+      }
+    },
+    "exit_breakdown": {
+      "SL_10": {
+        "n": 30,
+        "pnl": 0
+      },
+      "Other": {
+        "n": 37,
+        "pnl": 0
+      },
+      "SL_20": {
+        "n": 8,
+        "pnl": 0
+      },
+      "TP_20": {
+        "n": 30,
+        "pnl": 0
+      },
+      "TP_40": {
+        "n": 2,
+        "pnl": 0
+      }
+    },
+    "top_buckets": [
+      {
+        "bucket": "W_L_2",
+        "n": 45,
+        "pnl": 0,
+        "wr": 0
+      },
+      {
+        "bucket": "?",
+        "n": 10,
+        "pnl": 0,
+        "wr": 0
+      },
+      {
+        "bucket": "W_L_3+",
+        "n": 26,
+        "pnl": 0,
+        "wr": 0
+      },
+      {
+        "bucket": "W_L_OS",
+        "n": 13,
+        "pnl": 0,
+        "wr": 0
+      },
+      {
+        "bucket": "W_U_OB",
+        "n": 13,
+        "pnl": 0,
+        "wr": 0
+      }
+    ]
+  },
+  "delta": {
+    "trades": -143,
+    "net": -2114.5,
+    "wr": -44.8,
+    "pf": null,
+    "trades_per_day": {
+      "baseline": 16.7,
+      "prod": 7.1
+    },
+    "net_per_trade": {
+      "baseline": 8.46,
+      "prod": 0,
+      "delta": -8.46
+    }
+  },
+  "inputs_snapshot": {
+    "in_0": "5",
+    "in_1": 9,
+    "in_2": 21,
+    "in_3": 50,
+    "in_4": 3,
+    "in_5": 5,
+    "in_6": 0.15,
+    "in_7": 12,
+    "in_8": 26,
+    "in_9": 9,
+    "in_10": 1,
+    "in_11": 14,
+    "in_12": "2-Bar",
+    "in_13": 14,
+    "in_14": 14,
+    "in_15": 18,
+    "in_16": 35,
+    "in_17": true,
+    "in_18": 21,
+    "in_19": 14,
+    "in_20": 9,
+    "in_21": "Direction Change",
+    "in_22": true,
+    "in_23": true,
+    "in_24": 20,
+    "in_25": 2,
+    "in_26": 14,
+    "in_27": 30,
+    "in_28": 70,
+    "in_29": 3,
+    "in_30": 20,
+    "in_31": 10,
+    "in_32": true,
+    "in_33": "0930-1600",
+    "in_34": true,
+    "in_35": true,
+    "in_36": true,
+    "in_37": 2,
+    "in_38": 4,
+    "in_39": 4,
+    "in_40": false,
+    "in_41": true,
+    "in_42": true,
+    "in_43": false,
+    "in_44": true,
+    "in_45": true,
+    "in_46": 10,
+    "in_47": 12,
+    "in_48": 0,
+    "in_49": true,
+    "in_50": true,
+    "in_51": 35,
+    "in_52": true,
+    "in_53": true,
+    "in_54": true,
+    "in_55": true,
+    "in_56": 0,
+    "in_57": "fixed",
+    "in_58": 1,
+    "in_59": 1000000,
+    "in_60": "cash_per_contract",
+    "in_61": 0.62,
+    "in_62": 1,
+    "in_63": false,
+    "in_64": true,
+    "in_65": false,
+    "in_66": 0,
+    "in_67": "NONE",
+    "in_68": "FIFO",
+    "in_69": 100,
+    "in_70": 100,
+    "in_71": 2,
+    "in_72": false,
+    "in_73": false,
+    "in_74": "BACKTEST",
+    "in_75": "",
+    "in_76": "order_fills",
+    "in_77": "",
+    "in_78": true,
+    "in_79": ""
+  },
+  "interpretation": [
+    "Trade count cut sharply — less commission drag, less chop exposure.",
+    "Profit factor lower — fewer trades; check if net/trade improved."
+  ]
+}
