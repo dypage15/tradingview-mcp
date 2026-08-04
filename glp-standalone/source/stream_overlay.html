@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GLP Stream Companion</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: transparent;
+      --panel: rgba(10, 16, 14, 0.82);
+      --line: rgba(61, 224, 197, 0.35);
+      --text: #eef6f1;
+      --muted: #9bb0a6;
+      --cyan: #3de0c5;
+      --amber: #e6c35c;
+      --coral: #ff8a7a;
+      --green: #7dffb3;
+      --mono: "IBM Plex Mono", monospace;
+      --sans: "DM Sans", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow: hidden;
+    }
+    body.desk { background: #0b1210; overflow: auto; }
+
+    .wrap {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+      height: 100%;
+      padding: 16px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 12px;
+      backdrop-filter: blur(8px);
+    }
+
+    .disclaimer {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--amber);
+      background: rgba(20, 16, 8, 0.85);
+      border: 1px solid rgba(230, 195, 92, 0.45);
+      border-radius: 8px;
+      padding: 8px 12px;
+      max-width: 420px;
+      text-align: right;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      backdrop-filter: blur(10px);
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .regime {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .regime.positive { color: var(--green); }
+    .regime.negative { color: var(--coral); }
+    .regime.transition, .regime.unknown { color: var(--amber); }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    .levels {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .lvl {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 8px;
+      background: rgba(0,0,0,0.25);
+    }
+    .lvl b {
+      display: block;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .lvl span { font-size: 16px; font-weight: 700; }
+
+    .prompt-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 8px;
+    }
+    .prompt {
+      font-size: 22px;
+      line-height: 1.35;
+      min-height: 4.2em;
+    }
+    .prompt-meta {
+      margin-top: 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .lower {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+    .ticker {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-family: var(--mono);
+      font-size: 15px;
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .controls {
+      display: none;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    body.desk .controls { display: flex; }
+    .controls button, .controls select {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: #16241e;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .watch-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .watch-list li { margin: 6px 0; }
+    .watch-list li.active { color: var(--text); }
+
+    body.compact .main { grid-template-columns: 1fr; }
+    body.compact .card.map { display: none; }
+    body.lower-only .main, body.lower-only .top { display: none; }
+    body.lower-only .wrap { grid-template-rows: 1fr; align-content: end; }
+
+    .status { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  </style>
+</head>
+<body class="desk">
+  <div class="wrap">
+    <div class="controls">
+      <select id="mode">
+        <option value="desk">Director desk (full)</option>
+        <option value="overlay">OBS overlay (transparent)</option>
+        <option value="compact">Compact prompt</option>
+        <option value="lower">Lower-third only</option>
+      </select>
+      <select id="symbol">
+        <option>NQ</option><option>ES</option><option>GC</option>
+      </select>
+      <select id="session">
+        <option value="rth">RTH</option>
+        <option value="asia">Asia</option>
+        <option value="london">London</option>
+      </select>
+      <button type="button" id="refresh">Refresh book</button>
+      <button type="button" id="prev">◀ Beat</button>
+      <button type="button" id="next">Beat ▶</button>
+      <button type="button" id="auto">Auto-advance: off</button>
+      <span class="status" id="status">waiting…</span>
+    </div>
+
+    <div class="top">
+      <div class="badge" id="badge">GLP · STREAM COMPANION</div>
+      <div class="disclaimer" id="disclaimer">Educational only · Not financial advice</div>
+    </div>
+
+    <div class="main">
+      <section class="card">
+        <div class="prompt-label">Say this next</div>
+        <div class="prompt" id="prompt">Waiting for a live book…</div>
+        <div class="prompt-meta" id="promptMeta">beat 0 / 0</div>
+      </section>
+      <section class="card map">
+        <div class="regime" id="regime">—</div>
+        <h1 id="headline">No snapshot yet</h1>
+        <p id="oneliner" style="color:var(--muted);margin:0"></p>
+        <div class="levels" id="levels"></div>
+        <div class="prompt-label" style="margin-top:14px">Watch list</div>
+        <ol class="watch-list" id="watch"></ol>
+      </section>
+    </div>
+
+    <div class="lower">
+      <div class="ticker" id="ticker">GLP · waiting for stream state</div>
+    </div>
+  </div>
+
+  <script>
+    const qs = new URLSearchParams(location.search);
+    let state = null;
+    let beat = 0;
+    let auto = false;
+    let autoTimer = null;
+    let thirdIdx = 0;
+
+    const $ = (id) => document.getElementById(id);
+
+    function applyMode(mode) {
+      document.body.className = "";
+      if (mode === "overlay") { /* transparent */ }
+      else if (mode === "compact") document.body.classList.add("compact");
+      else if (mode === "lower") document.body.classList.add("lower-only");
+      else document.body.classList.add("desk");
+      localStorage.setItem("glp-stream-mode", mode);
+    }
+
+    function render() {
+      if (!state || !state.track) {
+        $("status").textContent = "no state — hit Refresh or wait for GLP";
+        return;
+      }
+      const t = state.track;
+      const beats = t.beats || [];
+      beat = Math.max(0, Math.min(beat, Math.max(0, beats.length - 1)));
+      const b = beats[beat] || { role: "—", text: "—" };
+
+      $("regime").textContent = `${t.regime || "?"} gamma · ${t.confidence || ""} · ${t.term_structure || ""}`;
+      $("regime").className = "regime " + (t.regime || "unknown");
+      $("headline").textContent = t.headline || t.futures;
+      $("oneliner").textContent = t.oneliner || "";
+      $("disclaimer").textContent = t.disclaimer || "Educational only · Not financial advice";
+      $("badge").textContent = `GLP · ${t.futures} · ${(t.session || "").toUpperCase()}`;
+
+      const lv = t.levels || {};
+      $("levels").innerHTML = ["spot","flip","pin","call_wall","put_wall","air_pocket"].map((k) =>
+        `<div class="lvl"><b>${k.replace("_"," ")}</b><span>${lv[k] ?? "n/a"}</span></div>`
+      ).join("");
+
+      $("watch").innerHTML = (t.watch || []).map((w, i) =>
+        `<li class="${b.text === w ? "active" : ""}">${w}</li>`
+      ).join("");
+
+      $("prompt").textContent = b.text;
+      $("promptMeta").textContent = `${b.role} · beat ${beat + 1} / ${beats.length}` +
+        (state.updated_at ? ` · ${state.updated_at}` : "");
+
+      const thirds = t.lower_thirds || [];
+      if (thirds.length) {
+        $("ticker").textContent = thirds[thirdIdx % thirds.length];
+      }
+      $("status").textContent = state.source || "ok";
+    }
+
+    async function pull() {
+      try {
+        const r = await fetch("/api/state", { cache: "no-store" });
+        state = await r.json();
+        render();
+      } catch (e) {
+        $("status").textContent = "fetch failed";
+      }
+    }
+
+    async function refreshBook() {
+      $("status").textContent = "pulling book…";
+      const body = {
+        symbol: $("symbol").value,
+        session: $("session").value,
+      };
+      try {
+        const r = await fetch("/api/refresh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        state = await r.json();
+        beat = 0;
+        render();
+      } catch (e) {
+        $("status").textContent = "refresh failed";
+      }
+    }
+
+    $("mode").value = qs.get("mode") || localStorage.getItem("glp-stream-mode") || "desk";
+    applyMode($("mode").value);
+    $("mode").onchange = () => applyMode($("mode").value);
+    $("prev").onclick = () => { beat--; render(); };
+    $("next").onclick = () => { beat++; render(); };
+    $("refresh").onclick = refreshBook;
+    $("auto").onclick = () => {
+      auto = !auto;
+      $("auto").textContent = "Auto-advance: " + (auto ? "on" : "off");
+      clearInterval(autoTimer);
+      if (auto) autoTimer = setInterval(() => { beat++; render(); }, 12000);
+    };
+
+    setInterval(pull, 5000);
+    setInterval(() => {
+      if (!state?.track?.lower_thirds?.length) return;
+      thirdIdx++;
+      render();
+    }, 7000);
+
+    if (qs.get("mode") === "overlay" || qs.get("mode") === "lower") {
+      document.body.classList.remove("desk");
+      applyMode(qs.get("mode"));
+    }
+    pull();
+  </script>
+</body>
+</html>

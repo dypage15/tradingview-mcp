@@ -1,0 +1,5 @@
+# Optional Discord bridge for GLP (webhook + mention bot).
+# Install:  pip install -r requirements-discord.txt
+-r requirements.txt
+discord.py>=2.3,<3
+
